@@ -16,9 +16,8 @@ class _TribePageState extends State<TribePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: isMember
-            ? Text('Tribe Hangout')
-            : Text('Find a Tribe you belong in'),
+        title:
+            isMember ? Text('Tribe Hangout') : Text('Join or Create a Tribe'),
       ),
       body: ListView(
         // crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,6 +54,39 @@ class _TribePageState extends State<TribePage> {
               child: Text('Join'),
             ),
           ),
+          Divider(
+            thickness: 0.5,
+            indent: 10,
+            endIndent: 10,
+          ),
+          Center(
+            child: Text(
+              'Create a Tribe',
+              style: Theme.of(context).textTheme.bodyText1,
+              textScaleFactor: 1.5,
+            ),
+          ),
+          IconButton(
+              icon: Stack(children: [
+                Icon(Icons.festival),
+                Positioned(
+                  child: Text(
+                    '+',
+                    textScaleFactor: 1.1,
+                    style: TextStyle(color: Theme.of(context).accentColor),
+                  ),
+                  top: 0,
+                  right: 0,
+                )
+              ]),
+              onPressed: () {
+                print('Create Tribe');
+              }),
+          Divider(
+            thickness: 0.5,
+            indent: 10,
+            endIndent: 10,
+          ),
           Center(
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -62,14 +94,26 @@ class _TribePageState extends State<TribePage> {
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('Top Tribes in your area'),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      'Top Tribes in your area',
+                      style: Theme.of(context).textTheme.headline6,
+                    ),
                     ...[1, 2, 3]
                         .map((e) => SizedBox(
                               width: MediaQuery.of(context).size.width * 0.9,
                               child: TribeCard(),
                             ))
                         .toList(),
-                    Text('Tribes with most friends in them'),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      'Tribes with most friends in them',
+                      style: Theme.of(context).textTheme.headline6,
+                    ),
                     ...[1, 2, 3]
                         .map((e) => SizedBox(
                               width: MediaQuery.of(context).size.width * 0.9,
