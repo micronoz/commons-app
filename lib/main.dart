@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tribal_instinct/pages/home.dart';
 
+//TODO need to add user state management
+
 void main() {
   runApp(MyApp());
 }
@@ -14,7 +16,7 @@ class MyApp extends StatelessWidget {
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
         primarySwatch: Colors.blue,
-        accentColor: Colors.red,
+        accentColor: Colors.blueGrey,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: HomePage(),
