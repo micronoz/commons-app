@@ -1,4 +1,4 @@
-package com.example.tribal_instinct
+package com.nozberkman.tribal_instinct
 
 import io.flutter.embedding.android.FlutterActivity
 
