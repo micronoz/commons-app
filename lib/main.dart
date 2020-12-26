@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:tribal_instinct/pages/home.dart';
 
 import 'managers/auth.dart';
@@ -36,16 +37,20 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Tribal Instinct',
-      theme: ThemeData(
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
-        primarySwatch: Colors.blue,
-        accentColor: Colors.red,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: HomePage(),
-    );
+    return MultiProvider(
+        providers: [
+          Provider.value(value: widget.userManager.currentUser.value)
+        ],
+        child: MaterialApp(
+          title: 'Tribal Instinct',
+          theme: ThemeData(
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            primarySwatch: Colors.blue,
+            accentColor: Colors.red,
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+          ),
+          home: HomePage(),
+        ));
   }
 }

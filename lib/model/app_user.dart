@@ -32,6 +32,12 @@ class AppUser extends ChangeNotifier {
         "Hello my name is Nabi");
   }
 
+  AppUser() : this.id = '1' {
+    this.name = 'Nabi';
+    this.summary = 'Hello my name is Nabi';
+    this.photo = NetworkImage('https://picsum.photos/250?image=11');
+  }
+
   Map<String, dynamic> toJson() => {
         'id': id,
       };
