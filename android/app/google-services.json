@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "600024232537",
+    "project_id": "tribal-instinct",
+    "storage_bucket": "tribal-instinct.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:600024232537:android:13e245c48f4be3b1b5b748",
+        "android_client_info": {
+          "package_name": "com.nozberkman.tribal_instinct"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "600024232537-lsas356aidn86gsuq46rvu41d8qq977e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nozberkman.tribal_instinct",
+            "certificate_hash": "4e28965974321997767e489f90775f6481d83b66"
+          }
+        },
+        {
+          "client_id": "600024232537-ice3hj3saqivs750pc5vn38c1rukl5np.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWVmZrU-v27-EvbVX62su3DN87VailNZU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "600024232537-ice3hj3saqivs750pc5vn38c1rukl5np.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
