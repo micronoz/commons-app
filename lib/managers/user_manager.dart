@@ -22,6 +22,10 @@ class UserManager {
     return Provider.of<UserManager>(context, listen: false);
   }
 
+  Future<AppUser> _getUserProfile() async {
+    return AppUser.fromJson({'id': '1'});
+  }
+
   UserManager._(
     AppUser currentUser,
   ) : this.currentUser = ValueNotifier<AppUser>(currentUser);

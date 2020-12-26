@@ -11,22 +11,9 @@ class AppUser extends ChangeNotifier {
   String address;
 
   AppUser._(this.id, this.name, photoUrl, this.summary) {
-    if (!["", null].contains(photoUrl))
-      this.photo = NetworkImage(
-        photoUrl,
-        // loadingBuilder: (context, child, progress) {
-        //   if (progress == null) return child;
-        //   return Center(
-        //     child: CircularProgressIndicator(
-        //       value: progress.expectedTotalBytes != null
-        //           ? progress.cumulativeBytesLoaded / progress.expectedTotalBytes
-        //           : null,
-        //     ),
-        //   );
-        // },
-      );
-    else
-      this.photo = AssetImage('assets/profile_photo.png');
+    this.photo = NetworkImage(
+      photoUrl,
+    );
   }
 
   void updateUserPosition() async {
@@ -40,10 +27,9 @@ class AppUser extends ChangeNotifier {
   }
 
   static AppUser fromJson(Map<String, dynamic> json) {
-    // return AppUser._(
-    //     json['id'], json['name'], json['photoUrl'], json['summary']);
-
-    return AppUser._(json['id'], "Nabi", "", "Hello my name is Nabi");
+    //TODO Parse json
+    return AppUser._(json['id'], "Nabi", "https://picsum.photos/250?image=11",
+        "Hello my name is Nabi");
   }
 
   Map<String, dynamic> toJson() => {
