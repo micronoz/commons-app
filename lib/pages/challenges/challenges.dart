@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tribal_instinct/pages/challenges/battles.dart';
 import 'package:tribal_instinct/pages/challenges/quests.dart';
 
 import 'alliances.dart';
@@ -14,7 +13,7 @@ class _ChallengesPageState extends State<ChallengesPage>
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-        length: 3,
+        length: 2,
         child: Scaffold(
           appBar: AppBar(
             title: Text('Events'),
@@ -24,16 +23,12 @@ class _ChallengesPageState extends State<ChallengesPage>
                   text: 'Alliance',
                 ),
                 Tab(
-                  text: 'Battle',
-                ),
-                Tab(
                   text: 'Quest',
                 )
               ],
             ),
           ),
-          body: TabBarView(
-              children: [AlliancesPage(), BattlesPage(), QuestsPage()]),
+          body: TabBarView(children: [AlliancesPage(), QuestsPage()]),
         ));
   }
 }

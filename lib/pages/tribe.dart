@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tribal_instinct/components/tribe_card.dart';
+import 'package:tribal_instinct/pages/create_tribe.dart';
 
 class TribePage extends StatefulWidget {
   @override
@@ -55,9 +56,7 @@ class _TribePageState extends State<TribePage> {
             ),
           ),
           Divider(
-            thickness: 0.5,
-            indent: 10,
-            endIndent: 10,
+            thickness: 10,
           ),
           Center(
             child: Text(
@@ -80,12 +79,11 @@ class _TribePageState extends State<TribePage> {
                 )
               ]),
               onPressed: () {
-                print('Create Tribe');
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => CreateTribePage()));
               }),
           Divider(
-            thickness: 0.5,
-            indent: 10,
-            endIndent: 10,
+            thickness: 10,
           ),
           Center(
             child: Row(

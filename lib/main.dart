@@ -38,19 +38,17 @@ class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-        providers: [
-          Provider.value(value: widget.userManager.currentUser.value)
-        ],
-        child: MaterialApp(
-          title: 'Tribal Instinct',
-          theme: ThemeData(
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            primarySwatch: Colors.blue,
-            accentColor: Colors.red,
-            visualDensity: VisualDensity.adaptivePlatformDensity,
-          ),
-          home: HomePage(),
-        ));
+      providers: [Provider.value(value: widget.userManager.currentUser.value)],
+      child: MaterialApp(
+        title: 'Tribal Instinct',
+        theme: ThemeData(
+          // platform: TargetPlatform.iOS,
+          primarySwatch: Colors.cyan,
+          accentColor: Colors.orangeAccent,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        home: HomePage(),
+      ),
+    );
   }
 }

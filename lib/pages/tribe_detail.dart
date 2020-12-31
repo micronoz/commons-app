@@ -12,6 +12,13 @@ class _TribeDetailState extends State<TribeDetail> {
   Widget build(BuildContext context) {
     var _tribeModel = Tribe();
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        label: Text('Join Tribe'),
+        icon: Icon(Icons.hvac_rounded), //TODO Find handshake icon
+        onPressed: () {
+          print('Join Tribe button');
+        },
+      ),
       appBar: AppBar(
         title: Text('Tribe Tour'),
       ),

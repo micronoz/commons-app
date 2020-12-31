@@ -16,6 +16,9 @@ class TribeCard extends StatelessWidget {
       child: Container(
         height: 100,
         child: Card(
+          clipBehavior: Clip.hardEdge,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           elevation: 10,
           child: Row(
             children: [
@@ -28,7 +31,7 @@ class TribeCard extends StatelessWidget {
               ),
               Spacer(flex: 10),
               Text('15000000 points'),
-              Icon(Icons.star_outline),
+              Icon(Icons.star_rounded),
               Spacer(
                 flex: 2,
               )
