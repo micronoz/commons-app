@@ -23,18 +23,34 @@ class TribeCard extends StatelessWidget {
           child: Row(
             children: [
               Image.network('https://picsum.photos/250?image=9'),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [Text('Tribe name'), Text('Tribe slogan'), extras]
-                    .where((element) => element != null)
-                    .toList(),
+              Flexible(
+                fit: FlexFit.tight,
+                flex: 10,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Tribe name',
+                      style: Theme.of(context).textTheme.headline5,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      'Tribe subtitle',
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodyText2,
+                      textScaleFactor: 1.1,
+                    ),
+                    extras
+                  ].where((element) => element != null).toList(),
+                ),
               ),
-              Spacer(flex: 10),
-              Text('15000000 points'),
-              Icon(Icons.star_rounded),
               Spacer(
-                flex: 2,
-              )
+                flex: 1,
+              ),
+              Row(children: [Text('1500'), Icon(Icons.star_rounded)]),
+              Spacer(
+                flex: 1,
+              ),
             ],
           ),
         ),

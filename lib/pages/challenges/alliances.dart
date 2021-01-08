@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tribal_instinct/components/event_card.dart';
 
 class AlliancesPage extends StatefulWidget {
   @override
@@ -9,8 +10,8 @@ class _AlliancesPageState extends State<AlliancesPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Center(
-        child: Text('Alliance'),
+      child: ListView(
+        children: [Text('Alliance Events'), EventCard()],
       ),
     );
   }

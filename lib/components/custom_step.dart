@@ -72,10 +72,11 @@ class CustomStep extends Step {
 }
 
 class CustomStepState {
-  CustomStepState({
-    this.state = StepState.indexed,
-    this.isActive = false,
-  }) : assert(state != null) {
+  CustomStepState(
+      {this.state = StepState.indexed,
+      this.isActive = false,
+      @required this.title})
+      : assert(state != null) {
     formKey = GlobalKey<FormState>();
     key = UniqueKey();
   }
@@ -90,4 +91,6 @@ class CustomStepState {
   GlobalKey<FormState> formKey;
 
   Key key;
+
+  Widget title;
 }
