@@ -17,7 +17,7 @@ class Auth {
 
   Auth._(
     User currentUser,
-  ) : this.currentUser = ValueNotifier<User>(currentUser);
+  ) : currentUser = ValueNotifier<User>(currentUser);
 
   final ValueNotifier<User> currentUser;
   final _googleSignIn = GoogleSignIn();

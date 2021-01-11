@@ -10,8 +10,8 @@ class AppUser extends ChangeNotifier {
   Position location;
   String address;
 
-  AppUser._(this.id, this.name, photoUrl, this.summary) {
-    this.photo = NetworkImage(
+  AppUser._(this.id, this.name, String photoUrl, this.summary) {
+    photo = NetworkImage(
       photoUrl,
     );
   }
@@ -20,7 +20,7 @@ class AppUser extends ChangeNotifier {
     print('Updating position');
     location = await Geolocator.getCurrentPosition();
     print(location.toJson());
-    List<Placemark> placemarks =
+    var placemarks =
         await placemarkFromCoordinates(location.latitude, location.longitude);
     address =
         '${placemarks.first?.subAdministrativeArea}, ${placemarks.first?.administrativeArea}';
@@ -28,14 +28,14 @@ class AppUser extends ChangeNotifier {
 
   static AppUser fromJson(Map<String, dynamic> json) {
     //TODO Parse json
-    return AppUser._(json['id'], "Nabi", "https://picsum.photos/250?image=11",
-        "Hello my name is Nabi");
+    return AppUser._(json['id'], 'Nabi', 'https://picsum.photos/250?image=11',
+        'Hello my name is Nabi');
   }
 
-  AppUser() : this.id = '1' {
-    this.name = 'Nabi';
-    this.summary = 'Hello my name is Nabi';
-    this.photo = NetworkImage('https://picsum.photos/250?image=11');
+  AppUser() : id = '1' {
+    name = 'Nabi';
+    summary = 'Hello my name is Nabi';
+    photo = NetworkImage('https://picsum.photos/250?image=11');
   }
 
   Map<String, dynamic> toJson() => {

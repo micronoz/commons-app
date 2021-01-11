@@ -12,7 +12,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final menuIcons = [
+  final menuIcons = <Map<String, dynamic>>[
     {'icon': Icons.rss_feed, 'label': 'Feed'},
     {'icon': Icons.festival, 'label': 'Tribe'},
     {'icon': Icons.track_changes, 'label': 'Challenges'},

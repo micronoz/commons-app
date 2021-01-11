@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:tribal_instinct/model/app_user.dart';
 
 class UserManager {
-  ValueNotifier<bool> absorbing = new ValueNotifier(true);
-  ValueNotifier<Map<String, AppUser>> profiles = new ValueNotifier(new Map());
+  ValueNotifier<bool> absorbing = ValueNotifier(true);
+  ValueNotifier<Map<String, AppUser>> profiles = ValueNotifier({});
 
   static UserManager create() {
     return UserManager._(null);
@@ -13,7 +13,7 @@ class UserManager {
   Future<void> init() async {
     absorbing.value = true;
     print('Requesting user object');
-    AppUser user = await _getUserProfile();
+    var user = await _getUserProfile();
     currentUser.value = user;
     absorbing.value = false;
   }
@@ -28,7 +28,7 @@ class UserManager {
 
   UserManager._(
     AppUser currentUser,
-  ) : this.currentUser = ValueNotifier<AppUser>(currentUser);
+  ) : currentUser = ValueNotifier<AppUser>(currentUser);
 
   final ValueNotifier<AppUser> currentUser;
 }

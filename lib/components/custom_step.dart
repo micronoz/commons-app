@@ -28,8 +28,9 @@ class CustomStep extends Step {
         key: formKey,
         child: content,
       );
-    } else
+    } else {
       this.content = content;
+    }
   }
 
   /// The title of the step that typically describes it.
@@ -61,12 +62,12 @@ class CustomStep extends Step {
   GlobalKey<FormState> formKey;
 
   bool validate() {
-    assert(this.formKey != null);
+    assert(formKey != null);
     return formKey.currentState.validate();
   }
 
   void save() {
-    assert(this.formKey != null);
+    assert(formKey != null);
     formKey.currentState.save();
   }
 }
