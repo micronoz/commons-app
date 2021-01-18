@@ -48,7 +48,6 @@ class _ChallengesPageState extends State<ChallengesPage>
         ),
       ),
       body: TabBarView(
-        physics: NeverScrollableScrollPhysics(),
         children: [AlliancesPage(), QuestsPage()],
         controller: _tabController,
       ),

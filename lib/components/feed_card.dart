@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tribal_instinct/pages/profile.dart';
 
 class FeedCard extends StatelessWidget {
   @override
@@ -27,9 +28,16 @@ class FeedCard extends StatelessWidget {
                     const SizedBox(
                       width: 5,
                     ),
-                    Text(
-                      'nozberkman',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    InkWell(
+                      onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => ProfilePage())),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Text(
+                          'nozberkman',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
                     )
                   ],
                 ),

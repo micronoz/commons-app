@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:tribal_instinct/components/custom_carousel.dart';
 import 'package:tribal_instinct/model/tribe.dart';
+import 'package:tribal_instinct/pages/challenges/challenge_detail.dart';
 
 class EventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasMaterial(context));
     return InkWell(
-      onTap: () => print('Hi'),
+      onTap: () => Navigator.of(context)
+          .push(MaterialPageRoute(builder: (_) => ChallengeDetailPage())),
       child: Card(
         margin: EdgeInsets.only(bottom: 10, top: 10),
         clipBehavior: Clip.hardEdge,
