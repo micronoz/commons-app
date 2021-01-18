@@ -32,6 +32,7 @@ dependencies:
   geocoding: ^1.0.5
   carousel_slider: ^2.3.1
   image_picker: ^0.6.7+17
+  flutter_search_bar: ^2.1.0
 
 dev_dependencies:
   pedantic: ^1.9.2

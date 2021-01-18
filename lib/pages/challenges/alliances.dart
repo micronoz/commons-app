@@ -11,7 +11,7 @@ class _AlliancesPageState extends State<AlliancesPage> {
   Widget build(BuildContext context) {
     return Container(
       child: ListView(
-        children: [EventCard()],
+        children: [EventCard(), EventCard(), EventCard()],
       ),
     );
   }
