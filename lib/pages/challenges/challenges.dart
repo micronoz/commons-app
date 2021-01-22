@@ -40,13 +40,23 @@ class _ChallengesPageState extends State<ChallengesPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: _tabController.index == 1 ? Colors.orange : null,
-        title: Text('Events'),
-        bottom: TabBar(
-          tabs: tabs,
-          controller: _tabController,
-        ),
-      ),
+          backgroundColor: _tabController.index == 1 ? Colors.orange : null,
+          title: Text('Events'),
+          bottom: TabBar(
+            tabs: tabs,
+            controller: _tabController,
+          ),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  print('hi');
+                },
+                child: const Text(
+                  '+',
+                  style: TextStyle(color: Colors.black),
+                  textScaleFactor: 2,
+                ))
+          ]),
       body: TabBarView(
         children: [AlliancesPage(), QuestsPage()],
         controller: _tabController,
