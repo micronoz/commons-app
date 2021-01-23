@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tribal_instinct/pages/challenges/create_challenge.dart';
 import 'package:tribal_instinct/pages/challenges/quests.dart';
 
 import 'alliances.dart';
@@ -14,7 +15,7 @@ class _ChallengesPageState extends State<ChallengesPage>
   TabController _tabController;
   final List<Tab> tabs = <Tab>[
     Tab(
-      text: 'Alliance',
+      text: 'Social',
     ),
     Tab(
       text: 'Quest',
@@ -47,15 +48,10 @@ class _ChallengesPageState extends State<ChallengesPage>
             controller: _tabController,
           ),
           actions: [
-            TextButton(
-                onPressed: () {
-                  print('hi');
-                },
-                child: const Text(
-                  '+',
-                  style: TextStyle(color: Colors.black),
-                  textScaleFactor: 2,
-                ))
+            IconButton(
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => CreateChallengePage())),
+                icon: Icon(Icons.add_rounded))
           ]),
       body: TabBarView(
         children: [AlliancesPage(), QuestsPage()],

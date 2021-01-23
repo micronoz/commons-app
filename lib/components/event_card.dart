@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tribal_instinct/components/custom_carousel.dart';
 import 'package:tribal_instinct/model/tribe.dart';
 import 'package:tribal_instinct/pages/challenges/challenge_detail.dart';
 
@@ -17,12 +16,12 @@ class EventCard extends StatelessWidget {
         elevation: 10,
         child: Column(
           children: [
-            CustomCarousel(
-              imageList: Tribe().photos.map((e) => NetworkImage(e)).toList(),
+            AspectRatio(
               aspectRatio: 16 / 9,
-              enableEnlarge: false,
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(5)),
+              child: Image.network(
+                Tribe().photos[0],
+                fit: BoxFit.cover,
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -35,23 +34,21 @@ class EventCard extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      Flexible(
-                        flex: 10,
-                        child: Text(
-                          'Team majority attendance required',
-                          style: Theme.of(context).textTheme.headline2,
-                          textScaleFactor: 0.5,
-                        ),
-                      ),
-                      const Flexible(
-                          child: Padding(
+                      Padding(
                         child: Icon(
                           Icons.group,
                         ),
                         padding: EdgeInsets.only(right: 10),
-                      ))
+                      ),
+                      Flexible(
+                        child: Text(
+                          'Minimum group size is 4',
+                          style: Theme.of(context).textTheme.headline2,
+                          textScaleFactor: 0.5,
+                        ),
+                      ),
                     ],
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.start,
                   ),
                   Padding(
                     child: Text(
