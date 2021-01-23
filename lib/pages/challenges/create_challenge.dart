@@ -47,7 +47,7 @@ class _CreateChallengePageState extends State<CreateChallengePage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Create Journey'),
+          title: Text('Create Adventure'),
         ),
         body: Form(
           key: _formKey,
@@ -55,7 +55,7 @@ class _CreateChallengePageState extends State<CreateChallengePage> {
             padding: const EdgeInsets.all(8),
             children: [
               Text(
-                'Let\'s organize your Journey',
+                'Let\'s plan your Adventure',
                 style: Theme.of(context).textTheme.headline4,
                 textScaleFactor: 0.9,
               ),

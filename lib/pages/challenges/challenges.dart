@@ -42,7 +42,7 @@ class _ChallengesPageState extends State<ChallengesPage>
     return Scaffold(
       appBar: AppBar(
           backgroundColor: _tabController.index == 1 ? Colors.orange : null,
-          title: Text('Events'),
+          title: Text('Adventures'),
           bottom: TabBar(
             tabs: tabs,
             controller: _tabController,
