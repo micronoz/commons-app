@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tribal_instinct/components/question_switch.dart';
+import 'package:tribal_instinct/components/session_card.dart';
 
 class CreateChallengePage extends StatefulWidget {
   @override
@@ -10,12 +11,20 @@ class CreateChallengePage extends StatefulWidget {
 }
 
 class _CreateChallengePageState extends State<CreateChallengePage> {
+  void removeSession(Widget card) {
+    setState(() {
+      _sessions.remove(card);
+    });
+  }
+
   final _formKey = GlobalKey<FormState>();
   var _edited = false;
   var _online = false;
   var _minimumGroup = false;
   var _maximumGroup = false;
   var _maximumCohort = false;
+  var _repeating = false;
+  var _sessions = <SessionCard>[];
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +82,7 @@ class _CreateChallengePageState extends State<CreateChallengePage> {
                 height: 20,
               ),
               Text(
-                'Describe what this event is about',
+                'Describe what this Adventure is about',
                 style: Theme.of(context).textTheme.headline6,
               ),
               TextFormField(
@@ -99,6 +108,41 @@ class _CreateChallengePageState extends State<CreateChallengePage> {
                 height: 20,
               ),
               QuestionSwitch(
+                question: 'When will it be?',
+                disabledOption: 'Single sessions',
+                enabledOption: 'Repeating',
+                callback: (val) => setState(() => _repeating = val),
+              ),
+              Text(
+                '(You can always add more later)',
+                style: Theme.of(context).textTheme.subtitle1,
+              ),
+              ..._sessions,
+              Row(
+                children: [
+                  IconButton(
+                      icon: Icon(
+                        Icons.add_circle,
+                        color: Colors.green,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _sessions.add(SessionCard(
+                            callback: removeSession,
+                            key: UniqueKey(),
+                          ));
+                        });
+                      }),
+                  Text(
+                    'Add session',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  )
+                ],
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              QuestionSwitch(
                 question: 'Minimum group size',
                 disabledOption: 'Disabled',
                 enabledOption: 'Enabled',
@@ -114,6 +158,9 @@ class _CreateChallengePageState extends State<CreateChallengePage> {
                   children: [
                     Flexible(
                       child: TextFormField(
+                        textAlign: TextAlign.center,
+                        decoration:
+                            const InputDecoration(border: OutlineInputBorder()),
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly
                         ],
@@ -139,6 +186,9 @@ class _CreateChallengePageState extends State<CreateChallengePage> {
                   children: [
                     Flexible(
                       child: TextFormField(
+                        textAlign: TextAlign.center,
+                        decoration:
+                            const InputDecoration(border: OutlineInputBorder()),
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly
                         ],
@@ -168,6 +218,9 @@ class _CreateChallengePageState extends State<CreateChallengePage> {
                   children: [
                     Flexible(
                       child: TextFormField(
+                        textAlign: TextAlign.center,
+                        decoration:
+                            const InputDecoration(border: OutlineInputBorder()),
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly
                         ],

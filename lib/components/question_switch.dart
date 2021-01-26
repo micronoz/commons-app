@@ -25,38 +25,35 @@ class _QuestionSwitchState extends State<QuestionSwitch> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 20,
       children: [
-        Flexible(
-          child: Text(
-            widget.question,
-            style: Theme.of(context).textTheme.headline6,
-          ),
+        Text(
+          widget.question,
+          style: Theme.of(context).textTheme.headline6,
         ),
-        Flexible(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                widget.disabledOption,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Switch(
-                value: _enabled,
-                onChanged: (status) {
-                  _enabled = !_enabled;
-                  widget.callback(status);
-                },
-                activeColor: Colors.green,
-                activeTrackColor: Colors.lightGreenAccent,
-              ),
-              Text(
-                widget.enabledOption,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              widget.disabledOption,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Switch(
+              value: _enabled,
+              onChanged: (status) {
+                _enabled = !_enabled;
+                widget.callback(status);
+              },
+              activeColor: Colors.green,
+              activeTrackColor: Colors.lightGreenAccent,
+            ),
+            Text(
+              widget.enabledOption,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
       ],
     );
