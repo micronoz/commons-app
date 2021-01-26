@@ -143,6 +143,7 @@ class _CreateChallengePageState extends State<CreateChallengePage> {
                 height: 20,
               ),
               QuestionSwitch(
+                key: Key('min'),
                 question: 'Minimum group size',
                 disabledOption: 'Disabled',
                 enabledOption: 'Enabled',
@@ -176,6 +177,7 @@ class _CreateChallengePageState extends State<CreateChallengePage> {
                 height: 20,
               ),
               QuestionSwitch(
+                key: Key('max group'),
                 question: 'Maximum group size',
                 disabledOption: 'Disabled',
                 enabledOption: 'Enabled',
@@ -204,6 +206,7 @@ class _CreateChallengePageState extends State<CreateChallengePage> {
                 height: 20,
               ),
               QuestionSwitch(
+                key: Key('max cohort'),
                 question: 'Maximum cohort size',
                 disabledOption: 'Disabled',
                 enabledOption: 'Enabled',
