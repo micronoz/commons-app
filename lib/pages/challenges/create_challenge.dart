@@ -11,6 +11,11 @@ class CreateChallengePage extends StatefulWidget {
 }
 
 class _CreateChallengePageState extends State<CreateChallengePage> {
+  void saveAndExit(BuildContext context) {
+    // TODO save to model and send to server
+    Navigator.of(context).pop();
+  }
+
   void removeSession(Widget card) {
     setState(() {
       _sessions.remove(card);
@@ -128,7 +133,7 @@ class _CreateChallengePageState extends State<CreateChallengePage> {
                       onPressed: () {
                         setState(() {
                           _sessions.add(SessionCard(
-                            callback: removeSession,
+                            removeCallback: removeSession,
                             key: UniqueKey(),
                           ));
                         });
@@ -235,6 +240,74 @@ class _CreateChallengePageState extends State<CreateChallengePage> {
                     )
                   ],
                 ),
+              const SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                height: 40,
+                child: RaisedButton(
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(30))),
+                  onPressed: () => saveAndExit(context),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Ready to go!'),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Icon(Icons.check)
+                    ],
+                  ),
+                  color: Colors.green,
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              SizedBox(
+                height: 40,
+                child: RaisedButton(
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(30))),
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                              title: const Text(
+                                  'Are you sure you want to cancel?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('No'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('Yes'),
+                                ),
+                              ],
+                            ));
+                  },
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Nah maybe another time...'),
+                      Icon(Icons.close)
+                    ],
+                  ),
+                  color: Colors.red,
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
             ],
           ),
         ),
