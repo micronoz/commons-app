@@ -1,4 +1,4 @@
-class Mingle {
+class Reu {
   String id;
   String name;
 }

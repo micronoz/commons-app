@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tribal_instinct/model/tribe.dart';
-import 'package:tribal_instinct/pages/mingles/mingle_detail.dart';
+import 'package:tribal_instinct/pages/reus/reu_detail.dart';
 
 class EventCard extends StatelessWidget {
   @override
@@ -8,7 +8,7 @@ class EventCard extends StatelessWidget {
     assert(debugCheckHasMaterial(context));
     return InkWell(
       onTap: () => Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => MingleDetailPage())),
+          .push(MaterialPageRoute(builder: (_) => ReuDetailPage())),
       child: Card(
         margin: EdgeInsets.only(bottom: 10, top: 10),
         clipBehavior: Clip.hardEdge,

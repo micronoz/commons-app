@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class MingleDetailPage extends StatelessWidget {
+class ReuDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

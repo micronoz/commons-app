@@ -1,16 +1,14 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tribal_instinct/components/question_switch.dart';
 import 'package:tribal_instinct/components/session_card.dart';
 
-class CreateMinglePage extends StatefulWidget {
+class CreateReuPage extends StatefulWidget {
   @override
-  _CreateMinglePageState createState() => _CreateMinglePageState();
+  _CreateReuPageState createState() => _CreateReuPageState();
 }
 
-class _CreateMinglePageState extends State<CreateMinglePage> {
+class _CreateReuPageState extends State<CreateReuPage> {
   void saveAndExit(BuildContext context) {
     // TODO save to model and send to server
     Navigator.of(context).pop();
@@ -61,7 +59,7 @@ class _CreateMinglePageState extends State<CreateMinglePage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Create a Mingle'),
+          title: Text('Create a Reu'),
         ),
         body: Form(
           key: _formKey,
@@ -69,7 +67,7 @@ class _CreateMinglePageState extends State<CreateMinglePage> {
             padding: const EdgeInsets.all(8),
             children: [
               Text(
-                'Let\'s plan your Mingle',
+                'Let\'s plan your Reu',
                 style: Theme.of(context).textTheme.headline4,
                 textScaleFactor: 0.9,
               ),
@@ -87,7 +85,7 @@ class _CreateMinglePageState extends State<CreateMinglePage> {
                 height: 20,
               ),
               Text(
-                'Describe what this Mingle is about',
+                'Describe what this Reu is about',
                 style: Theme.of(context).textTheme.headline6,
               ),
               TextFormField(
