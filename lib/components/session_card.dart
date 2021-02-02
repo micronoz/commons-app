@@ -28,6 +28,7 @@ class _SessionCardState extends State<SessionCard> {
   final DateFormat _format = DateFormat.yMd();
   TimeOfDay _time;
   DateTime _combined;
+  String _frequency = 'No Repeat';
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +90,25 @@ class _SessionCardState extends State<SessionCard> {
                 '* Cannot time travel into the past!',
                 style: TextStyle(
                     fontWeight: FontWeight.bold, color: Colors.red[600]),
-              )
+              ),
+            Center(
+              child: DropdownButton(
+                value: _frequency,
+                items: ['No Repeat', 'Weekly', 'Biweekly', 'Monthly', 'Yearly']
+                    .map((e) => DropdownMenuItem(
+                          child: Text(e),
+                          value: e,
+                        ))
+                    .toList(),
+                onChanged: (something) {
+                  setState(
+                    () {
+                      _frequency = something;
+                    },
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),

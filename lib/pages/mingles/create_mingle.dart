@@ -5,12 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:tribal_instinct/components/question_switch.dart';
 import 'package:tribal_instinct/components/session_card.dart';
 
-class CreateChallengePage extends StatefulWidget {
+class CreateMinglePage extends StatefulWidget {
   @override
-  _CreateChallengePageState createState() => _CreateChallengePageState();
+  _CreateMinglePageState createState() => _CreateMinglePageState();
 }
 
-class _CreateChallengePageState extends State<CreateChallengePage> {
+class _CreateMinglePageState extends State<CreateMinglePage> {
   void saveAndExit(BuildContext context) {
     // TODO save to model and send to server
     Navigator.of(context).pop();
@@ -61,7 +61,7 @@ class _CreateChallengePageState extends State<CreateChallengePage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Create Adventure'),
+          title: Text('Create a Mingle'),
         ),
         body: Form(
           key: _formKey,
@@ -69,7 +69,7 @@ class _CreateChallengePageState extends State<CreateChallengePage> {
             padding: const EdgeInsets.all(8),
             children: [
               Text(
-                'Let\'s plan your Adventure',
+                'Let\'s plan your Mingle',
                 style: Theme.of(context).textTheme.headline4,
                 textScaleFactor: 0.9,
               ),
@@ -87,7 +87,7 @@ class _CreateChallengePageState extends State<CreateChallengePage> {
                 height: 20,
               ),
               Text(
-                'Describe what this Adventure is about',
+                'Describe what this Mingle is about',
                 style: Theme.of(context).textTheme.headline6,
               ),
               TextFormField(
@@ -112,11 +112,9 @@ class _CreateChallengePageState extends State<CreateChallengePage> {
               const SizedBox(
                 height: 20,
               ),
-              QuestionSwitch(
-                question: 'When will it be?',
-                disabledOption: 'Single sessions',
-                enabledOption: 'Repeating',
-                callback: (val) => setState(() => _repeating = val),
+              Text(
+                'When will it be?',
+                style: Theme.of(context).textTheme.headline6,
               ),
               Text(
                 '(You can always add more later)',
