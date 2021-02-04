@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tribal_instinct/model/tribe.dart';
 import 'package:tribal_instinct/pages/reus/reu_detail.dart';
 
 class EventCard extends StatelessWidget {
@@ -19,7 +18,7 @@ class EventCard extends StatelessWidget {
             AspectRatio(
               aspectRatio: 16 / 9,
               child: Image.network(
-                Tribe().photos[0],
+                'https://i.imgur.com/6jo6B7J.jpg',
                 fit: BoxFit.cover,
               ),
             ),
