@@ -144,45 +144,18 @@ class _CreateReuPageState extends State<CreateReuPage> {
                 height: 20,
               ),
               QuestionSwitch(
-                key: Key('min'),
-                question: 'Minimum group size',
-                disabledOption: 'Disabled',
-                enabledOption: 'Enabled',
-                callback: (val) => setState(() => _minimumGroup = val),
-              ),
-              if (_minimumGroup)
-                Text(
-                  '(Individuals will be forced to group up)',
-                  style: Theme.of(context).textTheme.subtitle1,
-                ),
-              if (_minimumGroup)
-                Row(
-                  children: [
-                    Flexible(
-                      child: TextFormField(
-                        textAlign: TextAlign.center,
-                        decoration:
-                            const InputDecoration(border: OutlineInputBorder()),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
-                        keyboardType: TextInputType.number,
-                      ),
-                    ),
-                    Spacer(
-                      flex: 2,
-                    )
-                  ],
-                ),
-              const SizedBox(
-                height: 20,
-              ),
-              QuestionSwitch(
                 key: Key('max group'),
-                question: 'Maximum group size',
+                question: 'Target group size',
                 disabledOption: 'Disabled',
                 enabledOption: 'Enabled',
                 callback: (val) => setState(() => _maximumGroup = val),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 5),
+                child: Text(
+                  'Participants will be divided into groups of equal (if possible) size up to the target group size. \n\nChoose a number that is small enough for people to build connections but large enough to allow them to meet new people.',
+                  style: Theme.of(context).textTheme.subtitle1,
+                ),
               ),
               if (_maximumGroup)
                 Row(
@@ -213,9 +186,12 @@ class _CreateReuPageState extends State<CreateReuPage> {
                 enabledOption: 'Enabled',
                 callback: (val) => setState(() => _maximumCohort = val),
               ),
-              Text(
-                '(Max number of participants per session)',
-                style: Theme.of(context).textTheme.subtitle1,
+              Padding(
+                padding: const EdgeInsets.only(bottom: 5),
+                child: Text(
+                  'Max number of participants per session',
+                  style: Theme.of(context).textTheme.subtitle1,
+                ),
               ),
               if (_maximumCohort)
                 Row(

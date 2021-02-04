@@ -40,10 +40,10 @@ class _SessionCardState extends State<SessionCard> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Wrap(
+              alignment: WrapAlignment.spaceEvenly,
               children: [
                 if (_date == null)
                   RaisedButton(
@@ -53,6 +53,7 @@ class _SessionCardState extends State<SessionCard> {
                 else
                   RaisedButton(
                     child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(_format.format(_date.toLocal())),
                         Icon(Icons.edit)
@@ -70,6 +71,7 @@ class _SessionCardState extends State<SessionCard> {
                 else
                   RaisedButton(
                     child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [Text(_time.format(context)), Icon(Icons.edit)],
                     ),
                     onPressed: () =>
@@ -91,24 +93,24 @@ class _SessionCardState extends State<SessionCard> {
                 style: TextStyle(
                     fontWeight: FontWeight.bold, color: Colors.red[600]),
               ),
-            Center(
-              child: DropdownButton(
-                value: _frequency,
-                items: ['No Repeat', 'Weekly', 'Biweekly', 'Monthly', 'Yearly']
-                    .map((e) => DropdownMenuItem(
-                          child: Text(e),
-                          value: e,
-                        ))
-                    .toList(),
-                onChanged: (something) {
-                  setState(
-                    () {
-                      _frequency = something;
-                    },
-                  );
-                },
-              ),
-            ),
+            // Center(
+            //   child: DropdownButton(
+            //     value: _frequency,
+            //     items: ['No Repeat', 'Weekly', 'Biweekly', 'Monthly', 'Yearly']
+            //         .map((e) => DropdownMenuItem(
+            //               child: Text(e),
+            //               value: e,
+            //             ))
+            //         .toList(),
+            //     onChanged: (something) {
+            //       setState(
+            //         () {
+            //           _frequency = something;
+            //         },
+            //       );
+            //     },
+            //   ),
+            // ),
           ],
         ),
       ),
