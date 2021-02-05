@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:tribal_instinct/model/adventure.dart';
 
 class AppUser extends ChangeNotifier {
   final String id;
@@ -12,6 +13,7 @@ class AppUser extends ChangeNotifier {
   String address;
   Set<AppUser> followers;
   Set<AppUser> following;
+  Set<Adventure> adventures;
 
   AppUser._(
       this.id, this.name, this.username, String photoUrl, this.description) {

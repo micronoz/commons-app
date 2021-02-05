@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:tribal_instinct/components/event_card.dart';
 import 'package:tribal_instinct/pages/adventures/create_adventure.dart';
 
-class AdventuresPage extends StatefulWidget {
-  const AdventuresPage({Key key}) : super(key: key);
+class DiscoverPage extends StatefulWidget {
+  const DiscoverPage({Key key}) : super(key: key);
   @override
-  _AdventuresPageState createState() => _AdventuresPageState();
+  _DiscoverPageState createState() => _DiscoverPageState();
 }
 
-class _AdventuresPageState extends State<AdventuresPage> {
+class _DiscoverPageState extends State<DiscoverPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Adventures'), actions: [
+      appBar: AppBar(title: Text('Discover'), actions: [
         IconButton(
             onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => CreateAdventurePage())),

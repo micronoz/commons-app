@@ -23,11 +23,11 @@ class _CreateAdventurePageState extends State<CreateAdventurePage> {
   final _formKey = GlobalKey<FormState>();
   var _edited = false;
   var _online = false;
-  var _minimumGroup = false;
   var _maximumGroup = false;
   var _maximumCohort = false;
+  var _format = false;
   var _repeating = false;
-  var _sessions = <SessionCard>[];
+  final _sessions = <SessionCard>[];
 
   @override
   Widget build(BuildContext context) {
@@ -96,6 +96,14 @@ class _CreateAdventurePageState extends State<CreateAdventurePage> {
                 height: 20,
               ),
               QuestionSwitch(
+                question: 'Format',
+                disabledOption: 'Self-guided',
+                enabledOption: 'Hosted',
+                callback: (val) => setState(() => _format = val),
+                additionalInfo:
+                    'In a \'Self-guided\' format you have to provide enough information to allow the grouped participants to be able to host the event themselves without you being present (e.g. providing recordings for a yoga class, providing map and guide for a hike etc.) Provide clear instructions and helpful materials for your guests. \n\nIn a \'Hosted\' format, you have to be present in each of the sessions and be able to host all of the groups in that session at the same time (limited by the maximum cohort size you set, which is required for hosted events).',
+              ),
+              QuestionSwitch(
                 question: 'Where will it be?',
                 disabledOption: 'In-person',
                 enabledOption: 'Online',
@@ -149,13 +157,8 @@ class _CreateAdventurePageState extends State<CreateAdventurePage> {
                 disabledOption: 'Disabled',
                 enabledOption: 'Enabled',
                 callback: (val) => setState(() => _maximumGroup = val),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 5),
-                child: Text(
-                  'Participants will be divided into groups of equal (if possible) size up to the target group size. \n\nChoose a number that is small enough for people to build connections but large enough to allow them to meet new people.',
-                  style: Theme.of(context).textTheme.subtitle1,
-                ),
+                additionalInfo:
+                    'Participants will be divided into groups of equal (if possible) size up to the target group size. \n\nChoose a number that is small enough for people to build connections but large enough to allow them to meet new people.',
               ),
               if (_maximumGroup)
                 Row(
@@ -185,13 +188,7 @@ class _CreateAdventurePageState extends State<CreateAdventurePage> {
                 disabledOption: 'Disabled',
                 enabledOption: 'Enabled',
                 callback: (val) => setState(() => _maximumCohort = val),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 5),
-                child: Text(
-                  'Max number of participants per session',
-                  style: Theme.of(context).textTheme.subtitle1,
-                ),
+                additionalInfo: 'Max number of participants per session',
               ),
               if (_maximumCohort)
                 Row(

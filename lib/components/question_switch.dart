@@ -8,13 +8,15 @@ class QuestionSwitch extends StatefulWidget {
       @required this.question,
       @required this.disabledOption,
       @required this.enabledOption,
-      @required this.callback})
+      @required this.callback,
+      this.additionalInfo})
       : super(key: key);
 
   final String question;
   final String disabledOption;
   final String enabledOption;
   final BoolCallback callback;
+  final String additionalInfo;
 
   @override
   State<StatefulWidget> createState() => _QuestionSwitchState();
@@ -27,12 +29,39 @@ class _QuestionSwitchState extends State<QuestionSwitch> {
   Widget build(BuildContext context) {
     return Wrap(
       crossAxisAlignment: WrapCrossAlignment.center,
-      spacing: 20,
+      spacing: widget.additionalInfo != null ? 0 : 20,
       children: [
         Text(
           widget.question,
           style: Theme.of(context).textTheme.headline6,
         ),
+        if (widget.additionalInfo != null)
+          IconButton(
+            icon: Icon(Icons.info_outline_rounded),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text(widget.question),
+                  content: SingleChildScrollView(
+                    child: Text(
+                      widget.additionalInfo,
+                      textScaleFactor: 1.1,
+                    ),
+                  ),
+                  contentPadding: EdgeInsets.only(top: 10, left: 20, right: 20),
+                  actions: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 30),
+                      child: TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: Text('OK!')),
+                    )
+                  ],
+                ),
+              );
+            },
+          ),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -54,7 +83,7 @@ class _QuestionSwitchState extends State<QuestionSwitch> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ],
-        ),
+        )
       ],
     );
   }

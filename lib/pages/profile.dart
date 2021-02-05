@@ -13,7 +13,7 @@ class _ProfilePageState extends State<ProfilePage> {
         elevation: 0,
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: Text('User handle'),
+        title: Text('@nozberkman'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
