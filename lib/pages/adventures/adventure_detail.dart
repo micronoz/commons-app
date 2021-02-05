@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tribal_instinct/components/member_card.dart';
+import 'package:tribal_instinct/model/adventure.dart';
 import 'package:tribal_instinct/model/app_user.dart';
-import 'package:tribal_instinct/model/reu.dart';
-import 'package:tribal_instinct/model/reu_types.dart';
+import 'package:tribal_instinct/model/adventure_types.dart';
 
-class ReuDetailPage extends StatelessWidget {
+class AdventureDetailPage extends StatelessWidget {
   final DateFormat _format = DateFormat();
-  final reu = Reu(
+  final adventure = Adventure(
       '1',
       'Book club meeting',
       '''
@@ -27,9 +27,9 @@ Quisque sit amet sagittis tellus. Orci varius natoque penatibus et magnis dis pa
       DateTime.now(),
       [AppUser(), AppUser()],
       AppUser(),
-      ReuHost.hosted,
-      ReuMedium.in_person,
-      ReuGroup.grouped_assembly);
+      AdventureHost.hosted,
+      AdventureMedium.in_person,
+      AdventureGroup.grouped_assembly);
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +41,7 @@ Quisque sit amet sagittis tellus. Orci varius natoque penatibus et magnis dis pa
             backgroundColor: Colors.green,
             onPressed: () {},
             label: Text(
-              'Sign up for this Reu',
+              'Sign up for this Adventure',
               style:
                   TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
             ),
@@ -49,34 +49,34 @@ Quisque sit amet sagittis tellus. Orci varius natoque penatibus et magnis dis pa
         ],
       ),
       appBar: AppBar(
-        title: Text('Reu details'),
+        title: Text('Adventure details'),
       ),
       body: ListView(
         children: [
           AspectRatio(
             aspectRatio: 16 / 9,
             child: Image.network(
-              reu.photoUrl,
+              adventure.photoUrl,
               fit: BoxFit.cover,
             ),
           ),
           Text(
-            reu.title,
+            adventure.title,
             style: Theme.of(context).textTheme.headline2,
             textScaleFactor: 0.6,
             textAlign: TextAlign.center,
           ),
           Text(
-            (reu.mediumType == ReuMedium.in_person
+            (adventure.mediumType == AdventureMedium.in_person
                     ? 'in-person at '
                     : 'online at ') +
-                reu.location,
+                adventure.location,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyText1,
             textScaleFactor: 1.3,
           ),
           Text(
-            reu.hostType == ReuHost.self_hosted
+            adventure.hostType == AdventureHost.self_hosted
                 ? 'without a host present'
                 : 'with host present',
             textAlign: TextAlign.center,
@@ -84,31 +84,31 @@ Quisque sit amet sagittis tellus. Orci varius natoque penatibus et magnis dis pa
             textScaleFactor: 1.3,
           ),
           Text(
-            'on ' + _format.format(reu.dateTime.toLocal()),
+            'on ' + _format.format(adventure.dateTime.toLocal()),
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyText1,
             textScaleFactor: 1.3,
           ),
           Text(
-            reu.groupType.toString(),
+            adventure.groupType.toString(),
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyText1,
             textScaleFactor: 1.3,
           ),
           Text(
-            'Available space: ${reu.cohortSize - reu.attendees.length}/${reu.cohortSize}',
+            'Available space: ${adventure.cohortSize - adventure.attendees.length}/${adventure.cohortSize}',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyText1,
             textScaleFactor: 1.3,
           ),
           Text(
-            'Price: ' + reu.price,
+            'Price: ' + adventure.price,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyText1,
             textScaleFactor: 1.3,
           ),
           Text(
-            reu.description,
+            adventure.description,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyText2,
           ),
@@ -119,7 +119,7 @@ Quisque sit amet sagittis tellus. Orci varius natoque penatibus et magnis dis pa
               style: Theme.of(context).textTheme.headline5,
             ),
           ),
-          ...reu.attendees.map(
+          ...adventure.attendees.map(
             (m) => MemberCard(
               m,
             ),

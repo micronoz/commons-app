@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tribal_instinct/pages/reus/reus.dart';
+import 'package:tribal_instinct/pages/adventures/adventures.dart';
 import 'package:tribal_instinct/pages/feed.dart';
 import 'package:tribal_instinct/pages/profile.dart';
 
@@ -13,7 +13,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final menuIcons = <Map<String, dynamic>>[
     {'icon': Icons.rss_feed, 'label': 'Feed'},
-    {'icon': Icons.track_changes, 'label': 'Reus'},
+    {'icon': Icons.track_changes, 'label': 'Adventures'},
     {'icon': Icons.supervisor_account, 'label': 'Profile'}
   ]
       .map(
@@ -25,7 +25,7 @@ class _HomePageState extends State<HomePage> {
       )
       .toList(growable: false);
 
-  final _pages = [FeedPage(), ReusPage(), ProfilePage()];
+  final _pages = [FeedPage(), AdventuresPage(), ProfilePage()];
 
   int _pageIndex = 0;
 

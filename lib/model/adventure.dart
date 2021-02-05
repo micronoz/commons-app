@@ -1,7 +1,7 @@
 import 'package:tribal_instinct/model/app_user.dart';
-import 'package:tribal_instinct/model/reu_types.dart';
+import 'package:tribal_instinct/model/adventure_types.dart';
 
-class Reu {
+class Adventure {
   final String id;
   final String title;
   final String description;
@@ -13,11 +13,11 @@ class Reu {
   final DateTime dateTime;
   final List<AppUser> attendees;
   final AppUser organizer;
-  final ReuHost hostType;
-  final ReuMedium mediumType;
-  final ReuGroup groupType;
+  final AdventureHost hostType;
+  final AdventureMedium mediumType;
+  final AdventureGroup groupType;
 
-  Reu(
+  Adventure(
       this.id,
       this.title,
       this.description,

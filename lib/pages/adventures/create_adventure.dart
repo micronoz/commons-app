@@ -3,12 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:tribal_instinct/components/question_switch.dart';
 import 'package:tribal_instinct/components/session_card.dart';
 
-class CreateReuPage extends StatefulWidget {
+class CreateAdventurePage extends StatefulWidget {
   @override
-  _CreateReuPageState createState() => _CreateReuPageState();
+  _CreateAdventurePageState createState() => _CreateAdventurePageState();
 }
 
-class _CreateReuPageState extends State<CreateReuPage> {
+class _CreateAdventurePageState extends State<CreateAdventurePage> {
   void saveAndExit(BuildContext context) {
     // TODO save to model and send to server
     Navigator.of(context).pop();
@@ -59,7 +59,7 @@ class _CreateReuPageState extends State<CreateReuPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Create a Reu'),
+          title: Text('Create a Adventure'),
         ),
         body: Form(
           key: _formKey,
@@ -67,7 +67,7 @@ class _CreateReuPageState extends State<CreateReuPage> {
             padding: const EdgeInsets.all(8),
             children: [
               Text(
-                'Let\'s plan your Reu',
+                'Let\'s plan your Adventure',
                 style: Theme.of(context).textTheme.headline4,
                 textScaleFactor: 0.9,
               ),
@@ -85,7 +85,7 @@ class _CreateReuPageState extends State<CreateReuPage> {
                 height: 20,
               ),
               Text(
-                'Describe what this Reu is about',
+                'Describe what this Adventure is about',
                 style: Theme.of(context).textTheme.headline6,
               ),
               TextFormField(
