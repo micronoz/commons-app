@@ -4,12 +4,14 @@ import 'package:tribal_instinct/components/custom_step.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tribal_instinct/pages/create_summary.dart';
 
-class CreateTribePage extends StatefulWidget {
+class CreateClubPage extends StatefulWidget {
   @override
-  _CreateTribePageState createState() => _CreateTribePageState();
+  _CreateClubPageState createState() => _CreateClubPageState();
 }
 
-class _CreateTribePageState extends State<CreateTribePage> {
+// TODO get rid of step form
+
+class _CreateClubPageState extends State<CreateClubPage> {
   int currentStep = 0;
   List<Step> steps;
   List<CustomStepState> stepStates = [

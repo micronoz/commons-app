@@ -1,6 +1,6 @@
 import 'package:tribal_instinct/model/app_user.dart';
 
-class Union {
+class Club {
   String title;
   String description;
   String photoUrl;

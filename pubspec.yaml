@@ -35,6 +35,7 @@ dependencies:
   flutter_search_bar: ^2.1.0
   intl: ^0.16.1
   graphql: ^4.0.0
+  enum_to_string: ^1.0.14
 
 dev_dependencies:
   pedantic: ^1.9.2

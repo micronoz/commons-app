@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:tribal_instinct/pages/discover.dart';
+import 'package:tribal_instinct/pages/clubs/clubs.dart';
+import 'package:tribal_instinct/pages/discover/discover.dart';
 import 'package:tribal_instinct/pages/feed.dart';
-import 'package:tribal_instinct/pages/my_adventures.dart';
+import 'package:tribal_instinct/pages/adventures/experiences.dart';
 import 'package:tribal_instinct/pages/profile.dart';
 
 class HomePage extends StatefulWidget {
@@ -12,10 +13,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final menuIcons = <Map<String, dynamic>>[
+  final menuIcons = <Map<String, Object>>[
     {'icon': Icons.rss_feed, 'label': 'Feed'},
-    {'icon': Icons.track_changes, 'label': 'Adventures'},
-    {'icon': Icons.calendar_today, 'label': 'Upcoming'},
+    {'icon': Icons.adb_outlined, 'label': 'Discover'},
+    {'icon': Icons.calendar_today, 'label': 'Experiences'},
+    {'icon': Icons.group, 'label': 'Clubs'},
     {'icon': Icons.supervisor_account, 'label': 'Profile'}
   ]
       .map(
@@ -30,7 +32,8 @@ class _HomePageState extends State<HomePage> {
   final _pages = [
     FeedPage(),
     DiscoverPage(),
-    MyAdventuresPage(),
+    ExperiencesPage(),
+    ClubsPage(),
     ProfilePage()
   ];
 
@@ -44,10 +47,12 @@ class _HomePageState extends State<HomePage> {
         children: _pages,
       ),
       bottomNavigationBar: BottomNavigationBar(
+        unselectedFontSize: 14,
+        selectedFontSize: 14,
         iconSize: 28,
         unselectedItemColor: Theme.of(context).disabledColor,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
         type: BottomNavigationBarType.fixed,
         items: menuIcons,
         currentIndex: _pageIndex,
