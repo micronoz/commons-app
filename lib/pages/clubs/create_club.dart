@@ -113,12 +113,12 @@ class _CreateClubPageState extends State<CreateClubPage> {
                       try {
                         var pickedImage =
                             await _picker.getImage(source: ImageSource.gallery);
+                        setState(() {
+                          _pickedImage = pickedImage;
+                        });
                       } catch (e) {
                         print(e);
                       }
-                      setState(() {
-                        _pickedImage = _pickedImage;
-                      });
                     },
                     child: Row(
                       mainAxisSize: MainAxisSize.min,

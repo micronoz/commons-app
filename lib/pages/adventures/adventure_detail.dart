@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tribal_instinct/components/member_card.dart';
 import 'package:tribal_instinct/model/adventure.dart';
-import 'package:tribal_instinct/model/app_user.dart';
 import 'package:tribal_instinct/model/adventure_types.dart';
 
 class AdventureDetailPage extends StatelessWidget {

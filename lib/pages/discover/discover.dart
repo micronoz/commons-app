@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tribal_instinct/pages/adventures/create_adventure.dart';
 import 'package:tribal_instinct/pages/discover/discover_category.dart';
 
 class DiscoverPage extends StatefulWidget {
