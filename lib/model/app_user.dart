@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:tribal_instinct/model/adventure.dart';
+import 'package:tribal_instinct/model/organizer.dart';
 
-class AppUser extends ChangeNotifier {
+class AppUser extends ChangeNotifier implements Organizer {
   final String id;
   String name;
-  String username;
+  @override
+  String identifier;
   ImageProvider photo;
   String description;
   Position location;
@@ -16,7 +18,7 @@ class AppUser extends ChangeNotifier {
   Set<Adventure> adventures;
 
   AppUser._(
-      this.id, this.name, this.username, String photoUrl, this.description) {
+      this.id, this.name, this.identifier, String photoUrl, this.description) {
     photo = NetworkImage(
       photoUrl,
     );
@@ -44,7 +46,7 @@ class AppUser extends ChangeNotifier {
 
   AppUser() : id = '1' {
     name = 'Nabi';
-    username = 'nozberkman';
+    identifier = 'nozberkman';
     description =
         'Hello my name is Nabi. I\'m from Cyprus and this is the new app I created for bringing people together.';
     photo = NetworkImage('https://picsum.photos/250?image=11');

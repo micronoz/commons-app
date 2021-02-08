@@ -49,6 +49,8 @@ class _CreateClubPageState extends State<CreateClubPage> {
             if (_formKey.currentState.validate()) {
               print('Club creation succeess');
               _formKey.currentState.save();
+              //TODO Add server save logic
+              Navigator.of(context).pop();
             }
           },
           child: Icon(Icons.check),

@@ -37,11 +37,13 @@ class MemberCard extends StatelessWidget {
                       ),
                     ),
                     Flexible(
-                      child: Text('@' + member.username,
-                          style: Theme.of(context).textTheme.bodyText1,
-                          textScaleFactor: 1.3,
-                          softWrap: false,
-                          overflow: TextOverflow.ellipsis),
+                      child: Text(
+                        '@' + member.identifier,
+                        style: TextStyle(),
+                        textScaleFactor: 1.3,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     )
                   ],
                 ),

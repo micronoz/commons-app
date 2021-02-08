@@ -9,6 +9,7 @@ class ClubCard extends StatelessWidget {
       onTap: () => Navigator.of(context)
           .push(MaterialPageRoute(builder: (_) => AdventureDetailPage())),
       child: Card(
+        semanticContainer: true,
         margin: EdgeInsets.only(bottom: 10, top: 10),
         clipBehavior: Clip.hardEdge,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
