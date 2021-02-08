@@ -66,7 +66,7 @@ class _CreateClubPageState extends State<CreateClubPage> {
               children: [
                 Text(
                   'Name your Club',
-                  style: Theme.of(context).textTheme.bodyText1,
+                  style: Theme.of(context).textTheme.headline6,
                 ),
                 TextFormField(
                   initialValue: tribeName,
@@ -78,7 +78,7 @@ class _CreateClubPageState extends State<CreateClubPage> {
                 formSpacing,
                 Text(
                   'Describe your Club',
-                  style: Theme.of(context).textTheme.bodyText1,
+                  style: Theme.of(context).textTheme.headline6,
                 ),
                 TextFormField(
                   initialValue: tribeSummary,
@@ -90,7 +90,7 @@ class _CreateClubPageState extends State<CreateClubPage> {
                 _pickedImage == null
                     ? Text(
                         'Add a Tribe photo',
-                        style: Theme.of(context).textTheme.bodyText1,
+                        style: Theme.of(context).textTheme.headline6,
                       )
                     : AspectRatio(
                         aspectRatio: 1,
