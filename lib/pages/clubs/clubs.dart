@@ -12,6 +12,7 @@ class _ClubsPageState extends State<ClubsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text('Clubs'),
         actions: [
           IconButton(
               onPressed: () => Navigator.of(context).push(
