@@ -16,23 +16,22 @@ class Adventure {
   final Organizer organizer;
   final AdventureHost hostType;
   final AdventureMedium mediumType;
-  final AdventureGroup groupType;
 
   Adventure(
-      this.id,
-      this.title,
-      this.description,
-      this.photoUrl,
-      this.price,
-      this.location,
-      this.groupSize,
-      this.cohortSize,
-      this.dateTime,
-      this.attendees,
-      this.organizer,
-      this.hostType,
-      this.mediumType,
-      this.groupType);
+    this.id,
+    this.title,
+    this.description,
+    this.photoUrl,
+    this.price,
+    this.location,
+    this.groupSize,
+    this.cohortSize,
+    this.dateTime,
+    this.attendees,
+    this.organizer,
+    this.hostType,
+    this.mediumType,
+  );
 
   static Adventure getDefault() {
     return Adventure(
@@ -48,7 +47,6 @@ class Adventure {
         [AppUser(), AppUser()],
         AppUser(),
         AdventureHost.hosted,
-        AdventureMedium.in_person,
-        AdventureGroup.grouped_assembly);
+        AdventureMedium.in_person);
   }
 }
