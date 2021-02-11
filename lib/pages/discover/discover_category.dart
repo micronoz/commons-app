@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tribal_instinct/components/event_card_small.dart';
-import 'package:tribal_instinct/model/adventure.dart';
+import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/model/discover_types.dart';
 import 'package:tribal_instinct/pages/discover/discover_items.dart';
 
@@ -56,9 +56,9 @@ class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
                 style: Theme.of(context).textTheme.headline2,
                 textScaleFactor: 0.4,
               ),
-              EventCardSmall(Adventure.getDefault()),
-              EventCardSmall(Adventure.getDefault()),
-              EventCardSmall(Adventure.getDefault()),
+              EventCardSmall(Activity.getDefault()),
+              EventCardSmall(Activity.getDefault()),
+              EventCardSmall(Activity.getDefault()),
               SizedBox(
                 height: 20,
               ),

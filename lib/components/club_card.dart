@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tribal_instinct/pages/adventures/adventure_detail.dart';
+import 'package:tribal_instinct/pages/activities/activity_detail.dart';
 
 class ClubCard extends StatelessWidget {
   @override
@@ -7,7 +7,7 @@ class ClubCard extends StatelessWidget {
     assert(debugCheckHasMaterial(context));
     return InkWell(
       onTap: () => Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => AdventureDetailPage())),
+          .push(MaterialPageRoute(builder: (_) => ActivityDetailPage())),
       child: Card(
         semanticContainer: true,
         margin: EdgeInsets.only(bottom: 10, top: 10),

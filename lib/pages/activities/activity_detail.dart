@@ -5,17 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:tribal_instinct/components/member_card.dart';
-import 'package:tribal_instinct/model/adventure.dart';
-import 'package:tribal_instinct/model/adventure_types.dart';
+import 'package:tribal_instinct/model/activity.dart';
+import 'package:tribal_instinct/model/activity_types.dart';
 
-class AdventureDetailPage extends StatefulWidget {
+class ActivityDetailPage extends StatefulWidget {
   @override
-  _AdventureDetailPageState createState() => _AdventureDetailPageState();
+  _ActivityDetailPageState createState() => _ActivityDetailPageState();
 }
 
-class _AdventureDetailPageState extends State<AdventureDetailPage> {
+class _ActivityDetailPageState extends State<ActivityDetailPage> {
   final DateFormat _format = DateFormat();
-  final adventure = Adventure.getDefault();
+  final activity = Activity.getDefault();
   final String _id = '1';
   final timeout = const Duration(seconds: 1);
 
@@ -57,40 +57,40 @@ class _AdventureDetailPageState extends State<AdventureDetailPage> {
                         joinEvent(_id);
                       },
                       label: Text(
-                        'Sign up for this Adventure',
+                        'Sign up for this Activity',
                         style: TextStyle(
                             color: Colors.white, fontWeight: FontWeight.w900),
                       ),
                     ),
               appBar: AppBar(
-                title: Text('Adventure details'),
+                title: Text('Activity details'),
               ),
               body: ListView(
                 children: [
                   AspectRatio(
                     aspectRatio: 16 / 9,
                     child: Image.network(
-                      adventure.photoUrl,
+                      activity.photoUrl,
                       fit: BoxFit.cover,
                     ),
                   ),
                   Text(
-                    adventure.title,
+                    activity.title,
                     style: Theme.of(context).textTheme.headline2,
                     textScaleFactor: 0.6,
                     textAlign: TextAlign.center,
                   ),
                   Text(
-                    (adventure.mediumType == AdventureMedium.in_person
+                    (activity.mediumType == ActivityMedium.in_person
                             ? 'in-person at '
                             : 'online at ') +
-                        adventure.location,
+                        activity.location,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyText1,
                     textScaleFactor: 1.3,
                   ),
                   Text(
-                    adventure.hostType == AdventureHost.self_hosted
+                    activity.hostType == ActivityHost.self_hosted
                         ? 'without a host present'
                         : 'with host present',
                     textAlign: TextAlign.center,
@@ -98,25 +98,25 @@ class _AdventureDetailPageState extends State<AdventureDetailPage> {
                     textScaleFactor: 1.3,
                   ),
                   Text(
-                    'on ' + _format.format(adventure.dateTime.toLocal()),
+                    'on ' + _format.format(activity.dateTime.toLocal()),
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyText1,
                     textScaleFactor: 1.3,
                   ),
                   Text(
-                    'Available space: ${adventure.cohortSize - adventure.attendees.length}/${adventure.cohortSize}',
+                    'Available space: ${activity.cohortSize - activity.attendees.length}/${activity.cohortSize}',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyText1,
                     textScaleFactor: 1.3,
                   ),
                   Text(
-                    'Price: ' + adventure.price,
+                    'Price: ' + activity.price,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyText1,
                     textScaleFactor: 1.3,
                   ),
                   Text(
-                    adventure.description,
+                    activity.description,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyText2,
                   ),
@@ -163,7 +163,7 @@ class _AdventureDetailPageState extends State<AdventureDetailPage> {
                       style: Theme.of(context).textTheme.headline5,
                     ),
                   ),
-                  ...adventure.attendees.map(
+                  ...activity.attendees.map(
                     (m) => MemberCard(
                       m,
                     ),

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:tribal_instinct/model/adventure.dart';
+import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/model/app_user.dart';
-import 'package:tribal_instinct/pages/adventures/adventure_detail.dart';
+import 'package:tribal_instinct/pages/activities/activity_detail.dart';
 
 class EventCardSmall extends StatelessWidget {
   EventCardSmall(this.event, {Key key}) : super(key: key);
-  final Adventure event;
+  final Activity event;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () => Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => AdventureDetailPage())),
+          .push(MaterialPageRoute(builder: (context) => ActivityDetailPage())),
       child: Card(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,

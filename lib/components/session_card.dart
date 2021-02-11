@@ -78,13 +78,14 @@ class _SessionCardState extends State<SessionCard> {
                         showTimePicker(context: context, initialTime: _time)
                             .then((value) => setState(() => _time = value)),
                   ),
-                IconButton(
-                  icon: Icon(
-                    Icons.remove_circle,
-                    color: Colors.red,
-                  ),
-                  onPressed: () => widget.removeCallback(widget),
-                )
+                if (widget.removeCallback != null)
+                  IconButton(
+                    icon: Icon(
+                      Icons.remove_circle,
+                      color: Colors.red,
+                    ),
+                    onPressed: () => widget.removeCallback(widget),
+                  )
               ],
             ),
             if (_combined?.isBefore(DateTime.now()) ?? false)

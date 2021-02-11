@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:tribal_instinct/components/event_card.dart';
 import 'package:tribal_instinct/components/event_card_small.dart';
-import 'package:tribal_instinct/model/adventure.dart';
+import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/model/app_user.dart';
 import 'package:tribal_instinct/model/discover_types.dart';
-import 'package:tribal_instinct/pages/adventures/create_adventure.dart';
+import 'package:tribal_instinct/pages/activities/create_activity.dart';
 import 'package:tribal_instinct/pages/discover/discover.dart';
 
 class ExperiencesPage extends StatefulWidget {
@@ -22,7 +21,7 @@ class _ExperiencesPageState extends State<ExperiencesPage> {
         actions: [
           IconButton(
               onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => CreateAdventurePage())),
+                  builder: (context) => CreateActivityPage())),
               icon: Icon(Icons.add_rounded))
         ],
         title: Text('Experiences'),
@@ -54,7 +53,7 @@ class _ExperiencesPageState extends State<ExperiencesPage> {
             style: Theme.of(context).textTheme.headline1,
             textScaleFactor: 0.4,
           ),
-          EventCardSmall(Adventure.getDefault()),
+          EventCardSmall(Activity.getDefault()),
           Text(
             'I\'m attending',
             style: Theme.of(context).textTheme.headline1,

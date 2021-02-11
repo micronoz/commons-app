@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:tribal_instinct/model/adventure.dart';
+import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/model/organizer.dart';
 
 class AppUser extends ChangeNotifier implements Organizer {
@@ -15,7 +15,7 @@ class AppUser extends ChangeNotifier implements Organizer {
   String address;
   Set<AppUser> followers;
   Set<AppUser> following;
-  Set<Adventure> adventures;
+  Set<Activity> activities;
 
   AppUser._(
       this.id, this.name, this.identifier, String photoUrl, this.description) {
