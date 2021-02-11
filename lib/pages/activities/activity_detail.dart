@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:tribal_instinct/components/member_card.dart';
 import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/model/activity_types.dart';
+import 'package:tribal_instinct/model/app_user.dart';
 
 class ActivityDetailPage extends StatefulWidget {
   @override
@@ -19,9 +20,12 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
   final String _id = '1';
   final timeout = const Duration(seconds: 1);
 
+  final currentUser = AppUser(); //TODO REMOVE
+  var isAdmin = false;
+
   var _absorbing = false;
   var _success = false;
-  var _attending = false;
+  var _attending = true;
 
   void joinEvent(id) {
     Timer(timeout, () {
@@ -40,6 +44,8 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    var availableSpots = activity.cohortSize - activity.attendees.length;
+    print(isAdmin);
     return WillPopScope(
       onWillPop: () async => !_absorbing,
       child: AbsorbPointer(
@@ -89,14 +95,14 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                     style: Theme.of(context).textTheme.bodyText1,
                     textScaleFactor: 1.3,
                   ),
-                  Text(
-                    activity.hostType == ActivityHost.self_hosted
-                        ? 'without a host present'
-                        : 'with host present',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyText1,
-                    textScaleFactor: 1.3,
-                  ),
+                  // Text(
+                  //   activity.hostType == ActivityHost.self_hosted
+                  //       ? 'without a host present'
+                  //       : 'with host present',
+                  //   textAlign: TextAlign.center,
+                  //   style: Theme.of(context).textTheme.bodyText1,
+                  //   textScaleFactor: 1.3,
+                  // ),
                   Text(
                     'on ' + _format.format(activity.dateTime.toLocal()),
                     textAlign: TextAlign.center,
@@ -131,29 +137,41 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                             style: Theme.of(context).textTheme.headline5,
                           ),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Column(
-                              children: [
-                                CircleAvatar(
-                                  backgroundColor: Colors.blueGrey,
-                                  maxRadius: 30,
+                        Center(
+                          child: Wrap(
+                            alignment: WrapAlignment.start,
+                            runAlignment: WrapAlignment.spaceEvenly,
+                            runSpacing: 10,
+                            spacing: 35,
+                            children: [
+                              ...activity.attendees.map(
+                                (user) => Column(
+                                  children: [
+                                    CircleAvatar(
+                                        backgroundColor: Colors.blueGrey,
+                                        maxRadius: 35,
+                                        backgroundImage: user.photo),
+                                    Text(user.name)
+                                  ],
                                 ),
-                                Text('Nabi')
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                CircleAvatar(
-                                  backgroundColor: Colors.blueGrey,
-                                  maxRadius: 30,
-                                ),
-                                Text('Unassigned')
-                              ],
-                            )
-                          ],
-                        )
+                              ),
+                              ...List.generate(availableSpots, (index) => null)
+                                  .map((e) => Column(
+                                        children: [
+                                          CircleAvatar(
+                                            backgroundColor: Colors.blueGrey,
+                                            maxRadius: 35,
+                                            child: Text(
+                                              '+',
+                                              textScaleFactor: 3,
+                                            ),
+                                          ),
+                                          Text('Add')
+                                        ],
+                                      ))
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   Padding(

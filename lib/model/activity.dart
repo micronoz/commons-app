@@ -13,7 +13,7 @@ class Activity {
   final int cohortSize;
   final DateTime dateTime;
   final List<AppUser> attendees;
-  final Organizer organizer;
+  final AppUser organizer;
   final ActivityHost hostType;
   final ActivityMedium mediumType;
 
@@ -42,9 +42,9 @@ class Activity {
         'Free',
         'Peet\'s coffee',
         5,
-        50,
+        10,
         DateTime.now(),
-        [AppUser(), AppUser()],
+        [AppUser(), AppUser(), AppUser(), AppUser()],
         AppUser(),
         ActivityHost.hosted,
         ActivityMedium.in_person);

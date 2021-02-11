@@ -1,7 +1,10 @@
+import 'package:enum_to_string/enum_to_string.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tribal_instinct/components/question_switch.dart';
 import 'package:tribal_instinct/components/session_card.dart';
+import 'package:tribal_instinct/model/activity_types.dart';
+import 'package:tribal_instinct/extensions/string_extension.dart';
 
 class CreateActivityPage extends StatefulWidget {
   @override
@@ -23,10 +26,12 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
   final _formKey = GlobalKey<FormState>();
   var _edited = false;
   var _online = false;
-  var _maximumGroup = false;
+  var _multiGroup = false;
   var _maximumAttendance = false;
   var _format = false;
   var _repeating = false;
+  var _approval = false;
+  ActivityVisibility _sliderValue = ActivityVisibility.invite_only;
   final _sessions = <SessionCard>[];
 
   @override
@@ -112,7 +117,7 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
               TextFormField(
                 decoration: InputDecoration(
                     hintText: _online
-                        ? 'Provide a link (leave blank to add it later)'
+                        ? 'Provide a link (you can add it later as well)'
                         : 'Location'),
               ),
               const SizedBox(
@@ -160,19 +165,25 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                 height: 20,
               ),
               QuestionSwitch(
-                key: Key('max group'),
-                question: 'Target group size',
+                key: Key('multi group'),
+                question: 'Multi group',
                 disabledOption: 'Disabled',
                 enabledOption: 'Enabled',
-                callback: (val) => setState(() => _maximumGroup = val),
+                callback: (val) => setState(() => _multiGroup = val),
                 additionalInfo:
-                    'Participants will be divided into groups of equal (if possible) size up to the target group size. \n\nChoose a number that is small enough for people to build connections but large enough to allow them to meet new people.',
+                    'Usually keep this disabled for personal Activities\n\nEnabling this setting allows you to divide the attendees into multiple smaller groups in which they can connect with each other better. They can meet ahead of time and attend the event together. Grouping will be done randomly for now.\n\nIf enabled, you will need to define a target group size, which will be the average number of people per group.',
               ),
-              if (_maximumGroup)
+              if (_multiGroup)
+                Text(
+                  'Target group size',
+                  style: Theme.of(context).textTheme.subtitle1,
+                ),
+              if (_multiGroup)
                 Row(
                   children: [
                     Flexible(
                       child: TextFormField(
+                        style: Theme.of(context).textTheme.headline6,
                         textAlign: TextAlign.center,
                         decoration:
                             const InputDecoration(border: OutlineInputBorder()),
@@ -196,7 +207,8 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                 disabledOption: 'Disabled',
                 enabledOption: 'Enabled',
                 callback: (val) => setState(() => _maximumAttendance = val),
-                additionalInfo: 'Max number of participants per session',
+                additionalInfo:
+                    'Max number of individuals who can attend this activity.',
               ),
               if (_maximumAttendance)
                 Row(
@@ -204,6 +216,7 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                     Flexible(
                       child: TextFormField(
                         textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.headline6,
                         decoration:
                             const InputDecoration(border: OutlineInputBorder()),
                         inputFormatters: [
@@ -217,6 +230,46 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                     )
                   ],
                 ),
+              const SizedBox(
+                height: 20,
+              ),
+              Text(
+                'Visibility',
+                style: Theme.of(context).textTheme.headline6,
+              ),
+
+              SliderTheme(
+                data: SliderThemeData(
+                    showValueIndicator: ShowValueIndicator.always),
+                child: Slider(
+                  onChanged: (numa) {
+                    setState(() {
+                      print(numa);
+                      _sliderValue = ActivityVisibility.values[numa.truncate()];
+                    });
+                  },
+                  value: _sliderValue.index.toDouble(),
+                  min: 0,
+                  max: 2,
+                  label: EnumToString.convertToString(_sliderValue)
+                      .replaceAll('_', ' ')
+                      .capitalize(),
+                  divisions: 2,
+                ),
+              ),
+
+              if (_sliderValue == ActivityVisibility.people_i_follow ||
+                  _sliderValue == ActivityVisibility.public)
+                QuestionSwitch(
+                  key: Key('approval'),
+                  question: 'Require approval',
+                  disabledOption: 'Disabled',
+                  enabledOption: 'Enabled',
+                  callback: (val) => setState(() => _approval = val),
+                  additionalInfo:
+                      'Enabling this will require you to approve each of the participants before they are allowed to join the activity.',
+                ),
+
               const SizedBox(
                 height: 20,
               ),

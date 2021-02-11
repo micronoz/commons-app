@@ -55,4 +55,13 @@ class AppUser extends ChangeNotifier implements Organizer {
   Map<String, dynamic> toJson() => {
         'id': id,
       };
+
+  @override
+  bool operator ==(Object other) {
+    if (other is AppUser) {
+      return (id == other.id);
+    } else {
+      return false;
+    }
+  }
 }
