@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>600024232537-9l1gmbi1m1kldll1h4s0ge9h06blumfg.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.600024232537-9l1gmbi1m1kldll1h4s0ge9h06blumfg</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>600024232537-lsas356aidn86gsuq46rvu41d8qq977e.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCPyFcvZN3Vs0oxeapNDnMslt2wl5iN-5c</string>
+	<key>GCM_SENDER_ID</key>
+	<string>600024232537</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.nozberkman.commons</string>
+	<key>PROJECT_ID</key>
+	<string>tribal-instinct</string>
+	<key>STORAGE_BUCKET</key>
+	<string>tribal-instinct.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false/>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false/>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true/>
+	<key>IS_GCM_ENABLED</key>
+	<true/>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true/>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:600024232537:ios:d28fc44f52e2a7b7b5b748</string>
+</dict>
+</plist>
