@@ -8,6 +8,7 @@ import 'package:tribal_instinct/components/member_card.dart';
 import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/model/activity_types.dart';
 import 'package:tribal_instinct/model/app_user.dart';
+import 'package:tribal_instinct/pages/invite.dart';
 
 class ActivityDetailPage extends StatefulWidget {
   @override
@@ -42,10 +43,16 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
     });
   }
 
+  void invite(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => InvitePage(activity)));
+  }
+
   @override
   Widget build(BuildContext context) {
+    currentUser.hydrate();
     var availableSpots = activity.cohortSize - activity.attendees.length;
-    print(isAdmin);
+    isAdmin = currentUser == activity.organizer;
     return WillPopScope(
       onWillPop: () async => !_absorbing,
       child: AbsorbPointer(
@@ -133,7 +140,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                         Padding(
                           padding: const EdgeInsets.only(left: 5, top: 10),
                           child: Text(
-                            'My Group',
+                            isAdmin ? 'Slots' : 'My Group',
                             style: Theme.of(context).textTheme.headline5,
                           ),
                         ),
@@ -156,19 +163,37 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                                 ),
                               ),
                               ...List.generate(availableSpots, (index) => null)
-                                  .map((e) => Column(
-                                        children: [
-                                          CircleAvatar(
-                                            backgroundColor: Colors.blueGrey,
-                                            maxRadius: 35,
-                                            child: Text(
-                                              '+',
-                                              textScaleFactor: 3,
+                                  .map((e) => isAdmin
+                                      ? Column(
+                                          children: [
+                                            InkWell(
+                                              onTap: () => invite(context),
+                                              child: CircleAvatar(
+                                                backgroundColor:
+                                                    Colors.blueGrey,
+                                                maxRadius: 35,
+                                                child: Text(
+                                                  '+',
+                                                  textScaleFactor: 3,
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                          Text('Add')
-                                        ],
-                                      ))
+                                            Text('Add')
+                                          ],
+                                        )
+                                      : Column(
+                                          children: [
+                                            CircleAvatar(
+                                              backgroundColor: Colors.blueGrey,
+                                              maxRadius: 35,
+                                              child: Text(
+                                                '?',
+                                                textScaleFactor: 3,
+                                              ),
+                                            ),
+                                            Text('null')
+                                          ],
+                                        ))
                             ],
                           ),
                         ),
@@ -181,11 +206,12 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                       style: Theme.of(context).textTheme.headline5,
                     ),
                   ),
-                  ...activity.attendees.map(
-                    (m) => MemberCard(
+                  ...activity.attendees.map((m) => MemberCard(
                       m,
-                    ),
-                  ),
+                      'Unfollow',
+                      'Follow',
+                      (AppUser u) => currentUser.following.contains(u))),
+
                   if (!_attending)
                     const SizedBox(
                       height: 60,

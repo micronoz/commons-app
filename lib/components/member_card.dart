@@ -1,19 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:tribal_instinct/model/app_user.dart';
 
-class MemberCard extends StatelessWidget {
-  MemberCard(this.member, {Key key}) : super(key: key);
+class MemberCard extends StatefulWidget {
+  MemberCard(this.member, this.onText, this.offText, this.isOn, {Key key})
+      : super(key: key);
   final AppUser member;
+  final String onText;
+  final String offText;
+  final Function isOn;
 
   @override
+  _MemberCardState createState() => _MemberCardState();
+}
+
+class _MemberCardState extends State<MemberCard> {
+  @override
   Widget build(BuildContext context) {
+    var isOn = widget.isOn(widget.member);
     return Container(
       padding: EdgeInsets.all(10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Image(
-            image: member.photo,
+            image: widget.member.photo,
             width: 60,
             height: 60,
           ),
@@ -29,7 +39,7 @@ class MemberCard extends StatelessWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        member.name + ' ',
+                        widget.member.name + ' ',
                         style: Theme.of(context).textTheme.bodyText1,
                         textScaleFactor: 1.3,
                         softWrap: false,
@@ -38,7 +48,7 @@ class MemberCard extends StatelessWidget {
                     ),
                     Flexible(
                       child: Text(
-                        '@' + member.identifier,
+                        '@' + widget.member.identifier,
                         style: TextStyle(),
                         textScaleFactor: 1.3,
                         softWrap: false,
@@ -49,7 +59,7 @@ class MemberCard extends StatelessWidget {
                 ),
                 Flexible(
                   child: Text(
-                    member.description,
+                    widget.member.description,
                     style: Theme.of(context).textTheme.bodyText2,
                     maxLines: 2,
                     softWrap: true,
@@ -59,7 +69,9 @@ class MemberCard extends StatelessWidget {
               ],
             ),
           ),
-          TextButton(onPressed: () {}, child: Text('Follow'))
+          TextButton(
+              onPressed: () => setState,
+              child: Text(isOn ? widget.onText : widget.offText))
         ],
       ),
     );

@@ -52,6 +52,11 @@ class AppUser extends ChangeNotifier implements Organizer {
     photo = NetworkImage('https://picsum.photos/250?image=11');
   }
 
+  AppUser hydrate() {
+    following = {AppUser(), AppUser()};
+    return this;
+  }
+
   Map<String, dynamic> toJson() => {
         'id': id,
       };
@@ -64,4 +69,7 @@ class AppUser extends ChangeNotifier implements Organizer {
       return false;
     }
   }
+
+  @override
+  int get hashCode => id.hashCode;
 }

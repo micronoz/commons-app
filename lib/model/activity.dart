@@ -12,7 +12,8 @@ class Activity {
   final int groupSize;
   final int cohortSize;
   final DateTime dateTime;
-  final List<AppUser> attendees;
+  final Set<AppUser> attendees;
+  final Set<AppUser> invitees;
   final AppUser organizer;
   final ActivityHost hostType;
   final ActivityMedium mediumType;
@@ -28,6 +29,7 @@ class Activity {
     this.cohortSize,
     this.dateTime,
     this.attendees,
+    this.invitees,
     this.organizer,
     this.hostType,
     this.mediumType,
@@ -44,7 +46,8 @@ class Activity {
         5,
         10,
         DateTime.now(),
-        [AppUser(), AppUser(), AppUser(), AppUser()],
+        {AppUser(), AppUser(), AppUser(), AppUser()},
+        {},
         AppUser(),
         ActivityHost.hosted,
         ActivityMedium.in_person);
