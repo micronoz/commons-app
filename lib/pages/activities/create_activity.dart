@@ -25,7 +25,7 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
     });
   }
 
-  static const maxInputSize = 5;
+  static const maxInputSize = 255;
   static const emptyFieldError = 'You can not leave this field empty.';
   static const largeInputError =
       'This field can not have more than than ${maxInputSize} characters.';
