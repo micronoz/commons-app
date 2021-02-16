@@ -2,11 +2,13 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:enum_to_string/enum_to_string.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:tribal_instinct/components/question_switch.dart';
 import 'package:tribal_instinct/components/session_card.dart';
 import 'package:tribal_instinct/model/activity_types.dart';
 import 'package:tribal_instinct/extensions/string_extension.dart';
+import 'dart:io';
 
 class CreateActivityPage extends StatefulWidget {
   @override
@@ -40,10 +42,14 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
   // var _multiGroup = false;
   var _targetGroupSize = null;
   var _maximumAttendance = false;
-  var _maximumAttendenceSize = null;
+  int _maximumAttendenceSize = null;
   var _format = false;
   var _repeating = false;
   var _approval = false;
+
+  //TODO: This needs files changed for IOS. Check if those have been done.
+  final ImagePicker _picker = ImagePicker();
+  PickedFile _pickedImage;
   ActivityVisibility _sliderValue = ActivityVisibility.invite_only;
   final _sessions = <SessionCard>[];
 
@@ -313,7 +319,8 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                           FilteringTextInputFormatter.allow(RegExp(r'[1-9]\d*'))
                         ],
                         keyboardType: TextInputType.number,
-                        onChanged: (value) => _maximumAttendenceSize = value,
+                        onChanged: (value) =>
+                            _maximumAttendenceSize = int.parse(value),
                         validator: _genericValidator,
                       ),
                     ),
@@ -361,6 +368,52 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                       'Enabling this will require you to approve each of the participants before they are allowed to join the activity.',
                 ),
 
+              const SizedBox(
+                height: 20,
+              ),
+              Text(
+                'Add a photo (Optional)',
+                style: Theme.of(context).textTheme.headline6,
+              ),
+              _pickedImage == null
+                  ? SizedBox(
+                      height: 20,
+                    )
+                  : Column(children: [
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Image.file(
+                        File(_pickedImage.path),
+                        fit: BoxFit.fitHeight,
+                        height: 200,
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                    ]),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    try {
+                      var pickedImage =
+                          await _picker.getImage(source: ImageSource.gallery);
+                      setState(() {
+                        _pickedImage = pickedImage;
+                      });
+                    } catch (e) {
+                      print(e);
+                    }
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.photo),
+                      Text('${_pickedImage == null ? 'Pick' : 'Change'} Photo')
+                    ],
+                  ),
+                ),
+              ),
               const SizedBox(
                 height: 20,
               ),

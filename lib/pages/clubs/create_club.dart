@@ -18,6 +18,7 @@ class _CreateClubPageState extends State<CreateClubPage> {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  //TODO: This needs files changed for IOS. Check if those have been done.
   final ImagePicker _picker = ImagePicker();
   PickedFile _pickedImage;
 
