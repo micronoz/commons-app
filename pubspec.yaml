@@ -36,6 +36,7 @@ dependencies:
   intl: ^0.16.1
   graphql: ^4.0.0
   enum_to_string: ^1.0.14
+  datetime_picker_formfield: ^1.0.0
 
 dev_dependencies:
   pedantic: ^1.9.2

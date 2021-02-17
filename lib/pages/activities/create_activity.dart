@@ -1,10 +1,14 @@
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:enum_to_string/enum_to_string.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:tribal_instinct/components/question_switch.dart';
 import 'package:tribal_instinct/components/session_card.dart';
 import 'package:tribal_instinct/model/activity_types.dart';
 import 'package:tribal_instinct/extensions/string_extension.dart';
+import 'dart:io';
 
 class CreateActivityPage extends StatefulWidget {
   @override
@@ -23,16 +27,69 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
     });
   }
 
+  static const maxInputSize = 255;
+  static const emptyFieldError = 'You can not leave this field empty.';
+  static const largeInputError =
+      'This field can not have more than than ${maxInputSize} characters.';
+
   final _formKey = GlobalKey<FormState>();
   var _edited = false;
+  var _activityName = null;
+  var _desciption = null;
   var _online = false;
-  var _multiGroup = false;
+  var _location = null;
+  var _date = null;
+  // var _multiGroup = false;
+  var _targetGroupSize = null;
   var _maximumAttendance = false;
+  int _maximumAttendenceSize = null;
   var _format = false;
   var _repeating = false;
   var _approval = false;
+
+  //TODO: This needs files changed for IOS. Check if those have been done.
+  final ImagePicker _picker = ImagePicker();
+  PickedFile _pickedImage;
   ActivityVisibility _sliderValue = ActivityVisibility.invite_only;
   final _sessions = <SessionCard>[];
+
+  String _genericValidator(String value) {
+    if (value == null || value.isEmpty) {
+      return emptyFieldError;
+    } else if (value.length > maxInputSize) {
+      return largeInputError;
+    } else {
+      return null;
+    }
+  }
+
+  Future<void> _showFormError() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Incomplete Form'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                    'The fields are not filled in correctly. Please complete the form.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Will do!'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +142,8 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
               ),
               TextFormField(
                 decoration: InputDecoration(hintText: 'Title'),
+                onChanged: (value) => setState(() => _activityName = value),
+                validator: _genericValidator,
               ),
               const SizedBox(
                 height: 20,
@@ -96,6 +155,8 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
               TextFormField(
                 maxLines: null,
                 decoration: InputDecoration(hintText: 'Description'),
+                onChanged: (value) => setState(() => _desciption = value),
+                validator: _genericValidator,
               ),
               const SizedBox(
                 height: 20,
@@ -119,6 +180,9 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                     hintText: _online
                         ? 'Provide a link (you can add it later as well)'
                         : 'Location'),
+                //TODO: Reconsider the maximum input size for links
+                onChanged: (value) => _location = value,
+                validator: _genericValidator,
               ),
               const SizedBox(
                 height: 20,
@@ -131,9 +195,38 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                 '(Will calibrate to your local time)',
                 style: Theme.of(context).textTheme.subtitle1,
               ),
-              SessionCard(
-                removeCallback: null,
-                key: UniqueKey(),
+              DateTimeField(
+                format: DateFormat('yyyy-MM-dd HH:mm'),
+                onShowPicker: (context, currentValue) async {
+                  final date = await showDatePicker(
+                    context: context,
+                    firstDate: DateTime.now(),
+                    initialDate:
+                        currentValue ?? DateTime.now().add(Duration(days: 1)),
+                    lastDate: DateTime.now().add(Duration(days: 365)),
+                  );
+                  if (date != null) {
+                    final time = await showTimePicker(
+                      context: context,
+                      initialTime: TimeOfDay.fromDateTime(
+                          currentValue ?? DateTime.now()),
+                    );
+                    return DateTimeField.combine(date, time);
+                  } else {
+                    return currentValue;
+                  }
+                },
+                onChanged: (value) => _date = value,
+                validator: (value) {
+                  if (value == null) {
+                    return emptyFieldError;
+                  }
+                  if (value.isBefore(DateTime.now())) {
+                    return 'Time of the event must be in the future.';
+                  } else {
+                    return null;
+                  }
+                },
               ),
               // Text(
               //   '(You can always add more later)',
@@ -164,43 +257,45 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
               const SizedBox(
                 height: 20,
               ),
-              QuestionSwitch(
-                key: Key('multi group'),
-                question: 'Multi group',
-                disabledOption: 'Disabled',
-                enabledOption: 'Enabled',
-                callback: (val) => setState(() => _multiGroup = val),
-                additionalInfo:
-                    'Usually keep this disabled for personal Activities\n\nEnabling this setting allows you to divide the attendees into multiple smaller groups in which they can connect with each other better. They can meet ahead of time and attend the event together. Grouping will be done randomly for now.\n\nIf enabled, you will need to define a target group size, which will be the average number of people per group.',
-              ),
-              if (_multiGroup)
-                Text(
-                  'Target group size',
-                  style: Theme.of(context).textTheme.subtitle1,
-                ),
-              if (_multiGroup)
-                Row(
-                  children: [
-                    Flexible(
-                      child: TextFormField(
-                        style: Theme.of(context).textTheme.headline6,
-                        textAlign: TextAlign.center,
-                        decoration:
-                            const InputDecoration(border: OutlineInputBorder()),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
-                        keyboardType: TextInputType.number,
-                      ),
-                    ),
-                    Spacer(
-                      flex: 2,
-                    )
-                  ],
-                ),
-              const SizedBox(
-                height: 20,
-              ),
+              // QuestionSwitch(
+              //   key: Key('multi group'),
+              //   question: 'Multi group',
+              //   disabledOption: 'Disabled',
+              //   enabledOption: 'Enabled',
+              //   callback: (val) => setState(() => _multiGroup = val),
+              //   additionalInfo:
+              //       'Usually keep this disabled for personal Activities\n\nEnabling this setting allows you to divide the attendees into multiple smaller groups in which they can connect with each other better. They can meet ahead of time and attend the event together. Grouping will be done randomly for now.\n\nIf enabled, you will need to define a target group size, which will be the average number of people per group.',
+              // ),
+              // if (_multiGroup)
+              //   Text(
+              //     'Target group size',
+              //     style: Theme.of(context).textTheme.subtitle1,
+              //   ),
+              // if (_multiGroup)
+              //   Row(
+              //     children: [
+              //       Flexible(
+              //         child: TextFormField(
+              //           style: Theme.of(context).textTheme.headline6,
+              //           textAlign: TextAlign.center,
+              //           decoration:
+              //               const InputDecoration(border: OutlineInputBorder()),
+              //           inputFormatters: [
+              //             FilteringTextInputFormatter.digitsOnly
+              //           ],
+              //           keyboardType: TextInputType.number,
+              //           onChanged: (value) => _targetGroupSize = value,
+              //           validator: _genericValidator,
+              //         ),
+              //       ),
+              //       Spacer(
+              //         flex: 2,
+              //       )
+              //     ],
+              //   ),
+              // const SizedBox(
+              // height: 20,
+              // ),
               QuestionSwitch(
                 key: Key('max cohort'),
                 question: 'Maximum attendance size',
@@ -220,9 +315,13 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                         decoration:
                             const InputDecoration(border: OutlineInputBorder()),
                         inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly
+                          FilteringTextInputFormatter.digitsOnly,
+                          FilteringTextInputFormatter.allow(RegExp(r'[1-9]\d*'))
                         ],
                         keyboardType: TextInputType.number,
+                        onChanged: (value) =>
+                            _maximumAttendenceSize = int.parse(value),
+                        validator: _genericValidator,
                       ),
                     ),
                     Spacer(
@@ -244,7 +343,6 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                 child: Slider(
                   onChanged: (numa) {
                     setState(() {
-                      print(numa);
                       _sliderValue = ActivityVisibility.values[numa.truncate()];
                     });
                   },
@@ -273,12 +371,64 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
               const SizedBox(
                 height: 20,
               ),
+              Text(
+                'Add a photo (Optional)',
+                style: Theme.of(context).textTheme.headline6,
+              ),
+              _pickedImage == null
+                  ? SizedBox(
+                      height: 20,
+                    )
+                  : Column(children: [
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Image.file(
+                        File(_pickedImage.path),
+                        fit: BoxFit.fitHeight,
+                        height: 200,
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                    ]),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    try {
+                      var pickedImage =
+                          await _picker.getImage(source: ImageSource.gallery);
+                      setState(() {
+                        _pickedImage = pickedImage;
+                      });
+                    } catch (e) {
+                      print(e);
+                    }
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.photo),
+                      Text('${_pickedImage == null ? 'Pick' : 'Change'} Photo')
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
               SizedBox(
                 height: 40,
                 child: RaisedButton(
                   shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(30))),
-                  onPressed: () => saveAndExit(context),
+                  onPressed: () {
+                    if (_formKey.currentState.validate()) {
+                      saveAndExit(context);
+                    } else {
+                      _showFormError();
+                    }
+                  },
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
