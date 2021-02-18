@@ -36,21 +36,23 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
   var _edited = false;
   var _activityName = null;
   var _desciption = null;
-  var _online = false;
+  var _isOnline = false;
   var _location = null;
   var _date = null;
   // var _multiGroup = false;
-  var _targetGroupSize = null;
+  // var _targetGroupSize = null;
   var _maximumAttendance = false;
   int _maximumAttendenceSize = null;
   var _format = false;
-  var _repeating = false;
-  var _approval = false;
+  // var _repeating = false;
+  var _requireApproval = false;
+  var _isMatching = false;
+  var _matchingSize = null;
 
   //TODO: This needs files changed for IOS. Check if those have been done.
   final ImagePicker _picker = ImagePicker();
   PickedFile _pickedImage;
-  ActivityVisibility _sliderValue = ActivityVisibility.invite_only;
+  ActivityVisibility _visibilitySliderValue = ActivityVisibility.invite_only;
   final _sessions = <SessionCard>[];
 
   String _genericValidator(String value) {
@@ -173,11 +175,11 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                 question: 'Where will it be?',
                 disabledOption: 'In-person',
                 enabledOption: 'Online',
-                callback: (val) => setState(() => _online = val),
+                callback: (val) => setState(() => _isOnline = val),
               ),
               TextFormField(
                 decoration: InputDecoration(
-                    hintText: _online
+                    hintText: _isOnline
                         ? 'Provide a link (you can add it later as well)'
                         : 'Location'),
                 //TODO: Reconsider the maximum input size for links
@@ -316,11 +318,52 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                             const InputDecoration(border: OutlineInputBorder()),
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
-                          FilteringTextInputFormatter.allow(RegExp(r'[1-9]\d*'))
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'[1-9]\d{0,2}$'))
                         ],
                         keyboardType: TextInputType.number,
                         onChanged: (value) =>
                             _maximumAttendenceSize = int.parse(value),
+                        validator: _genericValidator,
+                      ),
+                    ),
+                    Spacer(
+                      flex: 2,
+                    )
+                  ],
+                ),
+              const SizedBox(
+                height: 20,
+              ),
+              QuestionSwitch(
+                key: Key('is matching'),
+                question: 'Matching',
+                disabledOption: 'Disabled',
+                enabledOption: 'Enabled',
+                callback: (val) => setState(() => _isMatching = val),
+                additionalInfo:
+                    'Match and connect participants beforehand in groups.',
+              ),
+              if (_isMatching)
+                Row(
+                  children: [
+                    Text(
+                      'Match group size:',
+                      style: Theme.of(context).textTheme.subtitle2,
+                    ),
+                    Flexible(
+                      child: TextFormField(
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.headline6,
+                        decoration:
+                            const InputDecoration(border: OutlineInputBorder()),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'[1-9]\d{0,2}$'))
+                        ],
+                        keyboardType: TextInputType.number,
+                        onChanged: (value) => _matchingSize = int.parse(value),
                         validator: _genericValidator,
                       ),
                     ),
@@ -343,27 +386,29 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                 child: Slider(
                   onChanged: (numa) {
                     setState(() {
-                      _sliderValue = ActivityVisibility.values[numa.truncate()];
+                      _visibilitySliderValue =
+                          ActivityVisibility.values[numa.truncate()];
                     });
                   },
-                  value: _sliderValue.index.toDouble(),
+                  value: _visibilitySliderValue.index.toDouble(),
                   min: 0,
                   max: 2,
-                  label: EnumToString.convertToString(_sliderValue)
+                  label: EnumToString.convertToString(_visibilitySliderValue)
                       .replaceAll('_', ' ')
                       .capitalize(),
                   divisions: 2,
                 ),
               ),
 
-              if (_sliderValue == ActivityVisibility.people_i_follow ||
-                  _sliderValue == ActivityVisibility.public)
+              if (_visibilitySliderValue ==
+                      ActivityVisibility.people_i_follow ||
+                  _visibilitySliderValue == ActivityVisibility.public)
                 QuestionSwitch(
                   key: Key('approval'),
                   question: 'Require approval',
                   disabledOption: 'Disabled',
                   enabledOption: 'Enabled',
-                  callback: (val) => setState(() => _approval = val),
+                  callback: (val) => setState(() => _requireApproval = val),
                   additionalInfo:
                       'Enabling this will require you to approve each of the participants before they are allowed to join the activity.',
                 ),

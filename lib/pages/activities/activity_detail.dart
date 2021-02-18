@@ -51,7 +51,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
   @override
   Widget build(BuildContext context) {
     currentUser.hydrate();
-    var availableSpots = activity.cohortSize - activity.attendees.length;
+    var availableSpots = activity.maxGroupSize - activity.attendees.length;
     isAdmin = currentUser == activity.organizer;
     return WillPopScope(
       onWillPop: () async => !_absorbing,
@@ -117,7 +117,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                     textScaleFactor: 1.3,
                   ),
                   Text(
-                    'Available space: ${activity.cohortSize - activity.attendees.length}/${activity.cohortSize}',
+                    'Available space: ${activity.maxGroupSize - activity.attendees.length}/${activity.maxGroupSize}',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyText1,
                     textScaleFactor: 1.3,
