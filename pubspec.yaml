@@ -37,6 +37,8 @@ dependencies:
   graphql: ^4.0.0
   enum_to_string: ^1.0.14
   datetime_picker_formfield: ^1.0.0
+  graphql_flutter: ^4.0.1
+  flutter_signin_button: ^1.1.0
 
 dev_dependencies:
   pedantic: ^1.9.2

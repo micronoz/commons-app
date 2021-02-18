@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tribal_instinct/managers/auth.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -88,6 +89,12 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(
               height: 10,
             ),
+            RaisedButton(
+              onPressed: () {
+                Auth.of(context).logout();
+              },
+              child: Text('Logout'),
+            )
           ],
         ),
       ),
