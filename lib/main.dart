@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:tribal_instinct/pages/home.dart';
+import 'package:tribal_instinct/pages/login.dart';
 
 import 'managers/auth.dart';
 import 'managers/user_manager.dart';
@@ -35,10 +37,34 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
+  final _navigatorKey = GlobalKey<NavigatorState>();
+  User currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    currentUser = widget.auth.init(_onUserChanged);
+  }
+
+  void _onUserChanged() {
+    setState(() {
+      currentUser = widget.auth.currentUser.value;
+    });
+  }
+
+  @override
+  void dispose() {
+    widget.auth.dispose(_onUserChanged);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [Provider.value(value: widget.userManager.currentUser.value)],
+      providers: [
+        Provider.value(value: widget.userManager.currentUser.value),
+        Provider<Auth>.value(value: widget.auth)
+      ],
       child: MaterialApp(
         title: 'Tribal Instinct',
         theme: ThemeData(
@@ -47,7 +73,8 @@ class _AppState extends State<App> {
           accentColor: Colors.orangeAccent,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: HomePage(),
+        navigatorKey: _navigatorKey,
+        home: currentUser != null ? HomePage() : LoginPage(),
       ),
     );
   }

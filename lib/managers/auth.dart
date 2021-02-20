@@ -8,6 +8,11 @@ import 'package:provider/provider.dart';
 class Auth {
   static Future<Auth> create() async {
     final currentUser = FirebaseAuth.instance.currentUser;
+    try {
+      await currentUser.reload();
+    } catch (err) {
+      await FirebaseAuth.instance.signOut();
+    }
     return Auth._(currentUser);
   }
 

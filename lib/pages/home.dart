@@ -7,6 +7,10 @@ import 'package:tribal_instinct/pages/profile.dart';
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
 
+  static MaterialPageRoute route() {
+    return MaterialPageRoute(builder: (context) => HomePage());
+  }
+
   @override
   _HomePageState createState() => _HomePageState();
 }
