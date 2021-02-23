@@ -26,6 +26,8 @@ class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
       yield Padding(
         padding: const EdgeInsets.all(1.0),
         child: FilterChip(
+          showCheckmark: false,
+          visualDensity: VisualDensity.comfortable,
           label: Text(category),
           selected: category == 'All'
               ? _filters.isEmpty
