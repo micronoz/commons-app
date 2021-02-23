@@ -8,6 +8,7 @@ import 'package:tribal_instinct/components/member_card.dart';
 import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/model/activity_types.dart';
 import 'package:tribal_instinct/model/app_user.dart';
+import 'package:tribal_instinct/pages/chat.dart';
 import 'package:tribal_instinct/pages/invite.dart';
 
 class ActivityDetailPage extends StatefulWidget {
@@ -27,6 +28,16 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
   var _absorbing = false;
   var _success = false;
   var _attending = true;
+
+  var _tabIndex = 0;
+
+  final tabs = <Tab>[
+    Tab(
+      icon: Icon(Icons.message),
+      text: 'Messages',
+    ),
+    Tab(icon: Icon(Icons.details), text: 'Details'),
+  ];
 
   void joinEvent(id) {
     Timer(timeout, () {
@@ -50,6 +61,10 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    var tabBar = TabBar(
+      tabs: tabs,
+      onTap: (index) => setState(() => _tabIndex = index),
+    );
     currentUser.hydrate();
     var availableSpots = activity.maxGroupSize - activity.attendees.length;
     isAdmin = currentUser == activity.organizer;
@@ -77,145 +92,161 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                     ),
               appBar: AppBar(
                 title: Text('Activity details'),
+                bottom: PreferredSize(
+                  preferredSize: tabBar.preferredSize,
+                  child: DefaultTabController(
+                    child: tabBar,
+                    length: 2,
+                    initialIndex: _tabIndex,
+                  ),
+                ),
               ),
-              body: ListView(
+              body: IndexedStack(
+                index: _tabIndex,
                 children: [
-                  AspectRatio(
-                    aspectRatio: 16 / 9,
-                    child: Image.network(
-                      activity.photoUrl,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Text(
-                    activity.title,
-                    style: Theme.of(context).textTheme.headline2,
-                    textScaleFactor: 0.6,
-                    textAlign: TextAlign.center,
-                  ),
-                  Text(
-                    (activity.mediumType == ActivityMedium.in_person
-                            ? 'in-person at '
-                            : 'online at ') +
-                        activity.location,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyText1,
-                    textScaleFactor: 1.3,
-                  ),
-                  // Text(
-                  //   activity.hostType == ActivityHost.self_hosted
-                  //       ? 'without a host present'
-                  //       : 'with host present',
-                  //   textAlign: TextAlign.center,
-                  //   style: Theme.of(context).textTheme.bodyText1,
-                  //   textScaleFactor: 1.3,
-                  // ),
-                  Text(
-                    'on ' + _format.format(activity.dateTime.toLocal()),
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyText1,
-                    textScaleFactor: 1.3,
-                  ),
-                  Text(
-                    'Available space: ${activity.maxGroupSize - activity.attendees.length}/${activity.maxGroupSize}',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyText1,
-                    textScaleFactor: 1.3,
-                  ),
-                  Text(
-                    'Price: ' + activity.price,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyText1,
-                    textScaleFactor: 1.3,
-                  ),
-                  Text(
-                    activity.description,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyText2,
-                  ),
-                  if (_attending)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 5, top: 10),
-                          child: Text(
-                            isAdmin ? 'Slots' : 'My Group',
-                            style: Theme.of(context).textTheme.headline5,
-                          ),
+                  ChatPage(),
+                  ListView(
+                    children: [
+                      AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: Image.network(
+                          activity.photoUrl,
+                          fit: BoxFit.cover,
                         ),
-                        Center(
-                          child: Wrap(
-                            alignment: WrapAlignment.start,
-                            runAlignment: WrapAlignment.spaceEvenly,
-                            runSpacing: 10,
-                            spacing: 35,
-                            children: [
-                              ...activity.attendees.map(
-                                (user) => Column(
-                                  children: [
-                                    CircleAvatar(
-                                        backgroundColor: Colors.blueGrey,
-                                        maxRadius: 35,
-                                        backgroundImage: user.photo),
-                                    Text(user.name)
-                                  ],
-                                ),
+                      ),
+                      Text(
+                        activity.title,
+                        style: Theme.of(context).textTheme.headline2,
+                        textScaleFactor: 0.6,
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        (activity.mediumType == ActivityMedium.in_person
+                                ? 'in-person at '
+                                : 'online at ') +
+                            activity.location,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyText1,
+                        textScaleFactor: 1.3,
+                      ),
+                      // Text(
+                      //   activity.hostType == ActivityHost.self_hosted
+                      //       ? 'without a host present'
+                      //       : 'with host present',
+                      //   textAlign: TextAlign.center,
+                      //   style: Theme.of(context).textTheme.bodyText1,
+                      //   textScaleFactor: 1.3,
+                      // ),
+                      Text(
+                        'on ' + _format.format(activity.dateTime.toLocal()),
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyText1,
+                        textScaleFactor: 1.3,
+                      ),
+                      Text(
+                        'Available space: ${activity.maxGroupSize - activity.attendees.length}/${activity.maxGroupSize}',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyText1,
+                        textScaleFactor: 1.3,
+                      ),
+                      Text(
+                        'Price: ' + activity.price,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyText1,
+                        textScaleFactor: 1.3,
+                      ),
+                      Text(
+                        activity.description,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyText2,
+                      ),
+                      if (_attending)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 5, top: 10),
+                              child: Text(
+                                isAdmin ? 'Slots' : 'My Group',
+                                style: Theme.of(context).textTheme.headline5,
                               ),
-                              ...List.generate(availableSpots, (index) => null)
-                                  .map((e) => isAdmin
-                                      ? Column(
-                                          children: [
-                                            InkWell(
-                                              onTap: () => invite(context),
-                                              child: CircleAvatar(
-                                                backgroundColor:
-                                                    Colors.blueGrey,
-                                                maxRadius: 35,
-                                                child: Text(
-                                                  '+',
-                                                  textScaleFactor: 3,
+                            ),
+                            Center(
+                              child: Wrap(
+                                alignment: WrapAlignment.start,
+                                runAlignment: WrapAlignment.spaceEvenly,
+                                runSpacing: 10,
+                                spacing: 35,
+                                children: [
+                                  ...activity.attendees.map(
+                                    (user) => Column(
+                                      children: [
+                                        CircleAvatar(
+                                            backgroundColor: Colors.blueGrey,
+                                            maxRadius: 35,
+                                            backgroundImage: user.photo),
+                                        Text(user.name)
+                                      ],
+                                    ),
+                                  ),
+                                  ...List.generate(
+                                          availableSpots, (index) => null)
+                                      .map((e) => isAdmin
+                                          ? Column(
+                                              children: [
+                                                InkWell(
+                                                  onTap: () => invite(context),
+                                                  child: CircleAvatar(
+                                                    backgroundColor:
+                                                        Colors.blueGrey,
+                                                    maxRadius: 35,
+                                                    child: Text(
+                                                      '+',
+                                                      textScaleFactor: 3,
+                                                    ),
+                                                  ),
                                                 ),
-                                              ),
-                                            ),
-                                            Text('Add')
-                                          ],
-                                        )
-                                      : Column(
-                                          children: [
-                                            CircleAvatar(
-                                              backgroundColor: Colors.blueGrey,
-                                              maxRadius: 35,
-                                              child: Text(
-                                                '?',
-                                                textScaleFactor: 3,
-                                              ),
-                                            ),
-                                            Text('null')
-                                          ],
-                                        ))
-                            ],
-                          ),
+                                                Text('Add')
+                                              ],
+                                            )
+                                          : Column(
+                                              children: [
+                                                CircleAvatar(
+                                                  backgroundColor:
+                                                      Colors.blueGrey,
+                                                  maxRadius: 35,
+                                                  child: Text(
+                                                    '?',
+                                                    textScaleFactor: 3,
+                                                  ),
+                                                ),
+                                                Text('null')
+                                              ],
+                                            ))
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 5),
-                    child: Text(
-                      'Participants',
-                      style: Theme.of(context).textTheme.headline5,
-                    ),
-                  ),
-                  ...activity.attendees.map((m) => MemberCard(
-                      m,
-                      'Unfollow',
-                      'Follow',
-                      (AppUser u) => currentUser.following.contains(u))),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 5),
+                        child: Text(
+                          'Participants',
+                          style: Theme.of(context).textTheme.headline5,
+                        ),
+                      ),
+                      ...activity.attendees.map((m) => MemberCard(
+                          m,
+                          'Unfollow',
+                          'Follow',
+                          (AppUser u) => currentUser.following.contains(u))),
 
-                  if (!_attending)
-                    const SizedBox(
-                      height: 60,
-                    )
+                      if (!_attending)
+                        const SizedBox(
+                          height: 60,
+                        )
+                    ],
+                  ),
                 ],
               ),
             ),
