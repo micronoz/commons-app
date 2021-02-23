@@ -2,7 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:tribal_instinct/constants.dart';
 import 'package:tribal_instinct/pages/home.dart';
 import 'package:tribal_instinct/pages/login.dart';
 
@@ -15,9 +17,12 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  runApp(App(
-    auth: await Auth.create(),
-    userManager: UserManager.create(),
+  await initHiveForFlutter();
+  runApp(AppConstants(
+    child: App(
+      auth: await Auth.create(),
+      userManager: UserManager.create(),
+    ),
   ));
 }
 
@@ -61,21 +66,42 @@ class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        Provider.value(value: widget.userManager.currentUser.value),
-        Provider<Auth>.value(value: widget.auth)
-      ],
-      child: MaterialApp(
-        title: 'Tribal Instinct',
-        theme: ThemeData(
-          // platform: TargetPlatform.iOS,
-          primarySwatch: Colors.cyan,
-          accentColor: Colors.orangeAccent,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
-        navigatorKey: _navigatorKey,
-        home: currentUser != null ? HomePage() : LoginPage(),
-      ),
-    );
+        providers: [
+          Provider.value(value: widget.userManager.currentUser.value),
+          Provider<Auth>.value(value: widget.auth),
+        ],
+        builder: (context, child) {
+          var httpLink = HttpLink(
+            AppConstants.of(context).backendUri,
+          );
+
+          var authLink = AuthLink(
+            getToken: () async {
+              final token = await currentUser.getIdToken();
+              return 'Bearer ${token}';
+            },
+          );
+
+          var link = authLink.concat(httpLink);
+          var client = GraphQLClient(
+            link: link,
+            cache: GraphQLCache(store: HiveStore()),
+          );
+          var clientNotifier = ValueNotifier(client);
+
+          return GraphQLProvider(
+              client: clientNotifier,
+              child: MaterialApp(
+                title: 'Tribal Instinct',
+                theme: ThemeData(
+                  // platform: TargetPlatform.iOS,
+                  primarySwatch: Colors.cyan,
+                  accentColor: Colors.orangeAccent,
+                  visualDensity: VisualDensity.adaptivePlatformDensity,
+                ),
+                navigatorKey: _navigatorKey,
+                home: currentUser != null ? HomePage() : LoginPage(),
+              ));
+        });
   }
 }

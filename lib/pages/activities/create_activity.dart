@@ -4,20 +4,52 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:tribal_instinct/components/question_switch.dart';
 import 'package:tribal_instinct/components/session_card.dart';
 import 'package:tribal_instinct/model/activity_types.dart';
 import 'package:tribal_instinct/extensions/string_extension.dart';
 import 'dart:io';
+import 'package:graphql_flutter/graphql_flutter.dart';
+
+String createActivityMutation = """
+  mutation CreateActivity(\$title: String!, \$description: String!, \$mediumType: String!, \$xLocation: Float!, \$yLocation: Float!, \$address: String!, \$eventDateTime: DateTime, \$visibility: Int!) {
+    createActivity(title: \$title, description: \$description, mediumType: \$mediumType, xLocation: \$xLocation, yLocation: \$yLocation, address: \$address, eventDateTime: \$eventDateTime, visibility: \$visibility) {
+      id
+    }
+  }
+""";
 
 class CreateActivityPage extends StatefulWidget {
   @override
   _CreateActivityPageState createState() => _CreateActivityPageState();
+
+  CreateActivityPage() : super();
 }
 
 class _CreateActivityPageState extends State<CreateActivityPage> {
-  void saveAndExit(BuildContext context) {
-    // TODO save to model and send to server
+  void saveAndExit(BuildContext context, RunMutation createEventMutation) {
+    final _mediumType = _isOnline ? 'online' : 'in_person';
+    final _dateTime = _date.toIso8601String();
+    print(_dateTime);
+    print(_maximumAttendance);
+    print(_maximumAttendenceSize);
+    print(_isMatching);
+    print(_matchingSize);
+    print(_visibilitySliderValue.index);
+    print(_requireApproval);
+    print(_pickedImage);
+    //TODO: Add location
+    createEventMutation({
+      'title': _activityName,
+      'description': _desciption,
+      'mediumType': _mediumType,
+      'xLocation': 0,
+      'yLocation': 0,
+      'address': _location,
+      'eventDateTime': _dateTime,
+      'visibility': _visibilitySliderValue.index,
+    });
     Navigator.of(context).pop();
   }
 
@@ -33,21 +65,21 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
       'This field can not have more than than ${maxInputSize} characters.';
 
   final _formKey = GlobalKey<FormState>();
-  var _edited = false;
-  var _activityName = null;
-  var _desciption = null;
-  var _isOnline = false;
-  var _location = null;
-  var _date = null;
+  bool _edited = false;
+  String _activityName = null;
+  String _desciption = null;
+  bool _isOnline = false;
+  String _location = null;
+  DateTime _date = null;
   // var _multiGroup = false;
   // var _targetGroupSize = null;
-  var _maximumAttendance = false;
+  bool _maximumAttendance = false;
   int _maximumAttendenceSize = null;
-  var _format = false;
+  // var _format = false;
   // var _repeating = false;
-  var _requireApproval = false;
-  var _isMatching = false;
-  var _matchingSize = null;
+  bool _requireApproval = false;
+  bool _isMatching = false;
+  int _matchingSize = null;
 
   //TODO: This needs files changed for IOS. Check if those have been done.
   final ImagePicker _picker = ImagePicker();
@@ -95,448 +127,465 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        if (_edited) {
-          return await showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                    title: const Text('Are you sure you want to cancel?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop(false);
-                        },
-                        child: Text('No'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop(true);
-                        },
-                        child: Text('Yes'),
-                      ),
-                    ],
-                  ));
-        } else {
-          return true;
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Create an Activity'),
-        ),
-        body: Form(
-          key: _formKey,
-          child: ListView(
-            padding: const EdgeInsets.all(8),
-            children: [
-              Text(
-                'Let\'s plan your Activity',
-                style: Theme.of(context).textTheme.headline4,
-                textScaleFactor: 0.9,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Text(
-                'Firstly, give it a name',
-                style: Theme.of(context).textTheme.headline6,
-              ),
-              TextFormField(
-                decoration: InputDecoration(hintText: 'Title'),
-                onChanged: (value) => setState(() => _activityName = value),
-                validator: _genericValidator,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Text(
-                'Describe what this Activity is about',
-                style: Theme.of(context).textTheme.headline6,
-              ),
-              TextFormField(
-                maxLines: null,
-                decoration: InputDecoration(hintText: 'Description'),
-                onChanged: (value) => setState(() => _desciption = value),
-                validator: _genericValidator,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              // QuestionSwitch(
-              //   question: 'Format',
-              //   disabledOption: 'Self-guided',
-              //   enabledOption: 'Hosted',
-              //   callback: (val) => setState(() => _format = val),
-              //   additionalInfo:
-              //       'In a \'Self-guided\' format you have to provide enough information to allow the grouped participants to be able to host the event themselves without you being present (e.g. providing recordings for a yoga class, providing map and guide for a hike etc.) Provide clear instructions and helpful materials for your guests. \n\nIn a \'Hosted\' format, you have to be present in each of the sessions and be able to host all of the groups in that session at the same time (limited by the maximum cohort size you set, which is required for hosted events).',
-              // ),
-              QuestionSwitch(
-                question: 'Where will it be?',
-                disabledOption: 'In-person',
-                enabledOption: 'Online',
-                callback: (val) => setState(() => _isOnline = val),
-              ),
-              TextFormField(
-                decoration: InputDecoration(
-                    hintText: _isOnline
-                        ? 'Provide a link (you can add it later as well)'
-                        : 'Location'),
-                //TODO: Reconsider the maximum input size for links
-                onChanged: (value) => _location = value,
-                validator: _genericValidator,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Text(
-                'When will it be?',
-                style: Theme.of(context).textTheme.headline6,
-              ),
-              Text(
-                '(Will calibrate to your local time)',
-                style: Theme.of(context).textTheme.subtitle1,
-              ),
-              DateTimeField(
-                format: DateFormat('yyyy-MM-dd HH:mm'),
-                onShowPicker: (context, currentValue) async {
-                  final date = await showDatePicker(
-                    context: context,
-                    firstDate: DateTime.now(),
-                    initialDate:
-                        currentValue ?? DateTime.now().add(Duration(days: 1)),
-                    lastDate: DateTime.now().add(Duration(days: 365)),
-                  );
-                  if (date != null) {
-                    final time = await showTimePicker(
-                      context: context,
-                      initialTime: TimeOfDay.fromDateTime(
-                          currentValue ?? DateTime.now()),
-                    );
-                    return DateTimeField.combine(date, time);
-                  } else {
-                    return currentValue;
-                  }
-                },
-                onChanged: (value) => _date = value,
-                validator: (value) {
-                  if (value == null) {
-                    return emptyFieldError;
-                  }
-                  if (value.isBefore(DateTime.now())) {
-                    return 'Time of the event must be in the future.';
-                  } else {
-                    return null;
-                  }
-                },
-              ),
-              // Text(
-              //   '(You can always add more later)',
-              //   style: Theme.of(context).textTheme.subtitle1,
-              // ),
-              // ..._sessions,
-              // Row(
-              //   children: [
-              //     IconButton(
-              //         icon: Icon(
-              //           Icons.add_circle,
-              //           color: Colors.green,
-              //         ),
-              //         onPressed: () {
-              //           setState(() {
-              //             _sessions.add(SessionCard(
-              //               removeCallback: removeSession,
-              //               key: UniqueKey(),
-              //             ));
-              //           });
-              //         }),
-              //     Text(
-              //       'Add session',
-              //       style: TextStyle(fontWeight: FontWeight.bold),
-              //     )
-              //   ],
-              // ),
-              const SizedBox(
-                height: 20,
-              ),
-              // QuestionSwitch(
-              //   key: Key('multi group'),
-              //   question: 'Multi group',
-              //   disabledOption: 'Disabled',
-              //   enabledOption: 'Enabled',
-              //   callback: (val) => setState(() => _multiGroup = val),
-              //   additionalInfo:
-              //       'Usually keep this disabled for personal Activities\n\nEnabling this setting allows you to divide the attendees into multiple smaller groups in which they can connect with each other better. They can meet ahead of time and attend the event together. Grouping will be done randomly for now.\n\nIf enabled, you will need to define a target group size, which will be the average number of people per group.',
-              // ),
-              // if (_multiGroup)
-              //   Text(
-              //     'Target group size',
-              //     style: Theme.of(context).textTheme.subtitle1,
-              //   ),
-              // if (_multiGroup)
-              //   Row(
-              //     children: [
-              //       Flexible(
-              //         child: TextFormField(
-              //           style: Theme.of(context).textTheme.headline6,
-              //           textAlign: TextAlign.center,
-              //           decoration:
-              //               const InputDecoration(border: OutlineInputBorder()),
-              //           inputFormatters: [
-              //             FilteringTextInputFormatter.digitsOnly
-              //           ],
-              //           keyboardType: TextInputType.number,
-              //           onChanged: (value) => _targetGroupSize = value,
-              //           validator: _genericValidator,
-              //         ),
-              //       ),
-              //       Spacer(
-              //         flex: 2,
-              //       )
-              //     ],
-              //   ),
-              // const SizedBox(
-              // height: 20,
-              // ),
-              QuestionSwitch(
-                key: Key('max cohort'),
-                question: 'Maximum attendance size',
-                disabledOption: 'Disabled',
-                enabledOption: 'Enabled',
-                callback: (val) => setState(() => _maximumAttendance = val),
-                additionalInfo:
-                    'Max number of individuals who can attend this activity.',
-              ),
-              if (_maximumAttendance)
-                Row(
-                  children: [
-                    Flexible(
-                      child: TextFormField(
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headline6,
-                        decoration:
-                            const InputDecoration(border: OutlineInputBorder()),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          FilteringTextInputFormatter.allow(
-                              RegExp(r'[1-9]\d{0,2}$'))
-                        ],
-                        keyboardType: TextInputType.number,
-                        onChanged: (value) =>
-                            _maximumAttendenceSize = int.parse(value),
-                        validator: _genericValidator,
-                      ),
-                    ),
-                    Spacer(
-                      flex: 2,
-                    )
-                  ],
-                ),
-              const SizedBox(
-                height: 20,
-              ),
-              QuestionSwitch(
-                key: Key('is matching'),
-                question: 'Matching',
-                disabledOption: 'Disabled',
-                enabledOption: 'Enabled',
-                callback: (val) => setState(() => _isMatching = val),
-                additionalInfo:
-                    'Match and connect participants beforehand in groups.',
-              ),
-              if (_isMatching)
-                Row(
-                  children: [
-                    Text(
-                      'Match group size:',
-                      style: Theme.of(context).textTheme.subtitle2,
-                    ),
-                    Flexible(
-                      child: TextFormField(
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headline6,
-                        decoration:
-                            const InputDecoration(border: OutlineInputBorder()),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          FilteringTextInputFormatter.allow(
-                              RegExp(r'[1-9]\d{0,2}$'))
-                        ],
-                        keyboardType: TextInputType.number,
-                        onChanged: (value) => _matchingSize = int.parse(value),
-                        validator: _genericValidator,
-                      ),
-                    ),
-                    Spacer(
-                      flex: 2,
-                    )
-                  ],
-                ),
-              const SizedBox(
-                height: 20,
-              ),
-              Text(
-                'Visibility',
-                style: Theme.of(context).textTheme.headline6,
-              ),
-
-              SliderTheme(
-                data: SliderThemeData(
-                    showValueIndicator: ShowValueIndicator.always),
-                child: Slider(
-                  onChanged: (numa) {
-                    setState(() {
-                      _visibilitySliderValue =
-                          ActivityVisibility.values[numa.truncate()];
-                    });
-                  },
-                  value: _visibilitySliderValue.index.toDouble(),
-                  min: 0,
-                  max: 2,
-                  label: EnumToString.convertToString(_visibilitySliderValue)
-                      .replaceAll('_', ' ')
-                      .capitalize(),
-                  divisions: 2,
-                ),
-              ),
-
-              if (_visibilitySliderValue ==
-                      ActivityVisibility.people_i_follow ||
-                  _visibilitySliderValue == ActivityVisibility.public)
-                QuestionSwitch(
-                  key: Key('approval'),
-                  question: 'Require approval',
-                  disabledOption: 'Disabled',
-                  enabledOption: 'Enabled',
-                  callback: (val) => setState(() => _requireApproval = val),
-                  additionalInfo:
-                      'Enabling this will require you to approve each of the participants before they are allowed to join the activity.',
-                ),
-
-              const SizedBox(
-                height: 20,
-              ),
-              Text(
-                'Add a photo (Optional)',
-                style: Theme.of(context).textTheme.headline6,
-              ),
-              _pickedImage == null
-                  ? SizedBox(
-                      height: 20,
-                    )
-                  : Column(children: [
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Image.file(
-                        File(_pickedImage.path),
-                        fit: BoxFit.fitHeight,
-                        height: 200,
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                    ]),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () async {
-                    try {
-                      var pickedImage =
-                          await _picker.getImage(source: ImageSource.gallery);
-                      setState(() {
-                        _pickedImage = pickedImage;
-                      });
-                    } catch (e) {
-                      print(e);
-                    }
-                  },
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.photo),
-                      Text('${_pickedImage == null ? 'Pick' : 'Change'} Photo')
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              SizedBox(
-                height: 40,
-                child: RaisedButton(
-                  shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(30))),
-                  onPressed: () {
-                    if (_formKey.currentState.validate()) {
-                      saveAndExit(context);
-                    } else {
-                      _showFormError();
-                    }
-                  },
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Ready to go!'),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      Icon(Icons.check)
-                    ],
-                  ),
-                  color: Colors.green,
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              SizedBox(
-                height: 40,
-                child: RaisedButton(
-                  shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(30))),
-                  onPressed: () {
-                    showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                              title: const Text(
-                                  'Are you sure you want to cancel?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Text('No'),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Text('Yes'),
-                                ),
-                              ],
-                            ));
-                  },
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Nah maybe another time...'),
-                      Icon(Icons.close)
-                    ],
-                  ),
-                  color: Colors.red,
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-            ],
-          ),
-        ),
+    return Mutation(
+      options: MutationOptions(
+        document: gql(createActivityMutation),
+        onCompleted: (dynamic resultData) {
+          print('Mutation Return:');
+          print(resultData);
+        },
       ),
+      builder: (
+        RunMutation runMutation,
+        QueryResult result,
+      ) {
+        return WillPopScope(
+          onWillPop: () async {
+            if (_edited) {
+              return await showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                        title: const Text('Are you sure you want to cancel?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(false);
+                            },
+                            child: Text('No'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(true);
+                            },
+                            child: Text('Yes'),
+                          ),
+                        ],
+                      ));
+            } else {
+              return true;
+            }
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text('Create an Activity'),
+            ),
+            body: Form(
+              key: _formKey,
+              child: ListView(
+                padding: const EdgeInsets.all(8),
+                children: [
+                  Text(
+                    'Let\'s plan your Activity',
+                    style: Theme.of(context).textTheme.headline4,
+                    textScaleFactor: 0.9,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Firstly, give it a name',
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(hintText: 'Title'),
+                    onChanged: (value) => setState(() => _activityName = value),
+                    validator: _genericValidator,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Describe what this Activity is about',
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                  TextFormField(
+                    maxLines: null,
+                    decoration: InputDecoration(hintText: 'Description'),
+                    onChanged: (value) => setState(() => _desciption = value),
+                    validator: _genericValidator,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  // QuestionSwitch(
+                  //   question: 'Format',
+                  //   disabledOption: 'Self-guided',
+                  //   enabledOption: 'Hosted',
+                  //   callback: (val) => setState(() => _format = val),
+                  //   additionalInfo:
+                  //       'In a \'Self-guided\' format you have to provide enough information to allow the grouped participants to be able to host the event themselves without you being present (e.g. providing recordings for a yoga class, providing map and guide for a hike etc.) Provide clear instructions and helpful materials for your guests. \n\nIn a \'Hosted\' format, you have to be present in each of the sessions and be able to host all of the groups in that session at the same time (limited by the maximum cohort size you set, which is required for hosted events).',
+                  // ),
+                  QuestionSwitch(
+                    question: 'Where will it be?',
+                    disabledOption: 'In-person',
+                    enabledOption: 'Online',
+                    callback: (val) => setState(() => _isOnline = val),
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                        hintText: _isOnline
+                            ? 'Provide a link (you can add it later as well)'
+                            : 'Location'),
+                    //TODO: Reconsider the maximum input size for links
+                    onChanged: (value) => _location = value,
+                    validator: _genericValidator,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'When will it be?',
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                  Text(
+                    '(Will calibrate to your local time)',
+                    style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                  DateTimeField(
+                    format: DateFormat('yyyy-MM-dd HH:mm'),
+                    onShowPicker: (context, currentValue) async {
+                      final date = await showDatePicker(
+                        context: context,
+                        firstDate: DateTime.now(),
+                        initialDate: currentValue ??
+                            DateTime.now().add(Duration(days: 1)),
+                        lastDate: DateTime.now().add(Duration(days: 365)),
+                      );
+                      if (date != null) {
+                        final time = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.fromDateTime(
+                              currentValue ?? DateTime.now()),
+                        );
+                        return DateTimeField.combine(date, time);
+                      } else {
+                        return currentValue;
+                      }
+                    },
+                    onChanged: (value) => _date = value,
+                    validator: (value) {
+                      if (value == null) {
+                        return emptyFieldError;
+                      }
+                      if (value.isBefore(DateTime.now())) {
+                        return 'Time of the event must be in the future.';
+                      } else {
+                        return null;
+                      }
+                    },
+                  ),
+                  // Text(
+                  //   '(You can always add more later)',
+                  //   style: Theme.of(context).textTheme.subtitle1,
+                  // ),
+                  // ..._sessions,
+                  // Row(
+                  //   children: [
+                  //     IconButton(
+                  //         icon: Icon(
+                  //           Icons.add_circle,
+                  //           color: Colors.green,
+                  //         ),
+                  //         onPressed: () {
+                  //           setState(() {
+                  //             _sessions.add(SessionCard(
+                  //               removeCallback: removeSession,
+                  //               key: UniqueKey(),
+                  //             ));
+                  //           });
+                  //         }),
+                  //     Text(
+                  //       'Add session',
+                  //       style: TextStyle(fontWeight: FontWeight.bold),
+                  //     )
+                  //   ],
+                  // ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  // QuestionSwitch(
+                  //   key: Key('multi group'),
+                  //   question: 'Multi group',
+                  //   disabledOption: 'Disabled',
+                  //   enabledOption: 'Enabled',
+                  //   callback: (val) => setState(() => _multiGroup = val),
+                  //   additionalInfo:
+                  //       'Usually keep this disabled for personal Activities\n\nEnabling this setting allows you to divide the attendees into multiple smaller groups in which they can connect with each other better. They can meet ahead of time and attend the event together. Grouping will be done randomly for now.\n\nIf enabled, you will need to define a target group size, which will be the average number of people per group.',
+                  // ),
+                  // if (_multiGroup)
+                  //   Text(
+                  //     'Target group size',
+                  //     style: Theme.of(context).textTheme.subtitle1,
+                  //   ),
+                  // if (_multiGroup)
+                  //   Row(
+                  //     children: [
+                  //       Flexible(
+                  //         child: TextFormField(
+                  //           style: Theme.of(context).textTheme.headline6,
+                  //           textAlign: TextAlign.center,
+                  //           decoration:
+                  //               const InputDecoration(border: OutlineInputBorder()),
+                  //           inputFormatters: [
+                  //             FilteringTextInputFormatter.digitsOnly
+                  //           ],
+                  //           keyboardType: TextInputType.number,
+                  //           onChanged: (value) => _targetGroupSize = value,
+                  //           validator: _genericValidator,
+                  //         ),
+                  //       ),
+                  //       Spacer(
+                  //         flex: 2,
+                  //       )
+                  //     ],
+                  //   ),
+                  // const SizedBox(
+                  // height: 20,
+                  // ),
+                  QuestionSwitch(
+                    key: Key('max cohort'),
+                    question: 'Maximum attendance size',
+                    disabledOption: 'Disabled',
+                    enabledOption: 'Enabled',
+                    callback: (val) => setState(() => _maximumAttendance = val),
+                    additionalInfo:
+                        'Max number of individuals who can attend this activity.',
+                  ),
+                  if (_maximumAttendance)
+                    Row(
+                      children: [
+                        Flexible(
+                          child: TextFormField(
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.headline6,
+                            decoration: const InputDecoration(
+                                border: OutlineInputBorder()),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'[1-9]\d{0,2}$'))
+                            ],
+                            keyboardType: TextInputType.number,
+                            onChanged: (value) =>
+                                _maximumAttendenceSize = int.parse(value),
+                            validator: _genericValidator,
+                          ),
+                        ),
+                        Spacer(
+                          flex: 2,
+                        )
+                      ],
+                    ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  QuestionSwitch(
+                    key: Key('is matching'),
+                    question: 'Matching',
+                    disabledOption: 'Disabled',
+                    enabledOption: 'Enabled',
+                    callback: (val) => setState(() => _isMatching = val),
+                    additionalInfo:
+                        'Match and connect participants beforehand in groups.',
+                  ),
+                  if (_isMatching)
+                    Row(
+                      children: [
+                        Text(
+                          'Match group size:',
+                          style: Theme.of(context).textTheme.subtitle2,
+                        ),
+                        Flexible(
+                          child: TextFormField(
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.headline6,
+                            decoration: const InputDecoration(
+                                border: OutlineInputBorder()),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'[1-9]\d{0,2}$'))
+                            ],
+                            keyboardType: TextInputType.number,
+                            onChanged: (value) =>
+                                _matchingSize = int.parse(value),
+                            validator: _genericValidator,
+                          ),
+                        ),
+                        Spacer(
+                          flex: 2,
+                        )
+                      ],
+                    ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Visibility',
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+
+                  SliderTheme(
+                    data: SliderThemeData(
+                        showValueIndicator: ShowValueIndicator.always),
+                    child: Slider(
+                      onChanged: (numa) {
+                        setState(() {
+                          _visibilitySliderValue =
+                              ActivityVisibility.values[numa.truncate()];
+                        });
+                      },
+                      value: _visibilitySliderValue.index.toDouble(),
+                      min: 0,
+                      max: 2,
+                      label:
+                          EnumToString.convertToString(_visibilitySliderValue)
+                              .replaceAll('_', ' ')
+                              .capitalize(),
+                      divisions: 2,
+                    ),
+                  ),
+
+                  if (_visibilitySliderValue ==
+                          ActivityVisibility.people_i_follow ||
+                      _visibilitySliderValue == ActivityVisibility.public)
+                    QuestionSwitch(
+                      key: Key('approval'),
+                      question: 'Require approval',
+                      disabledOption: 'Disabled',
+                      enabledOption: 'Enabled',
+                      callback: (val) => setState(() => _requireApproval = val),
+                      additionalInfo:
+                          'Enabling this will require you to approve each of the participants before they are allowed to join the activity.',
+                    ),
+
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Add a photo (Optional)',
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                  _pickedImage == null
+                      ? SizedBox(
+                          height: 20,
+                        )
+                      : Column(children: [
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Image.file(
+                            File(_pickedImage.path),
+                            fit: BoxFit.fitHeight,
+                            height: 200,
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                        ]),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        try {
+                          var pickedImage = await _picker.getImage(
+                              source: ImageSource.gallery);
+                          setState(() {
+                            _pickedImage = pickedImage;
+                          });
+                        } catch (e) {
+                          print(e);
+                        }
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.photo),
+                          Text(
+                              '${_pickedImage == null ? 'Pick' : 'Change'} Photo')
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  SizedBox(
+                    height: 40,
+                    child: RaisedButton(
+                      shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(30))),
+                      onPressed: () {
+                        if (_formKey.currentState.validate()) {
+                          saveAndExit(context, runMutation);
+                        } else {
+                          _showFormError();
+                        }
+                      },
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Ready to go!'),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Icon(Icons.check)
+                        ],
+                      ),
+                      color: Colors.green,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  SizedBox(
+                    height: 40,
+                    child: RaisedButton(
+                      shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(30))),
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                                  title: const Text(
+                                      'Are you sure you want to cancel?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text('No'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text('Yes'),
+                                    ),
+                                  ],
+                                ));
+                      },
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Nah maybe another time...'),
+                          Icon(Icons.close)
+                        ],
+                      ),
+                      color: Colors.red,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
