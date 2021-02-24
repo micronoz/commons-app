@@ -35,12 +35,7 @@ class AppUser extends ChangeNotifier {
 
   static AppUser fromJson(Map<String, dynamic> json) {
     //TODO Parse json
-    return AppUser._(UserProfile(
-        json['id'],
-        'Nabi',
-        'nozberkman',
-        'https://picsum.photos/250?image=11',
-        'Hello my name is Nabi. I\'m from Cyprus and this is the new app I created for bringing people together.'));
+    return AppUser._(UserProfile.mock());
   }
 
   AppUser hydrate() {
