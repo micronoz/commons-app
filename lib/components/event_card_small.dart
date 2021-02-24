@@ -40,7 +40,7 @@ class EventCardSmall extends StatelessWidget {
                             ? Icon(Icons.person)
                             : Icon(Icons.home),
                         Text(
-                          '@' + event.organizer.identifier,
+                          '@' + event.organizer.profile.identifier,
                           style: Theme.of(context).textTheme.bodyText2,
                           maxLines: 1,
                           softWrap: false,

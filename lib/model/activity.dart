@@ -30,8 +30,8 @@ class Activity {
       ActivityMedium.in_person,
       'Peet\'s coffee',
       DateTime.now(),
-      {AppUser(), AppUser(), AppUser(), AppUser()},
-      AppUser(),
+      {AppUser.mock(), AppUser.mock(), AppUser.mock(), AppUser.mock()},
+      AppUser.mock(),
     );
   }
 }

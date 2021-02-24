@@ -3,26 +3,20 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:provider/provider.dart';
 import 'package:tribal_instinct/model/activity.dart';
-import 'package:tribal_instinct/model/organizer.dart';
+import 'package:tribal_instinct/model/user_profile.dart';
 
-class AppUser extends ChangeNotifier implements Organizer {
-  final String id;
-  String name;
-  @override
-  String identifier;
-  ImageProvider photo;
-  String description;
+class AppUser extends ChangeNotifier {
+  UserProfile profile;
   Position location;
   String address;
   Set<AppUser> followers;
   Set<AppUser> following;
   Set<Activity> activities;
 
-  AppUser._(
-      this.id, this.name, this.identifier, String photoUrl, this.description) {
-    photo = NetworkImage(
-      photoUrl,
-    );
+  AppUser._(this.profile);
+
+  AppUser.mock() {
+    profile = UserProfile.mock();
   }
 
   static AppUser of(BuildContext context) {
@@ -41,40 +35,32 @@ class AppUser extends ChangeNotifier implements Organizer {
 
   static AppUser fromJson(Map<String, dynamic> json) {
     //TODO Parse json
-    return AppUser._(
+    return AppUser._(UserProfile(
         json['id'],
         'Nabi',
         'nozberkman',
         'https://picsum.photos/250?image=11',
-        'Hello my name is Nabi. I\'m from Cyprus and this is the new app I created for bringing people together.');
-  }
-
-  AppUser() : id = '1' {
-    name = 'Nabi';
-    identifier = 'nozberkman';
-    description =
-        'Hello my name is Nabi. I\'m from Cyprus and this is the new app I created for bringing people together.';
-    photo = NetworkImage('https://picsum.photos/250?image=11');
+        'Hello my name is Nabi. I\'m from Cyprus and this is the new app I created for bringing people together.'));
   }
 
   AppUser hydrate() {
-    following = {AppUser(), AppUser()};
+    following = {AppUser.mock(), AppUser.mock()};
     return this;
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
+        'id': profile.id,
       };
 
   @override
   bool operator ==(Object other) {
     if (other is AppUser) {
-      return (id == other.id);
+      return (profile.id == other.profile.id);
     } else {
       return false;
     }
   }
 
   @override
-  int get hashCode => id.hashCode;
+  int get hashCode => profile.id.hashCode;
 }

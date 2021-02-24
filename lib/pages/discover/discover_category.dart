@@ -135,8 +135,8 @@ class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
                         _mediumType,
                         _location,
                         _dateTime,
-                        {AppUser(), AppUser()},
-                        AppUser());
+                        {AppUser.mock(), AppUser.mock()},
+                        AppUser.mock());
                     return EventCardSmall(_activity);
                   });
             },

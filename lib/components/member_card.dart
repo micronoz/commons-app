@@ -23,7 +23,7 @@ class _MemberCardState extends State<MemberCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Image(
-            image: widget.member.photo,
+            image: widget.member.profile.photo,
             width: 60,
             height: 60,
           ),
@@ -39,7 +39,7 @@ class _MemberCardState extends State<MemberCard> {
                   children: [
                     Flexible(
                       child: Text(
-                        widget.member.name + ' ',
+                        widget.member.profile.name + ' ',
                         style: Theme.of(context).textTheme.bodyText1,
                         textScaleFactor: 1.3,
                         softWrap: false,
@@ -48,7 +48,7 @@ class _MemberCardState extends State<MemberCard> {
                     ),
                     Flexible(
                       child: Text(
-                        '@' + widget.member.identifier,
+                        '@' + widget.member.profile.identifier,
                         style: TextStyle(),
                         textScaleFactor: 1.3,
                         softWrap: false,
@@ -59,7 +59,7 @@ class _MemberCardState extends State<MemberCard> {
                 ),
                 Flexible(
                   child: Text(
-                    widget.member.description,
+                    widget.member.profile.description,
                     style: Theme.of(context).textTheme.bodyText2,
                     maxLines: 2,
                     softWrap: true,

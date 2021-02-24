@@ -22,7 +22,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
   final String _id = '1';
   final timeout = const Duration(seconds: 1);
 
-  final currentUser = AppUser(); //TODO REMOVE
+  final currentUser = AppUser.mock(); //TODO REMOVE
   var isAdmin = false;
 
   var _absorbing = false;
@@ -172,8 +172,9 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                                         CircleAvatar(
                                             backgroundColor: Colors.blueGrey,
                                             maxRadius: 35,
-                                            backgroundImage: user.photo),
-                                        Text(user.name)
+                                            backgroundImage:
+                                                user.profile.photo),
+                                        Text(user.profile.name)
                                       ],
                                     ),
                                   ),

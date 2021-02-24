@@ -11,7 +11,7 @@ class InvitePage extends StatefulWidget {
 }
 
 class _InvitePageState extends State<InvitePage> {
-  var currentUser = AppUser().hydrate();
+  var currentUser = AppUser.mock().hydrate();
 
   @override
   Widget build(BuildContext context) {
