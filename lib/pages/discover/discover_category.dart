@@ -97,7 +97,6 @@ class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
                 return Text('Loading');
               }
               List activities = result.data['discoverActivities'];
-              print(activities);
 
               if (activities.isEmpty) {
                 return Text(
