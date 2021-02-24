@@ -52,11 +52,11 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
 
   final _formKey = GlobalKey<FormState>();
   bool _edited = false;
-  String _activityName = null;
-  String _desciption = null;
+  String _activityName;
+  String _desciption;
   bool _isOnline = false;
-  String _location = null;
-  DateTime _date = null;
+  String _location;
+  DateTime _date;
 
   String _genericValidator(String value) {
     if (value == null || value.isEmpty) {
