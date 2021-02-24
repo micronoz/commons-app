@@ -39,6 +39,7 @@ dependencies:
   datetime_picker_formfield: ^1.0.0
   graphql_flutter: ^4.0.1
   flutter_signin_button: ^1.1.0
+  flutter_chat_bubble: ^1.0.2
 
 dev_dependencies:
   pedantic: ^1.9.2

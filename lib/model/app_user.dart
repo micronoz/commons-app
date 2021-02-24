@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:provider/provider.dart';
 import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/model/organizer.dart';
 
@@ -22,6 +23,10 @@ class AppUser extends ChangeNotifier implements Organizer {
     photo = NetworkImage(
       photoUrl,
     );
+  }
+
+  static AppUser of(BuildContext context) {
+    return Provider.of<AppUser>(context, listen: false);
   }
 
   void updateUserPosition() async {
