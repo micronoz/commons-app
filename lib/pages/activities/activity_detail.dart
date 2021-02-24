@@ -63,7 +63,15 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
   Widget build(BuildContext context) {
     var tabBar = TabBar(
       tabs: tabs,
-      onTap: (index) => setState(() => _tabIndex = index),
+      onTap: (index) => setState(() {
+        _tabIndex = index;
+        if (index == 1) {
+          final currentFocus = FocusScope.of(context);
+          if (!currentFocus.hasPrimaryFocus) {
+            currentFocus.unfocus();
+          }
+        }
+      }),
     );
     currentUser.hydrate();
     isAdmin = currentUser == activity.organizer;
