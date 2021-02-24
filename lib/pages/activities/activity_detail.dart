@@ -66,7 +66,6 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
       onTap: (index) => setState(() => _tabIndex = index),
     );
     currentUser.hydrate();
-    var availableSpots = activity.maxGroupSize - activity.attendees.length;
     isAdmin = currentUser == activity.organizer;
     return WillPopScope(
       onWillPop: () async => !_absorbing,
@@ -107,13 +106,6 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                   ChatPage(),
                   ListView(
                     children: [
-                      AspectRatio(
-                        aspectRatio: 16 / 9,
-                        child: Image.network(
-                          activity.photoUrl,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
                       Text(
                         activity.title,
                         style: Theme.of(context).textTheme.headline2,
@@ -139,18 +131,6 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                       // ),
                       Text(
                         'on ' + _format.format(activity.dateTime.toLocal()),
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodyText1,
-                        textScaleFactor: 1.3,
-                      ),
-                      Text(
-                        'Available space: ${activity.maxGroupSize - activity.attendees.length}/${activity.maxGroupSize}',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodyText1,
-                        textScaleFactor: 1.3,
-                      ),
-                      Text(
-                        'Price: ' + activity.price,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyText1,
                         textScaleFactor: 1.3,
@@ -189,40 +169,40 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                                       ],
                                     ),
                                   ),
-                                  ...List.generate(
-                                          availableSpots, (index) => null)
-                                      .map((e) => isAdmin
-                                          ? Column(
-                                              children: [
-                                                InkWell(
-                                                  onTap: () => invite(context),
-                                                  child: CircleAvatar(
-                                                    backgroundColor:
-                                                        Colors.blueGrey,
-                                                    maxRadius: 35,
-                                                    child: Text(
-                                                      '+',
-                                                      textScaleFactor: 3,
-                                                    ),
-                                                  ),
-                                                ),
-                                                Text('Add')
-                                              ],
-                                            )
-                                          : Column(
-                                              children: [
-                                                CircleAvatar(
-                                                  backgroundColor:
-                                                      Colors.blueGrey,
-                                                  maxRadius: 35,
-                                                  child: Text(
-                                                    '?',
-                                                    textScaleFactor: 3,
-                                                  ),
-                                                ),
-                                                Text('null')
-                                              ],
-                                            ))
+                                  // ...List.generate(
+                                  //         availableSpots, (index) => null)
+                                  //     .map((e) => isAdmin
+                                  //         ? Column(
+                                  //             children: [
+                                  //               InkWell(
+                                  //                 onTap: () => invite(context),
+                                  //                 child: CircleAvatar(
+                                  //                   backgroundColor:
+                                  //                       Colors.blueGrey,
+                                  //                   maxRadius: 35,
+                                  //                   child: Text(
+                                  //                     '+',
+                                  //                     textScaleFactor: 3,
+                                  //                   ),
+                                  //                 ),
+                                  //               ),
+                                  //               Text('Add')
+                                  //             ],
+                                  //           )
+                                  //         : Column(
+                                  //             children: [
+                                  //               CircleAvatar(
+                                  //                 backgroundColor:
+                                  //                     Colors.blueGrey,
+                                  //                 maxRadius: 35,
+                                  //                 child: Text(
+                                  //                   '?',
+                                  //                   textScaleFactor: 3,
+                                  //                 ),
+                                  //               ),
+                                  //               Text('null')
+                                  //             ],
+                                  //           ))
                                 ],
                               ),
                             ),
