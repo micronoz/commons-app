@@ -12,10 +12,10 @@ class InvitePage extends StatefulWidget {
 }
 
 class _InvitePageState extends State<InvitePage> {
-  var currentUser = AppUser.mock().hydrate();
-
   @override
   Widget build(BuildContext context) {
+    final currentUser = AppUser.of(context).hydrate();
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Invite Friends'),

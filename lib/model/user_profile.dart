@@ -21,4 +21,13 @@ class UserProfile {
         'Hello my name is Nabi. I\'m from Cyprus and this is the new app I created for bringing people together.';
     photo = NetworkImage('https://picsum.photos/250?image=11');
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (other is UserProfile) {
+      return (id == other.id);
+    } else {
+      return false;
+    }
+  }
 }

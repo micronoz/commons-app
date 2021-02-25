@@ -12,8 +12,6 @@ class ExperiencesPage extends StatefulWidget {
 }
 
 class _ExperiencesPageState extends State<ExperiencesPage> {
-  final myUser = AppUser.mock();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

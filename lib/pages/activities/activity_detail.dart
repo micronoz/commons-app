@@ -23,7 +23,6 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
   final String _id = '1';
   final timeout = const Duration(seconds: 1);
 
-  final currentUser = AppUser.mock(); //TODO REMOVE
   var isAdmin = false;
 
   var _absorbing = false;
@@ -62,6 +61,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = AppUser.of(context);
     var tabBar = TabBar(
       tabs: tabs,
       onTap: (index) => setState(() {
@@ -75,7 +75,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
       }),
     );
     currentUser.hydrate();
-    isAdmin = currentUser == activity.organizer;
+    isAdmin = currentUser.profile == activity.organizer;
     return WillPopScope(
       onWillPop: () async => !_absorbing,
       child: AbsorbPointer(
