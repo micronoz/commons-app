@@ -43,17 +43,17 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   final _navigatorKey = GlobalKey<NavigatorState>();
-  User currentUser;
+  User firebaseUser;
 
   @override
   void initState() {
     super.initState();
-    currentUser = widget.auth.init(_onUserChanged);
+    firebaseUser = widget.auth.init(_onUserChanged);
   }
 
   void _onUserChanged() {
     setState(() {
-      currentUser = widget.auth.currentUser.value;
+      firebaseUser = widget.auth.currentUser.value;
     });
   }
 
@@ -77,7 +77,7 @@ class _AppState extends State<App> {
 
           var authLink = AuthLink(
             getToken: () async {
-              final token = await currentUser.getIdToken();
+              final token = await firebaseUser.getIdToken();
               return 'Bearer ${token}';
             },
           );
@@ -100,7 +100,7 @@ class _AppState extends State<App> {
                   visualDensity: VisualDensity.adaptivePlatformDensity,
                 ),
                 navigatorKey: _navigatorKey,
-                home: currentUser != null ? HomePage() : LoginPage(),
+                home: firebaseUser != null ? HomePage() : LoginPage(),
               ));
         });
   }
