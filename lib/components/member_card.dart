@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:tribal_instinct/model/app_user.dart';
+import 'package:tribal_instinct/model/user_profile.dart';
 
 class MemberCard extends StatefulWidget {
   MemberCard(this.member, this.onText, this.offText, this.isOn, {Key key})
       : super(key: key);
-  final AppUser member;
+  final UserProfile member;
   final String onText;
   final String offText;
   final Function isOn;

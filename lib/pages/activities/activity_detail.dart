@@ -8,6 +8,7 @@ import 'package:tribal_instinct/components/member_card.dart';
 import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/model/activity_types.dart';
 import 'package:tribal_instinct/model/app_user.dart';
+import 'package:tribal_instinct/model/user_profile.dart';
 import 'package:tribal_instinct/pages/chat.dart';
 import 'package:tribal_instinct/pages/invite.dart';
 
@@ -22,7 +23,6 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
   final String _id = '1';
   final timeout = const Duration(seconds: 1);
 
-  final currentUser = AppUser(); //TODO REMOVE
   var isAdmin = false;
 
   var _absorbing = false;
@@ -61,6 +61,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = AppUser.of(context);
     var tabBar = TabBar(
       tabs: tabs,
       onTap: (index) => setState(() {
@@ -74,7 +75,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
       }),
     );
     currentUser.hydrate();
-    isAdmin = currentUser == activity.organizer;
+    isAdmin = currentUser.profile == activity.organizer;
     return WillPopScope(
       onWillPop: () async => !_absorbing,
       child: AbsorbPointer(
@@ -227,7 +228,8 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                           m,
                           'Unfollow',
                           'Follow',
-                          (AppUser u) => currentUser.following.contains(u))),
+                          (UserProfile u) =>
+                              currentUser.following.contains(u))),
 
                       if (!_attending)
                         const SizedBox(

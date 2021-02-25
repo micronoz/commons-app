@@ -1,5 +1,6 @@
 import 'package:tribal_instinct/model/app_user.dart';
 import 'package:tribal_instinct/model/activity_types.dart';
+import 'user_profile.dart';
 
 class Activity {
   final String id;
@@ -8,8 +9,8 @@ class Activity {
   final ActivityMedium mediumType;
   final String location;
   final DateTime dateTime;
-  final Set<AppUser> attendees;
-  final AppUser organizer;
+  final Set<UserProfile> attendees;
+  final UserProfile organizer;
 
   Activity(
     this.id,
@@ -30,8 +31,12 @@ class Activity {
       ActivityMedium.in_person,
       'Peet\'s coffee',
       DateTime.now(),
-      {AppUser(), AppUser(), AppUser(), AppUser()},
-      AppUser(),
+      {
+        UserProfile.mock(),
+        UserProfile.mock(),
+        UserProfile.mock(),
+      },
+      UserProfile.mock(),
     );
   }
 }
