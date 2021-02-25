@@ -67,7 +67,7 @@ class MessageCard extends StatelessWidget {
                 ],
               ),
             ),
-            Flexible(child: Icon(Icons.arrow_right))
+            Flexible(child: Icon(Icons.arrow_forward_ios))
           ],
         ),
       ),
