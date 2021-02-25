@@ -6,6 +6,13 @@ import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/model/message.dart';
 
 class ChatPage extends StatefulWidget {
+  final bool scaffold;
+  final String title;
+  ChatPage(this.scaffold, {this.title}) : super() {
+    if (scaffold) {
+      assert(title != null);
+    }
+  }
   @override
   _ChatPageState createState() => _ChatPageState();
 }
@@ -14,7 +21,6 @@ class _ChatPageState extends State<ChatPage> {
   final _messageInputHeight = 100.0;
   final _messages = Message.createRandomChat(count: 5);
   final _formKey = GlobalKey<FormState>();
-  var _currentMessage = '';
   var _messageIsEmpty = true;
   final _focusNode = FocusNode();
 
@@ -22,8 +28,8 @@ class _ChatPageState extends State<ChatPage> {
   void sendMessage(BuildContext context, String content) {
     if (content.isEmpty) return;
     print(content);
-    _currentMessage = '';
     _formKey.currentState.reset();
+    _messageIsEmpty = true;
     final myMessage =
         Message.createMessage(context, content, Activity.getDefault());
     //TODO send message to backend
@@ -40,7 +46,7 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    var body = Column(
       children: [
         Expanded(
           child: GestureDetector(
@@ -140,5 +146,16 @@ class _ChatPageState extends State<ChatPage> {
         )
       ],
     );
+
+    if (widget.scaffold) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: body,
+      );
+    } else {
+      return body;
+    }
   }
 }

@@ -112,7 +112,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
               body: IndexedStack(
                 index: _tabIndex,
                 children: [
-                  ChatPage(),
+                  ChatPage(false),
                   ListView(
                     children: [
                       Text(
