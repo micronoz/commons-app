@@ -16,12 +16,6 @@ class EventCardSmall extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Image(
-              image: NetworkImage(event.photoUrl),
-              width: 80,
-              height: 80,
-              fit: BoxFit.cover,
-            ),
             const SizedBox(
               width: 10,
             ),
@@ -67,17 +61,6 @@ class EventCardSmall extends StatelessWidget {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                event.price,
-                style: TextStyle(
-                  color: Colors.green,
-                  fontWeight: FontWeight.bold,
-                ),
-                textScaleFactor: 1.3,
-              ),
-            )
           ],
         ),
       ),
