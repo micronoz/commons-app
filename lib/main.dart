@@ -8,8 +8,8 @@ import 'package:tribal_instinct/constants.dart';
 import 'package:tribal_instinct/pages/home.dart';
 import 'package:tribal_instinct/pages/login.dart';
 
-import 'managers/auth.dart';
 import 'managers/user_manager.dart';
+import 'model/app_user.dart';
 
 //TODO need to add user state management
 
@@ -20,8 +20,7 @@ Future<void> main() async {
   await initHiveForFlutter();
   runApp(AppConstants(
     child: App(
-      auth: await Auth.create(),
-      userManager: UserManager.create(),
+      userManager: await UserManager.create(),
     ),
   ));
 }
@@ -29,13 +28,10 @@ Future<void> main() async {
 class App extends StatefulWidget {
   const App({
     Key key,
-    @required this.auth,
     @required this.userManager,
   }) : super(key: key);
 
-  final Auth auth;
   final UserManager userManager;
-  // final ItemManager itemManager;
 
   @override
   _AppState createState() => _AppState();
@@ -43,41 +39,23 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   final _navigatorKey = GlobalKey<NavigatorState>();
-  User firebaseUser;
-
-  @override
-  void initState() {
-    super.initState();
-    firebaseUser = widget.auth.init(_onUserChanged);
-  }
-
-  void _onUserChanged() {
-    setState(() {
-      firebaseUser = widget.auth.currentUser.value;
-    });
-  }
-
-  @override
-  void dispose() {
-    widget.auth.dispose(_onUserChanged);
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
         providers: [
-          Provider.value(value: widget.userManager.currentUser.value),
-          Provider<Auth>.value(value: widget.auth),
+          Provider<UserManager>.value(value: widget.userManager),
+          ValueListenableProvider.value(value: widget.userManager.appUser),
         ],
         builder: (context, child) {
+          var user = context.watch<AppUser>();
           var httpLink = HttpLink(
             AppConstants.of(context).backendUri,
           );
 
           var authLink = AuthLink(
             getToken: () async {
-              final token = await firebaseUser.getIdToken();
+              final token = await widget.userManager.getIdToken();
               return 'Bearer ${token}';
             },
           );
@@ -100,7 +78,7 @@ class _AppState extends State<App> {
                   visualDensity: VisualDensity.adaptivePlatformDensity,
                 ),
                 navigatorKey: _navigatorKey,
-                home: firebaseUser != null ? HomePage() : LoginPage(),
+                home: user != null ? HomePage() : LoginPage(),
               ));
         });
   }

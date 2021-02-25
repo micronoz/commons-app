@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
-import 'package:tribal_instinct/managers/auth.dart';
+import 'package:tribal_instinct/managers/user_manager.dart';
 
 class LoginPage extends StatefulWidget {
   static Route<dynamic> route() {
@@ -18,13 +18,13 @@ class _LoginPageState extends State<LoginPage> {
 
   void _onLoginWithGooglePressed() {
     setState(() {
-      _loginFuture = Auth.of(context).loginWithGoogle();
+      _loginFuture = UserManager.of(context).loginWithGoogle();
     });
   }
 
   void _onLoginAnonymouslyPressed() {
     setState(() {
-      _loginFuture = Auth.of(context).loginAnonymously();
+      _loginFuture = UserManager.of(context).loginAnonymously();
     });
   }
 

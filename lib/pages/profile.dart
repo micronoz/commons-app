@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tribal_instinct/managers/auth.dart';
+import 'package:tribal_instinct/managers/user_manager.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -91,7 +91,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             RaisedButton(
               onPressed: () {
-                Auth.of(context).logout();
+                UserManager.of(context).logout();
               },
               child: Text('Logout'),
             )

@@ -1,38 +1,134 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tribal_instinct/model/app_user.dart';
-import 'package:tribal_instinct/model/user_profile.dart';
+import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart' show PlatformException;
+import 'package:google_sign_in/google_sign_in.dart';
 
 class UserManager {
   ValueNotifier<bool> absorbing = ValueNotifier(true);
   ValueNotifier<Map<String, AppUser>> profiles = ValueNotifier({});
 
-  static UserManager create() {
-    // return UserManager._(null);
-    final myUser = AppUser.mock();
-    return UserManager._(myUser);
-  }
+  final appUser = ValueNotifier<AppUser>(null);
 
-  Future<void> init() async {
-    absorbing.value = true;
-    print('Requesting user object');
-    var user = await _fetchUserProfile();
-    currentUser.value = user;
-    absorbing.value = false;
+  User _firebaseUser;
+  final _googleSignIn = GoogleSignIn();
+  final _firebaseAuth = FirebaseAuth.instance;
+  var _authSub;
+
+  static Future<UserManager> create() async {
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    try {
+      await firebaseUser?.reload();
+    } catch (err) {
+      await FirebaseAuth.instance.signOut();
+    }
+
+    return UserManager._(firebaseUser);
   }
 
   static UserManager of(BuildContext context) {
     return Provider.of<UserManager>(context, listen: false);
   }
 
-  Future<AppUser> _fetchUserProfile() async {
-    // return AppUser.fromJson({'id': '1'});
-    return AppUser.mock();
+  Future<String> getIdToken() {
+    return _firebaseUser.getIdToken();
   }
 
-  UserManager._(
-    AppUser currentUser,
-  ) : currentUser = ValueNotifier<AppUser>(currentUser);
+  Future<void> _fetchUserProfile() async {
+    if (_firebaseUser != null) {
+      absorbing.value = true;
+      appUser.value = AppUser.mock();
+      absorbing.value = false;
+    } else {
+      appUser.value = null;
+    }
+  }
 
-  final ValueNotifier<AppUser> currentUser;
+  UserManager._(this._firebaseUser) {
+    _authSub = _firebaseAuth.authStateChanges().listen((User user) {
+      _firebaseUser = user;
+      _fetchUserProfile();
+    });
+  }
+
+  void dispose() {
+    _authSub.cancel();
+  }
+
+  Future<void> loginAnonymously() async {
+    try {
+      await _firebaseAuth.signInAnonymously();
+    } catch (e, st) {
+      throw _getAuthException(e, st);
+    }
+  }
+
+  Future<void> loginWithEmailAndPassword(String email, String password) async {
+    try {
+      await _firebaseAuth.signInWithEmailAndPassword(
+          email: email, password: password);
+    } catch (e, st) {
+      throw _getAuthException(e, st);
+    }
+  }
+
+  Future<void> loginWithGoogle() async {
+    try {
+      final account = await _googleSignIn.signIn();
+      if (account == null) {
+        throw AuthException.cancelled;
+      }
+      final auth = await account.authentication;
+      await _firebaseAuth.signInWithCredential(
+        GoogleAuthProvider.credential(
+            idToken: auth.idToken, accessToken: auth.accessToken),
+      );
+    } catch (e, st) {
+      throw _getAuthException(e, st);
+    }
+  }
+
+  Future<void> logout() async {
+    try {
+      await _firebaseAuth.signOut();
+      await _googleSignIn.signOut();
+    } catch (e, st) {
+      FlutterError.reportError(FlutterErrorDetails(exception: e, stack: st));
+    }
+  }
+
+  AuthException _getAuthException(dynamic e, StackTrace st) {
+    if (e is AuthException) {
+      return e;
+    }
+    FlutterError.reportError(FlutterErrorDetails(exception: e, stack: st));
+    if (e is PlatformException) {
+      switch (e.code) {
+        case 'ERROR_INVALID_EMAIL':
+          return const AuthException('Please check your email address.');
+        case 'ERROR_WRONG_PASSWORD':
+          return const AuthException('Please check your password.');
+        case 'ERROR_USER_NOT_FOUND':
+          return const AuthException(
+              'User not found. Is that the correct email address?');
+        case 'ERROR_USER_DISABLED':
+          return const AuthException(
+              'Your account has been disabled. Please contact support');
+        case 'ERROR_TOO_MANY_REQUESTS':
+          return const AuthException(
+              'You have tried to login too many times. Please try again later.');
+      }
+    }
+    return const AuthException('Sorry, an error occurred. Please try again.');
+  }
+}
+
+class AuthException implements Exception {
+  static const cancelled = AuthException('cancelled');
+  const AuthException(this.message);
+  final String message;
+  @override
+  String toString() => message;
 }
