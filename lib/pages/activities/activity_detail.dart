@@ -8,6 +8,7 @@ import 'package:tribal_instinct/components/member_card.dart';
 import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/model/activity_types.dart';
 import 'package:tribal_instinct/model/app_user.dart';
+import 'package:tribal_instinct/model/user_profile.dart';
 import 'package:tribal_instinct/pages/chat.dart';
 import 'package:tribal_instinct/pages/invite.dart';
 
@@ -172,9 +173,8 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                                         CircleAvatar(
                                             backgroundColor: Colors.blueGrey,
                                             maxRadius: 35,
-                                            backgroundImage:
-                                                user.profile.photo),
-                                        Text(user.profile.name)
+                                            backgroundImage: user.photo),
+                                        Text(user.name)
                                       ],
                                     ),
                                   ),
@@ -228,7 +228,8 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                           m,
                           'Unfollow',
                           'Follow',
-                          (AppUser u) => currentUser.following.contains(u))),
+                          (UserProfile u) =>
+                              currentUser.following.contains(u))),
 
                       if (!_attending)
                         const SizedBox(

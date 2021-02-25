@@ -5,12 +5,12 @@ import 'package:provider/provider.dart';
 import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/model/user_profile.dart';
 
-class AppUser extends ChangeNotifier {
+class AppUser {
   UserProfile profile;
   Position location;
   String address;
-  Set<AppUser> followers;
-  Set<AppUser> following;
+  Set<UserProfile> followers;
+  Set<UserProfile> following;
   Set<Activity> activities;
 
   AppUser._(this.profile);
@@ -39,7 +39,7 @@ class AppUser extends ChangeNotifier {
   }
 
   AppUser hydrate() {
-    following = {AppUser.mock(), AppUser.mock()};
+    following = {UserProfile.mock(), UserProfile.mock()};
     return this;
   }
 

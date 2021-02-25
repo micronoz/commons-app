@@ -3,8 +3,8 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:tribal_instinct/components/event_card_small.dart';
 import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/model/activity_types.dart';
-import 'package:tribal_instinct/model/app_user.dart';
 import 'package:tribal_instinct/model/discover_types.dart';
+import 'package:tribal_instinct/model/user_profile.dart';
 
 String discoverActivitiesQuery = """
   query DiscoverActivities {
@@ -135,8 +135,8 @@ class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
                         _mediumType,
                         _location,
                         _dateTime,
-                        {AppUser.mock(), AppUser.mock()},
-                        AppUser.mock());
+                        {UserProfile.mock(), UserProfile.mock()},
+                        UserProfile.mock());
                     return EventCardSmall(_activity);
                   });
             },
