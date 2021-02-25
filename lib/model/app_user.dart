@@ -23,10 +23,6 @@ class AppUser {
     return Provider.of<AppUser>(context, listen: false);
   }
 
-  static AppUser of(BuildContext context) {
-    return Provider.of<AppUser>(context, listen: false);
-  }
-
   void updateUserPosition() async {
     print('Updating position');
     location = await Geolocator.getCurrentPosition();
