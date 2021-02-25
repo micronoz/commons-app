@@ -1,20 +1,12 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
-import 'package:enum_to_string/enum_to_string.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import 'package:tribal_instinct/components/question_switch.dart';
-import 'package:tribal_instinct/components/session_card.dart';
-import 'package:tribal_instinct/model/activity_types.dart';
-import 'package:tribal_instinct/extensions/string_extension.dart';
-import 'dart:io';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 String createActivityMutation = """
-  mutation CreateActivity(\$title: String!, \$description: String!, \$mediumType: String!, \$xLocation: Float!, \$yLocation: Float!, \$address: String!, \$eventDateTime: DateTime, \$visibility: Int!) {
-    createActivity(title: \$title, description: \$description, mediumType: \$mediumType, xLocation: \$xLocation, yLocation: \$yLocation, address: \$address, eventDateTime: \$eventDateTime, visibility: \$visibility) {
+  mutation CreateActivity(\$title: String!, \$description: String!, \$mediumType: String!, \$xLocation: Float!, \$yLocation: Float!, \$address: String!, \$eventDateTime: DateTime) {
+    createActivity(title: \$title, description: \$description, mediumType: \$mediumType, xLocation: \$xLocation, yLocation: \$yLocation, address: \$address, eventDateTime: \$eventDateTime) {
       id
     }
   }
@@ -32,13 +24,13 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
     final _mediumType = _isOnline ? 'online' : 'in_person';
     final _dateTime = _date.toIso8601String();
     print(_dateTime);
-    print(_maximumAttendance);
-    print(_maximumAttendenceSize);
-    print(_isMatching);
-    print(_matchingSize);
-    print(_visibilitySliderValue.index);
-    print(_requireApproval);
-    print(_pickedImage);
+    // print(_maximumAttendance);
+    // print(_maximumAttendenceSize);
+    // print(_isMatching);
+    // print(_matchingSize);
+    // print(_visibilitySliderValue.index);
+    // print(_requireApproval);
+    // print(_pickedImage);
     //TODO: Add location
     createEventMutation({
       'title': _activityName,
@@ -48,15 +40,9 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
       'yLocation': 0,
       'address': _location,
       'eventDateTime': _dateTime,
-      'visibility': _visibilitySliderValue.index,
+      // 'visibility': _visibilitySliderValue.index,
     });
     Navigator.of(context).pop();
-  }
-
-  void removeSession(Widget card) {
-    setState(() {
-      _sessions.remove(card);
-    });
   }
 
   static const maxInputSize = 255;
@@ -66,26 +52,11 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
 
   final _formKey = GlobalKey<FormState>();
   bool _edited = false;
-  String _activityName = null;
-  String _desciption = null;
+  String _activityName;
+  String _desciption;
   bool _isOnline = false;
-  String _location = null;
-  DateTime _date = null;
-  // var _multiGroup = false;
-  // var _targetGroupSize = null;
-  bool _maximumAttendance = false;
-  int _maximumAttendenceSize = null;
-  // var _format = false;
-  // var _repeating = false;
-  bool _requireApproval = false;
-  bool _isMatching = false;
-  int _matchingSize = null;
-
-  //TODO: This needs files changed for IOS. Check if those have been done.
-  final ImagePicker _picker = ImagePicker();
-  PickedFile _pickedImage;
-  ActivityVisibility _visibilitySliderValue = ActivityVisibility.invite_only;
-  final _sessions = <SessionCard>[];
+  String _location;
+  DateTime _date;
 
   String _genericValidator(String value) {
     if (value == null || value.isEmpty) {
@@ -342,170 +313,7 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                   // const SizedBox(
                   // height: 20,
                   // ),
-                  QuestionSwitch(
-                    key: Key('max cohort'),
-                    question: 'Maximum attendance size',
-                    disabledOption: 'Disabled',
-                    enabledOption: 'Enabled',
-                    callback: (val) => setState(() => _maximumAttendance = val),
-                    additionalInfo:
-                        'Max number of individuals who can attend this activity.',
-                  ),
-                  if (_maximumAttendance)
-                    Row(
-                      children: [
-                        Flexible(
-                          child: TextFormField(
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.headline6,
-                            decoration: const InputDecoration(
-                                border: OutlineInputBorder()),
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                              FilteringTextInputFormatter.allow(
-                                  RegExp(r'[1-9]\d{0,2}$'))
-                            ],
-                            keyboardType: TextInputType.number,
-                            onChanged: (value) =>
-                                _maximumAttendenceSize = int.parse(value),
-                            validator: _genericValidator,
-                          ),
-                        ),
-                        Spacer(
-                          flex: 2,
-                        )
-                      ],
-                    ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  QuestionSwitch(
-                    key: Key('is matching'),
-                    question: 'Matching',
-                    disabledOption: 'Disabled',
-                    enabledOption: 'Enabled',
-                    callback: (val) => setState(() => _isMatching = val),
-                    additionalInfo:
-                        'Match and connect participants beforehand in groups.',
-                  ),
-                  if (_isMatching)
-                    Row(
-                      children: [
-                        Text(
-                          'Match group size:',
-                          style: Theme.of(context).textTheme.subtitle2,
-                        ),
-                        Flexible(
-                          child: TextFormField(
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.headline6,
-                            decoration: const InputDecoration(
-                                border: OutlineInputBorder()),
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                              FilteringTextInputFormatter.allow(
-                                  RegExp(r'[1-9]\d{0,2}$'))
-                            ],
-                            keyboardType: TextInputType.number,
-                            onChanged: (value) =>
-                                _matchingSize = int.parse(value),
-                            validator: _genericValidator,
-                          ),
-                        ),
-                        Spacer(
-                          flex: 2,
-                        )
-                      ],
-                    ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    'Visibility',
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
 
-                  SliderTheme(
-                    data: SliderThemeData(
-                        showValueIndicator: ShowValueIndicator.always),
-                    child: Slider(
-                      onChanged: (numa) {
-                        setState(() {
-                          _visibilitySliderValue =
-                              ActivityVisibility.values[numa.truncate()];
-                        });
-                      },
-                      value: _visibilitySliderValue.index.toDouble(),
-                      min: 0,
-                      max: 2,
-                      label:
-                          EnumToString.convertToString(_visibilitySliderValue)
-                              .replaceAll('_', ' ')
-                              .capitalize(),
-                      divisions: 2,
-                    ),
-                  ),
-
-                  if (_visibilitySliderValue ==
-                          ActivityVisibility.people_i_follow ||
-                      _visibilitySliderValue == ActivityVisibility.public)
-                    QuestionSwitch(
-                      key: Key('approval'),
-                      question: 'Require approval',
-                      disabledOption: 'Disabled',
-                      enabledOption: 'Enabled',
-                      callback: (val) => setState(() => _requireApproval = val),
-                      additionalInfo:
-                          'Enabling this will require you to approve each of the participants before they are allowed to join the activity.',
-                    ),
-
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    'Add a photo (Optional)',
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                  _pickedImage == null
-                      ? SizedBox(
-                          height: 20,
-                        )
-                      : Column(children: [
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Image.file(
-                            File(_pickedImage.path),
-                            fit: BoxFit.fitHeight,
-                            height: 200,
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                        ]),
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        try {
-                          var pickedImage = await _picker.getImage(
-                              source: ImageSource.gallery);
-                          setState(() {
-                            _pickedImage = pickedImage;
-                          });
-                        } catch (e) {
-                          print(e);
-                        }
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.photo),
-                          Text(
-                              '${_pickedImage == null ? 'Pick' : 'Change'} Photo')
-                        ],
-                      ),
-                    ),
-                  ),
                   const SizedBox(
                     height: 20,
                   ),

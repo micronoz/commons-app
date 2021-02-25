@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/model/app_user.dart';
+import 'package:tribal_instinct/model/user_profile.dart';
 import 'package:tribal_instinct/pages/activities/activity_detail.dart';
 
 class EventCardSmall extends StatelessWidget {
@@ -16,12 +17,6 @@ class EventCardSmall extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Image(
-              image: NetworkImage(event.photoUrl),
-              width: 80,
-              height: 80,
-              fit: BoxFit.cover,
-            ),
             const SizedBox(
               width: 10,
             ),
@@ -42,7 +37,7 @@ class EventCardSmall extends StatelessWidget {
                   Flexible(
                     child: Row(
                       children: [
-                        event.organizer.runtimeType == AppUser
+                        event.organizer.runtimeType == UserProfile
                             ? Icon(Icons.person)
                             : Icon(Icons.home),
                         Text(
@@ -67,17 +62,6 @@ class EventCardSmall extends StatelessWidget {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                event.price,
-                style: TextStyle(
-                  color: Colors.green,
-                  fontWeight: FontWeight.bold,
-                ),
-                textScaleFactor: 1.3,
-              ),
-            )
           ],
         ),
       ),

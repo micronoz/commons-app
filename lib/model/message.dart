@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:tribal_instinct/managers/user_manager.dart';
 import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/model/app_user.dart';
+import 'package:tribal_instinct/model/user_profile.dart';
 
 class Message {
   final String content;
   final DateTime timestamp;
-  final AppUser sender;
+  final UserProfile sender;
   final Activity activity;
   bool isSender; //TODO remove
 
@@ -24,7 +25,7 @@ class Message {
     final myMessage = Message._(
         content: content,
         timestamp: DateTime.now(),
-        sender: AppUser.of(context),
+        sender: AppUser.of(context).profile,
         activity: activity);
     return myMessage;
   }

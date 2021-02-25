@@ -8,6 +8,7 @@ import 'package:tribal_instinct/components/member_card.dart';
 import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/model/activity_types.dart';
 import 'package:tribal_instinct/model/app_user.dart';
+import 'package:tribal_instinct/model/user_profile.dart';
 import 'package:tribal_instinct/pages/chat.dart';
 import 'package:tribal_instinct/pages/invite.dart';
 
@@ -22,7 +23,6 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
   final String _id = '1';
   final timeout = const Duration(seconds: 1);
 
-  final currentUser = AppUser(); //TODO REMOVE
   var isAdmin = false;
 
   var _absorbing = false;
@@ -61,6 +61,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = AppUser.of(context);
     var tabBar = TabBar(
       tabs: tabs,
       onTap: (index) => setState(() {
@@ -74,8 +75,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
       }),
     );
     currentUser.hydrate();
-    var availableSpots = activity.maxGroupSize - activity.attendees.length;
-    isAdmin = currentUser == activity.organizer;
+    isAdmin = currentUser.profile == activity.organizer;
     return WillPopScope(
       onWillPop: () async => !_absorbing,
       child: AbsorbPointer(
@@ -115,13 +115,6 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                   ChatPage(),
                   ListView(
                     children: [
-                      AspectRatio(
-                        aspectRatio: 16 / 9,
-                        child: Image.network(
-                          activity.photoUrl,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
                       Text(
                         activity.title,
                         style: Theme.of(context).textTheme.headline2,
@@ -147,18 +140,6 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                       // ),
                       Text(
                         'on ' + _format.format(activity.dateTime.toLocal()),
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodyText1,
-                        textScaleFactor: 1.3,
-                      ),
-                      Text(
-                        'Available space: ${activity.maxGroupSize - activity.attendees.length}/${activity.maxGroupSize}',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodyText1,
-                        textScaleFactor: 1.3,
-                      ),
-                      Text(
-                        'Price: ' + activity.price,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyText1,
                         textScaleFactor: 1.3,
@@ -197,40 +178,40 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                                       ],
                                     ),
                                   ),
-                                  ...List.generate(
-                                          availableSpots, (index) => null)
-                                      .map((e) => isAdmin
-                                          ? Column(
-                                              children: [
-                                                InkWell(
-                                                  onTap: () => invite(context),
-                                                  child: CircleAvatar(
-                                                    backgroundColor:
-                                                        Colors.blueGrey,
-                                                    maxRadius: 35,
-                                                    child: Text(
-                                                      '+',
-                                                      textScaleFactor: 3,
-                                                    ),
-                                                  ),
-                                                ),
-                                                Text('Add')
-                                              ],
-                                            )
-                                          : Column(
-                                              children: [
-                                                CircleAvatar(
-                                                  backgroundColor:
-                                                      Colors.blueGrey,
-                                                  maxRadius: 35,
-                                                  child: Text(
-                                                    '?',
-                                                    textScaleFactor: 3,
-                                                  ),
-                                                ),
-                                                Text('null')
-                                              ],
-                                            ))
+                                  // ...List.generate(
+                                  //         availableSpots, (index) => null)
+                                  //     .map((e) => isAdmin
+                                  //         ? Column(
+                                  //             children: [
+                                  //               InkWell(
+                                  //                 onTap: () => invite(context),
+                                  //                 child: CircleAvatar(
+                                  //                   backgroundColor:
+                                  //                       Colors.blueGrey,
+                                  //                   maxRadius: 35,
+                                  //                   child: Text(
+                                  //                     '+',
+                                  //                     textScaleFactor: 3,
+                                  //                   ),
+                                  //                 ),
+                                  //               ),
+                                  //               Text('Add')
+                                  //             ],
+                                  //           )
+                                  //         : Column(
+                                  //             children: [
+                                  //               CircleAvatar(
+                                  //                 backgroundColor:
+                                  //                     Colors.blueGrey,
+                                  //                 maxRadius: 35,
+                                  //                 child: Text(
+                                  //                   '?',
+                                  //                   textScaleFactor: 3,
+                                  //                 ),
+                                  //               ),
+                                  //               Text('null')
+                                  //             ],
+                                  //           ))
                                 ],
                               ),
                             ),
@@ -247,7 +228,8 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                           m,
                           'Unfollow',
                           'Follow',
-                          (AppUser u) => currentUser.following.contains(u))),
+                          (UserProfile u) =>
+                              currentUser.following.contains(u))),
 
                       if (!_attending)
                         const SizedBox(
