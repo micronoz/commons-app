@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tribal_instinct/pages/clubs/clubs.dart';
 import 'package:tribal_instinct/pages/feed.dart';
 import 'package:tribal_instinct/pages/activities/activities.dart';
+import 'package:tribal_instinct/pages/messages.dart';
 import 'package:tribal_instinct/pages/profile.dart';
 
 class HomePage extends StatefulWidget {
@@ -19,7 +20,7 @@ class _HomePageState extends State<HomePage> {
   final menuIcons = <Map<String, Object>>[
     {'icon': Icons.rss_feed, 'label': 'Feed'},
     {'icon': Icons.calendar_today, 'label': 'Experiences'},
-    //  {'icon': Icons.group, 'label': 'Clubs'},
+    {'icon': Icons.chat, 'label': 'Messages'},
     {'icon': Icons.supervisor_account, 'label': 'Profile'}
   ]
       .map(
@@ -34,7 +35,7 @@ class _HomePageState extends State<HomePage> {
   final _pages = [
     FeedPage(),
     ExperiencesPage(),
-    //ClubsPage(),
+    MessagesPage(),
     ProfilePage(),
   ];
 
