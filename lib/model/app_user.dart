@@ -34,8 +34,15 @@ class AppUser {
   }
 
   static AppUser fromJson(Map<String, dynamic> json) {
-    //TODO Parse json
-    return AppUser._(UserProfile.mock());
+    // TODO: Also get the other fields and change the email field after
+    // adding necessary fields to the database.
+    final userProfile = UserProfile(
+        '2',
+        json['fullName'],
+        json['email'],
+        'https://picsum.photos/250?image=11',
+        'Hello my name is Nabi. I\'m from Cyprus and this is the new app I created for bringing people together.');
+    return AppUser._(userProfile);
   }
 
   AppUser hydrate() {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tribal_instinct/managers/user_manager.dart';
+import 'package:tribal_instinct/model/app_user.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -9,12 +10,13 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
+    final appUser = AppUser.of(context);
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: Text('@nozberkman'),
+        title: Text(appUser.profile.identifier),
       ),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
@@ -33,9 +35,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       image: DecorationImage(
-                          image:
-                              NetworkImage('https://picsum.photos/250?image=9'),
-                          fit: BoxFit.fill),
+                          image: appUser.profile.photo, fit: BoxFit.fill),
                     ),
                   ),
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:tribal_instinct/model/app_user.dart';
 import 'dart:async';
@@ -6,17 +7,26 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart' show PlatformException;
 import 'package:google_sign_in/google_sign_in.dart';
 
+String getProfileQuery = """
+  query GetUserProfile {
+    user {
+      email
+      fullName
+    }
+  }
+""";
+
 class UserManager {
   ValueNotifier<bool> absorbing = ValueNotifier(true);
   ValueNotifier<Map<String, AppUser>> profiles = ValueNotifier({});
 
   final appUser = ValueNotifier<AppUser>(null);
-
   User _firebaseUser;
   final _googleSignIn = GoogleSignIn();
   final _firebaseAuth = FirebaseAuth.instance;
   var _authSub;
 
+  ValueNotifier<GraphQLClient> _graphQLClientNotifier;
   static Future<UserManager> create() async {
     final firebaseUser = FirebaseAuth.instance.currentUser;
     try {
@@ -32,14 +42,25 @@ class UserManager {
     return Provider.of<UserManager>(context, listen: false);
   }
 
+  void registerGraphQL(ValueNotifier<GraphQLClient> notifier) {
+    print('Registering graphql notifier to userManager.');
+
+    _graphQLClientNotifier = notifier;
+  }
+
   Future<String> getIdToken() {
     return _firebaseUser.getIdToken();
   }
 
   Future<void> _fetchUserProfile() async {
-    if (_firebaseUser != null) {
+    if (_firebaseUser != null && _graphQLClientNotifier != null) {
       absorbing.value = true;
-      appUser.value = AppUser.mock();
+      print('Fetching user profile');
+      var result = await _graphQLClientNotifier.value.query(QueryOptions(
+        document: gql(getProfileQuery),
+      ));
+      final profileJSON = result.data['user'];
+      appUser.value = AppUser.fromJson(profileJSON);
       absorbing.value = false;
     } else {
       appUser.value = null;
@@ -47,7 +68,7 @@ class UserManager {
   }
 
   UserManager._(this._firebaseUser) {
-    _authSub = _firebaseAuth.authStateChanges().listen((User user) {
+    _authSub = _firebaseAuth.idTokenChanges().listen((User user) {
       _firebaseUser = user;
       _fetchUserProfile();
     });
