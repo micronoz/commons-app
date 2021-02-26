@@ -66,7 +66,7 @@ class _AppState extends State<App> {
             cache: GraphQLCache(store: HiveStore()),
           );
           var clientNotifier = ValueNotifier(client);
-
+          widget.userManager.registerGraphQL(clientNotifier);
           return GraphQLProvider(
               client: clientNotifier,
               child: MaterialApp(
