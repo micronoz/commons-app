@@ -9,7 +9,7 @@ import 'package:tribal_instinct/pages/home.dart';
 import 'package:tribal_instinct/pages/login.dart';
 
 import 'managers/user_manager.dart';
-import 'model/app_user.dart';
+import 'model/is_logged_in.dart';
 
 //TODO need to add user state management
 
@@ -46,9 +46,10 @@ class _AppState extends State<App> {
         providers: [
           Provider<UserManager>.value(value: widget.userManager),
           ValueListenableProvider.value(value: widget.userManager.appUser),
+          ValueListenableProvider.value(value: widget.userManager.isLoggedIn),
         ],
         builder: (context, child) {
-          var user = context.watch<AppUser>();
+          var isLoggedIn = context.watch<IsLoggedIn>();
           var httpLink = HttpLink(
             AppConstants.of(context).backendUri,
           );
@@ -67,6 +68,7 @@ class _AppState extends State<App> {
           );
           var clientNotifier = ValueNotifier(client);
           widget.userManager.registerGraphQL(clientNotifier);
+          widget.userManager.fetchUserProfile();
           return GraphQLProvider(
               client: clientNotifier,
               child: MaterialApp(
@@ -78,7 +80,7 @@ class _AppState extends State<App> {
                   visualDensity: VisualDensity.adaptivePlatformDensity,
                 ),
                 navigatorKey: _navigatorKey,
-                home: user != null ? HomePage() : LoginPage(),
+                home: isLoggedIn.val ? HomePage() : LoginPage(),
               ));
         });
   }

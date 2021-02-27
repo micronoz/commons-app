@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:tribal_instinct/pages/clubs/clubs.dart';
+import 'package:provider/provider.dart';
+import 'package:tribal_instinct/model/app_user.dart';
 import 'package:tribal_instinct/pages/feed.dart';
 import 'package:tribal_instinct/pages/activities/activities.dart';
 import 'package:tribal_instinct/pages/messages.dart';
+import 'package:tribal_instinct/pages/onboarding_flow.dart';
 import 'package:tribal_instinct/pages/profile.dart';
 
 class HomePage extends StatefulWidget {
@@ -43,6 +45,14 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final appUser = context.watch<AppUser>();
+    //AppUser is null when the user has not yet been created and fetched.
+    if (appUser == null) {
+      return Scaffold(
+        backgroundColor: Colors.lightBlue,
+        body: OnboardingFlow(),
+      );
+    }
     return Scaffold(
       body: IndexedStack(
         index: _pageIndex,

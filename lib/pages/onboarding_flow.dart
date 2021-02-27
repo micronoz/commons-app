@@ -1,5 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:tribal_instinct/managers/user_manager.dart';
 import 'onboarding_question.dart';
+
+String createUserMutation = """
+  mutation CreateUser(\$firstName: String!, \$lastName: String!, \$handle: String!) {
+    createUser(firstName: \$firstName, lastName: \$lastName, handle: \$handle) {
+      id
+    }
+  }
+""";
 
 class QuestionData {
   final String question;
@@ -66,6 +76,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                       setState(() {
                         _pageIndex--;
                       });
+                    } else {
+                      UserManager.of(context).logout();
                     }
                     currentFocus.unfocus();
                   },
@@ -80,28 +92,42 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         Padding(
           padding: EdgeInsets.only(top: 50),
         ),
-        RaisedButton(
-          child: Text('Next'),
-          onPressed: () {
-            if (!_pages[_pageIndex].formKey.currentState.validate()) {
-              return;
-            }
-            if (_pageIndex < _pages.length - 1) {
-              setState(() {
-                _pageIndex++;
-              });
-            } else {
-              for (var i = 0; i < _pages.length; i++) {
-                print(_pages[i].questionData.answer);
-                //TODO: Submit to backend
-              }
-            }
-            currentFocus.unfocus();
-          },
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(13.0),
-              side: BorderSide(color: Colors.grey)),
-        ),
+        Mutation(
+            options: MutationOptions(
+              document: gql(createUserMutation),
+              onCompleted: (dynamic resultData) {
+                print('Created User.');
+                UserManager.of(context).fetchUserProfile();
+              },
+            ),
+            builder: (
+              RunMutation runMutation,
+              QueryResult result,
+            ) {
+              return RaisedButton(
+                child: Text('Next'),
+                onPressed: () {
+                  if (!_pages[_pageIndex].formKey.currentState.validate()) {
+                    return;
+                  }
+                  if (_pageIndex < _pages.length - 1) {
+                    setState(() {
+                      _pageIndex++;
+                    });
+                  } else {
+                    runMutation({
+                      'firstName': _pages[0].questionData.answer,
+                      'lastName': _pages[1].questionData.answer,
+                      'handle': _pages[2].questionData.answer,
+                    });
+                  }
+                  currentFocus.unfocus();
+                },
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(13.0),
+                    side: BorderSide(color: Colors.grey)),
+              );
+            }),
         Container(
             margin: const EdgeInsets.symmetric(vertical: 24),
             child: Row(
