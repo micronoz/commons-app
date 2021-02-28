@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tribal_instinct/managers/user_manager.dart';
 import 'package:tribal_instinct/model/app_user.dart';
 import 'package:tribal_instinct/pages/feed.dart';
 import 'package:tribal_instinct/pages/activities/activities.dart';
@@ -45,19 +46,23 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final appUser = context.watch<AppUser>();
     //AppUser is null when the user has not yet been created and fetched.
-    if (appUser == null) {
-      return Scaffold(
-        backgroundColor: Colors.lightBlue,
-        body: OnboardingFlow(),
-      );
-    }
+    final appUser = context.watch<AppUser>();
     return Scaffold(
-      body: IndexedStack(
-        index: _pageIndex,
-        children: _pages,
-      ),
+      body: appUser == null
+          ? FutureBuilder(
+              future: UserManager.of(context).appUserResolver.value,
+              builder: (context, state) {
+                if (state.connectionState == ConnectionState.waiting ||
+                    state.connectionState == ConnectionState.none) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                return OnboardingFlow();
+              })
+          : IndexedStack(
+              index: _pageIndex,
+              children: _pages,
+            ),
       bottomNavigationBar: BottomNavigationBar(
         unselectedFontSize: 14,
         selectedFontSize: 14,

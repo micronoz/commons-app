@@ -1,4 +1,3 @@
-import 'package:tribal_instinct/model/app_user.dart';
 import 'package:tribal_instinct/model/activity_types.dart';
 import 'user_profile.dart';
 

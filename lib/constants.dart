@@ -6,7 +6,7 @@ class AppConstants extends InheritedWidget {
 
   const AppConstants({Widget child, Key key}) : super(key: key, child: child);
 
-  final String backendUri = 'http://10.0.2.2:4000/graphql';
+  final String backendUri = 'http://localhost:4000/graphql';
 
   @override
   bool updateShouldNotify(AppConstants oldWidget) => false;

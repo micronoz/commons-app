@@ -8,7 +8,7 @@ import 'package:flutter/services.dart' show PlatformException;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tribal_instinct/model/is_logged_in.dart';
 
-String getProfileQuery = """
+String getProfileQuery = '''
   query GetUserProfile {
     user {
       id
@@ -16,7 +16,7 @@ String getProfileQuery = """
       fullName
     }
   }
-""";
+''';
 
 class UserManager {
   ValueNotifier<bool> absorbing = ValueNotifier(true);
@@ -29,6 +29,8 @@ class UserManager {
   final _googleSignIn = GoogleSignIn();
   final _firebaseAuth = FirebaseAuth.instance;
   var _authSub;
+
+  final ValueNotifier<Future<QueryResult>> appUserResolver;
 
   ValueNotifier<GraphQLClient> _graphQLClientNotifier;
   static Future<UserManager> create() async {
@@ -60,17 +62,18 @@ class UserManager {
     if (_firebaseUser != null && _graphQLClientNotifier != null) {
       absorbing.value = true;
       print('Fetching user profile');
-      var result = await _graphQLClientNotifier.value.query(QueryOptions(
+      appUserResolver.value = _graphQLClientNotifier.value.query(QueryOptions(
           document: gql(getProfileQuery),
           fetchPolicy: FetchPolicy.noCache,
           variables: {
             'email': _firebaseAuth.currentUser.email,
           }));
-
+      var result = await appUserResolver.value;
       // TODO: Right now only checking if the data is null to see if the
       // user exists on the backend or not. This should be changed as this
       // might also be due to network or other errors.
       if (result.data == null) {
+        print(result);
         print('User fetching returned null data.');
         appUser.value = null;
         return;
@@ -84,7 +87,7 @@ class UserManager {
     }
   }
 
-  UserManager._(User firebaseUser) {
+  UserManager._(User firebaseUser) : appUserResolver = ValueNotifier(null) {
     _firebaseUser = firebaseUser;
     isLoggedIn.value =
         firebaseUser == null ? IsLoggedIn(false) : IsLoggedIn(true);

@@ -6,7 +6,7 @@ import 'package:tribal_instinct/model/activity_types.dart';
 import 'package:tribal_instinct/model/discover_types.dart';
 import 'package:tribal_instinct/model/user_profile.dart';
 
-String discoverActivitiesQuery = """
+String discoverActivitiesQuery = '''
   query DiscoverActivities {
     discoverActivities {
       title
@@ -16,7 +16,7 @@ String discoverActivitiesQuery = """
       eventDateTime
     }
   }
-""";
+''';
 
 class DiscoverCategoryPage extends StatefulWidget {
   final DiscoverType type;

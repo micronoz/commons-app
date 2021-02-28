@@ -3,13 +3,13 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:tribal_instinct/managers/user_manager.dart';
 import 'onboarding_question.dart';
 
-String createUserMutation = """
+String createUserMutation = '''
   mutation CreateUser(\$firstName: String!, \$lastName: String!, \$handle: String!) {
     createUser(firstName: \$firstName, lastName: \$lastName, handle: \$handle) {
       id
     }
   }
-""";
+''';
 
 class QuestionData {
   final String question;
@@ -97,6 +97,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               document: gql(createUserMutation),
               onCompleted: (dynamic resultData) {
                 print('Created User.');
+                print(resultData);
                 UserManager.of(context).fetchUserProfile();
               },
             ),
