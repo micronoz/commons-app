@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:tribal_instinct/managers/user_manager.dart';
 import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/model/app_user.dart';
 import 'package:tribal_instinct/model/user_profile.dart';

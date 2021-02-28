@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tribal_instinct/components/event_card_small.dart';
 import 'package:tribal_instinct/model/activity.dart';
-import 'package:tribal_instinct/model/app_user.dart';
 import 'package:tribal_instinct/model/discover_types.dart';
 import 'package:tribal_instinct/pages/activities/create_activity.dart';
 import 'package:tribal_instinct/pages/discover/discover.dart';

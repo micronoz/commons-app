@@ -28,7 +28,6 @@ class _SessionCardState extends State<SessionCard> {
   final DateFormat _format = DateFormat.yMd();
   TimeOfDay _time;
   DateTime _combined;
-  String _frequency = 'No Repeat';
 
   @override
   Widget build(BuildContext context) {

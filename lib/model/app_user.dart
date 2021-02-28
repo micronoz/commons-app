@@ -39,7 +39,7 @@ class AppUser {
     final userProfile = UserProfile(
         '2',
         json['fullName'],
-        json['email'],
+        json['handle'],
         'https://picsum.photos/250?image=11',
         'Hello my name is Nabi. I\'m from Cyprus and this is the new app I created for bringing people together.');
     return AppUser._(userProfile);

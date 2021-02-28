@@ -1,6 +1,5 @@
 import 'package:enum_to_string/enum_to_string.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:tribal_instinct/model/discover_types.dart';
 import 'package:tribal_instinct/pages/discover/discover_category.dart';
 import 'package:tribal_instinct/extensions/string_extension.dart';

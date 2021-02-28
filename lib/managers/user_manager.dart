@@ -6,25 +6,31 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart' show PlatformException;
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:tribal_instinct/model/is_logged_in.dart';
 
-String getProfileQuery = """
+String getProfileQuery = '''
   query GetUserProfile {
     user {
-      email
+      id
+      handle
       fullName
     }
   }
-""";
+''';
 
 class UserManager {
   ValueNotifier<bool> absorbing = ValueNotifier(true);
   ValueNotifier<Map<String, AppUser>> profiles = ValueNotifier({});
 
   final appUser = ValueNotifier<AppUser>(null);
+  final isLoggedIn = ValueNotifier<IsLoggedIn>(IsLoggedIn(false));
+
   User _firebaseUser;
   final _googleSignIn = GoogleSignIn();
   final _firebaseAuth = FirebaseAuth.instance;
   var _authSub;
+
+  final ValueNotifier<Future<QueryResult>> appUserResolver;
 
   ValueNotifier<GraphQLClient> _graphQLClientNotifier;
   static Future<UserManager> create() async {
@@ -52,13 +58,27 @@ class UserManager {
     return _firebaseUser.getIdToken();
   }
 
-  Future<void> _fetchUserProfile() async {
+  Future<void> fetchUserProfile() async {
     if (_firebaseUser != null && _graphQLClientNotifier != null) {
       absorbing.value = true;
       print('Fetching user profile');
-      var result = await _graphQLClientNotifier.value.query(QueryOptions(
-        document: gql(getProfileQuery),
-      ));
+      appUserResolver.value = _graphQLClientNotifier.value.query(QueryOptions(
+          document: gql(getProfileQuery),
+          fetchPolicy: FetchPolicy.noCache,
+          variables: {
+            'email': _firebaseAuth.currentUser.email,
+          }));
+      var result = await appUserResolver.value;
+      // TODO: Right now only checking if the data is null to see if the
+      // user exists on the backend or not. This should be changed as this
+      // might also be due to network or other errors.
+      if (result.data == null) {
+        print(result);
+        print('User fetching returned null data.');
+        appUser.value = null;
+        return;
+      }
+      print('Fetched user result successfully:');
       final profileJSON = result.data['user'];
       appUser.value = AppUser.fromJson(profileJSON);
       absorbing.value = false;
@@ -67,10 +87,14 @@ class UserManager {
     }
   }
 
-  UserManager._(this._firebaseUser) {
+  UserManager._(User firebaseUser) : appUserResolver = ValueNotifier(null) {
+    _firebaseUser = firebaseUser;
+    isLoggedIn.value =
+        firebaseUser == null ? IsLoggedIn(false) : IsLoggedIn(true);
     _authSub = _firebaseAuth.idTokenChanges().listen((User user) {
       _firebaseUser = user;
-      _fetchUserProfile();
+      isLoggedIn.value = user == null ? IsLoggedIn(false) : IsLoggedIn(true);
+      fetchUserProfile();
     });
   }
 

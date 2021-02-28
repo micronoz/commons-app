@@ -14,17 +14,15 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  Future _loginFuture;
-
   void _onLoginWithGooglePressed() {
     setState(() {
-      _loginFuture = UserManager.of(context).loginWithGoogle();
+      UserManager.of(context).loginWithGoogle();
     });
   }
 
   void _onLoginAnonymouslyPressed() {
     setState(() {
-      _loginFuture = UserManager.of(context).loginAnonymously();
+      UserManager.of(context).loginAnonymously();
     });
   }
 
@@ -33,10 +31,9 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       child: Scaffold(
         body: FutureBuilder(
-          future: _loginFuture,
+          future: UserManager.of(context).appUserResolver.value,
           builder: (context, state) {
-            if (state.connectionState == ConnectionState.waiting ||
-                state.connectionState == ConnectionState.done) {
+            if (state.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
             }
             return Center(
