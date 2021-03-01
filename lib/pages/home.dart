@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tribal_instinct/managers/user_manager.dart';
 import 'package:tribal_instinct/model/app_user.dart';
+import 'package:tribal_instinct/onboarding/onboarding_flow.dart';
 import 'package:tribal_instinct/pages/feed.dart';
 import 'package:tribal_instinct/pages/activities/activities.dart';
 import 'package:tribal_instinct/pages/chats.dart';
-import 'package:tribal_instinct/pages/onboarding_flow.dart';
 import 'package:tribal_instinct/pages/profile.dart';
 
 class HomePage extends StatefulWidget {
@@ -48,8 +48,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     //AppUser is null when the user has not yet been created and fetched.
     final appUser = context.watch<AppUser>();
+    final isAppUserNull = appUser == null;
     return Scaffold(
-      body: appUser == null
+      body: isAppUserNull
           ? FutureBuilder(
               future: UserManager.of(context).appUserResolver.value,
               builder: (context, state) {
@@ -63,18 +64,20 @@ class _HomePageState extends State<HomePage> {
               index: _pageIndex,
               children: _pages,
             ),
-      bottomNavigationBar: BottomNavigationBar(
-        unselectedFontSize: 14,
-        selectedFontSize: 14,
-        iconSize: 28,
-        unselectedItemColor: Theme.of(context).disabledColor,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        type: BottomNavigationBarType.fixed,
-        items: menuIcons,
-        currentIndex: _pageIndex,
-        onTap: (index) => setState(() => _pageIndex = index),
-      ),
+      bottomNavigationBar: isAppUserNull
+          ? null
+          : BottomNavigationBar(
+              unselectedFontSize: 14,
+              selectedFontSize: 14,
+              iconSize: 28,
+              unselectedItemColor: Theme.of(context).disabledColor,
+              showSelectedLabels: true,
+              showUnselectedLabels: true,
+              type: BottomNavigationBarType.fixed,
+              items: menuIcons,
+              currentIndex: _pageIndex,
+              onTap: (index) => setState(() => _pageIndex = index),
+            ),
     );
   }
 }
