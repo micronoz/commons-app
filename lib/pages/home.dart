@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tribal_instinct/managers/user_manager.dart';
 import 'package:tribal_instinct/model/app_user.dart';
+import 'package:tribal_instinct/onboarding/onboarding_flow.dart';
 import 'package:tribal_instinct/pages/feed.dart';
 import 'package:tribal_instinct/pages/activities/activities.dart';
 import 'package:tribal_instinct/pages/messages.dart';
-import 'package:tribal_instinct/pages/onboarding_flow.dart';
 import 'package:tribal_instinct/pages/profile.dart';
 
 class HomePage extends StatefulWidget {

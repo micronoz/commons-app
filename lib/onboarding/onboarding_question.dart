@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tribal_instinct/pages/onboarding_flow.dart';
+import 'onboarding_flow.dart';
 
 class OnboardingQuestion extends StatefulWidget {
   OnboardingQuestion({Key key, @required this.questionData}) : super(key: key);
