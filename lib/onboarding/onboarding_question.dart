@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:graphql/client.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'onboarding_flow.dart';
 
 class OnboardingQuestion extends StatefulWidget {
@@ -12,8 +14,45 @@ class OnboardingQuestion extends StatefulWidget {
 }
 
 class _OnboardingQuestionState extends State<OnboardingQuestion> {
+  String validatedValue;
+  String rejectedValue;
+
+// this will be called upon user interaction or re-initiation as commented below
+  String validateUnique(String val, GraphQLClient graphQLClient) {
+    print(val);
+    if (validatedValue == val) {
+      return null;
+    } else if (rejectedValue == val) {
+      return 'This value is already taken.';
+    } else {
+      initiateAsyncUniqueValidation(val, graphQLClient);
+      return 'Validating...';
+    }
+  }
+
+  Future<void> initiateAsyncUniqueValidation(
+      String val, GraphQLClient graphQLClient) async {
+    var result = await graphQLClient.query(QueryOptions(
+        document: gql(widget.questionData.uniqueCheckQuery),
+        fetchPolicy: FetchPolicy.noCache,
+        variables: {
+          'val': val,
+        }));
+    print(result.data['isUserHandleTaken']);
+    final isTaken =
+        result.data[widget.questionData.uniqueCheckQueryReturnField];
+    if (isTaken) {
+      rejectedValue = val;
+    } else {
+      validatedValue = val;
+    }
+
+    widget.formKey.currentState.validate();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final _gqlClient = GraphQLProvider.of(context).value;
     return Column(
       children: [
         Padding(
@@ -23,9 +62,21 @@ class _OnboardingQuestionState extends State<OnboardingQuestion> {
         Container(
           width: 200,
           child: Form(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             key: widget.formKey,
             child: TextFormField(
-              validator: widget.questionData.validator,
+              validator: (String val) {
+                final validatorResult = widget.questionData.validator(val);
+                if (validatorResult == null) {
+                  if (widget.questionData.uniqueCheckQuery == null) {
+                    return null;
+                  } else {
+                    return validateUnique(val, _gqlClient);
+                  }
+                } else {
+                  return validatorResult;
+                }
+              },
               onChanged: (value) => widget.questionData.answer = value,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),

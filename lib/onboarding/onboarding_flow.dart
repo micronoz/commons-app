@@ -11,14 +11,26 @@ String createUserMutation = '''
   }
 ''';
 
+String checkUserHandleUniqueQuery = '''
+  query CheckUserHandleUnique(\$val: String!) {
+    isUserHandleTaken(userHandle: \$val) 
+  }
+''';
+
 class QuestionData {
   final String question;
   final String hint;
   final String Function(String) validator;
-
+  final String uniqueCheckQuery;
+  final String uniqueCheckQueryReturnField;
   String answer;
 
-  QuestionData(this.question, this.hint, this.validator);
+  QuestionData(
+      {@required this.question,
+      @required this.hint,
+      @required this.validator,
+      this.uniqueCheckQuery,
+      this.uniqueCheckQueryReturnField});
 }
 
 String _genericValidator(String val) {
@@ -30,9 +42,20 @@ String _genericValidator(String val) {
 
 //TODO: Write more specific validators
 final List<QuestionData> data = [
-  QuestionData('What is your first name?', 'First Name', _genericValidator),
-  QuestionData('How about your last name?', 'Last Name', _genericValidator),
-  QuestionData("Let's choose a username now", 'Username', _genericValidator),
+  QuestionData(
+      question: 'What is your first name?',
+      hint: 'First Name',
+      validator: _genericValidator),
+  QuestionData(
+      question: 'How about your last name?',
+      hint: 'Last Name',
+      validator: _genericValidator),
+  QuestionData(
+      question: "Let's choose a username now",
+      hint: 'Username',
+      validator: _genericValidator,
+      uniqueCheckQuery: checkUserHandleUniqueQuery,
+      uniqueCheckQueryReturnField: 'isUserHandleTaken'),
 ];
 
 class OnboardingFlow extends StatefulWidget {
