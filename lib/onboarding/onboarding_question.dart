@@ -23,7 +23,7 @@ class _OnboardingQuestionState extends State<OnboardingQuestion> {
     if (validatedValue == val) {
       return null;
     } else if (rejectedValue == val) {
-      return 'This value is already taken.';
+      return 'This username is already taken.';
     } else {
       initiateAsyncUniqueValidation(val, graphQLClient);
       return 'Validating...';
