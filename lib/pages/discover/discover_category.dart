@@ -85,7 +85,7 @@ class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
           Query(
             options: QueryOptions(
               document: gql(discoverActivitiesQuery),
-              pollInterval: Duration(seconds: 1),
+              // pollInterval: Duration(seconds: 1),
             ),
             builder: (QueryResult result,
                 {VoidCallback refetch, FetchMore fetchMore}) {
@@ -125,8 +125,12 @@ class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
                         _mediumType = null;
                     }
                     final _location = _fetchedActivity['address'];
-                    final _dateTime =
-                        DateTime(int.parse(_fetchedActivity['eventDateTime']));
+
+                    final _dateTime = _fetchedActivity['eventDateTime'] == null
+                        ? null
+                        : DateTime(
+                            int.parse(_fetchedActivity['eventDateTime']));
+
                     //TODO: Actually get attendees and organizer
                     final _activity = Activity(
                         _id,
