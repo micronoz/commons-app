@@ -4,7 +4,7 @@ import 'package:tribal_instinct/managers/user_manager.dart';
 import 'package:tribal_instinct/model/app_user.dart';
 import 'package:tribal_instinct/pages/feed.dart';
 import 'package:tribal_instinct/pages/activities/activities.dart';
-import 'package:tribal_instinct/pages/messages.dart';
+import 'package:tribal_instinct/pages/chats.dart';
 import 'package:tribal_instinct/pages/onboarding_flow.dart';
 import 'package:tribal_instinct/pages/profile.dart';
 
@@ -23,7 +23,7 @@ class _HomePageState extends State<HomePage> {
   final menuIcons = <Map<String, Object>>[
     {'icon': Icons.rss_feed, 'label': 'Feed'},
     {'icon': Icons.calendar_today, 'label': 'Experiences'},
-    {'icon': Icons.chat, 'label': 'Messages'},
+    {'icon': Icons.chat, 'label': 'Chats'},
     {'icon': Icons.supervisor_account, 'label': 'Profile'}
   ]
       .map(
@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
   final _pages = [
     FeedPage(),
     ExperiencesPage(),
-    MessagesPage(),
+    ChatsPage(),
     ProfilePage(),
   ];
 

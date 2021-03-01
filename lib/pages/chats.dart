@@ -3,16 +3,20 @@ import 'package:tribal_instinct/components/message_card.dart';
 import 'package:tribal_instinct/model/app_user.dart';
 import 'package:tribal_instinct/pages/chat.dart';
 
-class MessagesPage extends StatefulWidget {
+class ChatsPage extends StatefulWidget {
   @override
-  _MessagesPageState createState() => _MessagesPageState();
+  _ChatsPageState createState() => _ChatsPageState();
 }
 
-class _MessagesPageState extends State<MessagesPage> {
+class _ChatsPageState extends State<ChatsPage> {
   @override
   Widget build(BuildContext context) {
     var otherUser = AppUser.mock();
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Chats'),
+        actions: [IconButton(icon: Icon(Icons.create), onPressed: () {})],
+      ),
       body: ListView.separated(
         itemCount: 10,
         itemBuilder: (context, index) => MessageCard(
@@ -26,7 +30,9 @@ class _MessagesPageState extends State<MessagesPage> {
             ),
           ),
         ),
-        separatorBuilder: (context, index) => Divider(),
+        separatorBuilder: (context, index) => Divider(
+          thickness: 2,
+        ),
       ),
     );
   }
