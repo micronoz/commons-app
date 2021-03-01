@@ -60,7 +60,7 @@ class _OnboardingQuestionState extends State<OnboardingQuestion> {
           child: Text(widget.questionData.question),
         ),
         Container(
-          width: 200,
+          width: 250,
           child: Form(
             autovalidateMode: AutovalidateMode.onUserInteraction,
             key: widget.formKey,
@@ -80,6 +80,7 @@ class _OnboardingQuestionState extends State<OnboardingQuestion> {
               onChanged: (value) => widget.questionData.answer = value,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
+                errorMaxLines: 2,
                 hintText: widget.questionData.hint,
               ),
             ),
