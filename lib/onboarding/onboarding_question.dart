@@ -19,7 +19,6 @@ class _OnboardingQuestionState extends State<OnboardingQuestion> {
 
 // this will be called upon user interaction or re-initiation as commented below
   String validateUnique(String val, GraphQLClient graphQLClient) {
-    print(val);
     if (validatedValue == val) {
       return null;
     } else if (rejectedValue == val) {
@@ -38,7 +37,6 @@ class _OnboardingQuestionState extends State<OnboardingQuestion> {
         variables: {
           'val': val,
         }));
-    print(result.data['isUserHandleTaken']);
     final isTaken =
         result.data[widget.questionData.uniqueCheckQueryReturnField];
     if (isTaken) {

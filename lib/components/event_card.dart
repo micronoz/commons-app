@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/pages/activities/activity_detail.dart';
 
 class EventCard extends StatelessWidget {
@@ -6,8 +7,8 @@ class EventCard extends StatelessWidget {
   Widget build(BuildContext context) {
     assert(debugCheckHasMaterial(context));
     return InkWell(
-      onTap: () => Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => ActivityDetailPage())),
+      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => ActivityDetailPage(Activity.getDefault()))),
       child: Card(
         margin: EdgeInsets.only(bottom: 10, top: 10),
         clipBehavior: Clip.hardEdge,

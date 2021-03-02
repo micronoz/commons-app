@@ -10,8 +10,8 @@ class EventCardSmall extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => ActivityDetailPage())),
+      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => ActivityDetailPage(Activity.getDefault()))),
       child: Card(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,

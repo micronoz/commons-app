@@ -13,14 +13,14 @@ import 'package:tribal_instinct/pages/chat.dart';
 import 'package:tribal_instinct/pages/invite.dart';
 
 class ActivityDetailPage extends StatefulWidget {
+  final Activity activity;
+  ActivityDetailPage(this.activity);
   @override
   _ActivityDetailPageState createState() => _ActivityDetailPageState();
 }
 
 class _ActivityDetailPageState extends State<ActivityDetailPage> {
   final DateFormat _format = DateFormat();
-  final activity = Activity.getDefault();
-  final String _id = '1';
   final timeout = const Duration(seconds: 1);
 
   var isAdmin = false;
@@ -55,8 +55,8 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
   }
 
   void invite(BuildContext context) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => InvitePage(activity)));
+    Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => InvitePage(widget.activity)));
   }
 
   @override
@@ -75,7 +75,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
       }),
     );
     currentUser.hydrate();
-    isAdmin = currentUser.profile == activity.organizer;
+    isAdmin = currentUser.profile == widget.activity.organizer;
     return WillPopScope(
       onWillPop: () async => !_absorbing,
       child: AbsorbPointer(
@@ -90,7 +90,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                   : FloatingActionButton.extended(
                       backgroundColor: Colors.green,
                       onPressed: () {
-                        joinEvent(_id);
+                        joinEvent(widget.activity.id);
                       },
                       label: Text(
                         'Sign up for this Activity',
@@ -116,16 +116,16 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                   ListView(
                     children: [
                       Text(
-                        activity.title,
+                        widget.activity.title,
                         style: Theme.of(context).textTheme.headline2,
                         textScaleFactor: 0.6,
                         textAlign: TextAlign.center,
                       ),
                       Text(
-                        (activity.mediumType == ActivityMedium.in_person
+                        (widget.activity.mediumType == ActivityMedium.in_person
                                 ? 'in-person at '
                                 : 'online at ') +
-                            activity.location,
+                            widget.activity.address,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyText1,
                         textScaleFactor: 1.3,
@@ -139,13 +139,14 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                       //   textScaleFactor: 1.3,
                       // ),
                       Text(
-                        'on ' + _format.format(activity.dateTime.toLocal()),
+                        'on ' +
+                            _format.format(widget.activity.dateTime.toLocal()),
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyText1,
                         textScaleFactor: 1.3,
                       ),
                       Text(
-                        activity.description,
+                        widget.activity.description,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyText2,
                       ),
@@ -167,7 +168,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                                 runSpacing: 10,
                                 spacing: 35,
                                 children: [
-                                  ...activity.attendees.map(
+                                  ...widget.activity.attendees.map(
                                     (user) => Column(
                                       children: [
                                         CircleAvatar(
@@ -224,7 +225,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                           style: Theme.of(context).textTheme.headline5,
                         ),
                       ),
-                      ...activity.attendees.map((m) => MemberCard(
+                      ...widget.activity.attendees.map((m) => MemberCard(
                           m,
                           'Unfollow',
                           'Follow',
