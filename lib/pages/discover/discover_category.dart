@@ -12,6 +12,7 @@ String discoverActivitiesQuery = '''
       title
       description
       address
+      location
       mediumType
       eventDateTime
     }
@@ -124,7 +125,8 @@ class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
                       default:
                         _mediumType = null;
                     }
-                    final _location = _fetchedActivity['address'];
+                    final _location = _fetchedActivity['location'];
+                    final _address = _fetchedActivity['address'];
 
                     final _dateTime = _fetchedActivity['eventDateTime'] == null
                         ? null
@@ -137,6 +139,7 @@ class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
                         _title,
                         _description,
                         _mediumType,
+                        _address,
                         _location,
                         _dateTime,
                         {UserProfile.mock(), UserProfile.mock()},

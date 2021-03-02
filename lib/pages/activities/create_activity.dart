@@ -3,11 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tribal_instinct/components/question_switch.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:tribal_instinct/model/activity.dart';
+
+import 'activity_detail.dart';
 
 String createActivityMutation = '''
   mutation CreateActivity(\$title: String!, \$description: String!, \$mediumType: String!, \$xLocation: Float!, \$yLocation: Float!, \$address: String!, \$eventDateTime: DateTime) {
     createActivity(title: \$title, description: \$description, mediumType: \$mediumType, xLocation: \$xLocation, yLocation: \$yLocation, address: \$address, eventDateTime: \$eventDateTime) {
       id
+      title
+      description
+      mediumType
+     eventDateTime
+     location{
+       x
+       y
+     }
+     address
     }
   }
 ''';
@@ -23,7 +35,7 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
   void saveAndExit(BuildContext context, RunMutation createEventMutation) {
     final _mediumType = _isOnline ? 'online' : 'in_person';
     final _dateTime = _date.toIso8601String();
-    print(_dateTime);
+    // print(_dateTime);
     // print(_maximumAttendance);
     // print(_maximumAttendenceSize);
     // print(_isMatching);
@@ -36,13 +48,16 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
       'title': _activityName,
       'description': _desciption,
       'mediumType': _mediumType,
-      'xLocation': 0,
-      'yLocation': 0,
+      'xLocation': 0.2,
+      'yLocation': -4,
       'address': _location,
       'eventDateTime': _dateTime,
       // 'visibility': _visibilitySliderValue.index,
     });
-    Navigator.of(context).pop();
+    // print(result);
+    // Navigator.of(context).pop();
+    // Navigator.of(context).push(MaterialPageRoute(
+    // builder: (_) => ActivityDetailPage(Activity.getDefault())));
   }
 
   static const maxInputSize = 255;
@@ -102,8 +117,17 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
       options: MutationOptions(
         document: gql(createActivityMutation),
         onCompleted: (dynamic resultData) {
-          print('Mutation Return:');
+          print('Create Activity mutation return:');
           print(resultData);
+          if (resultData != null) {
+            final activity = Activity.fromJSON(resultData['createActivity']);
+            // print(activity.location);
+            Navigator.of(context).pop();
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => ActivityDetailPage(activity)));
+          } else {
+            //TODO
+          }
         },
       ),
       builder: (
