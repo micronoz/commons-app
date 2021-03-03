@@ -48,7 +48,7 @@ class _MemberCardState extends State<MemberCard> {
                     ),
                     Flexible(
                       child: Text(
-                        '@' + widget.member.identifier,
+                        '@' + widget.member.handle,
                         style: TextStyle(),
                         textScaleFactor: 1.3,
                         softWrap: false,

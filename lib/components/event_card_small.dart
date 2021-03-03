@@ -11,7 +11,7 @@ class EventCardSmall extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () => Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => ActivityDetailPage(Activity.getDefault()))),
+          builder: (context) => ActivityDetailPage(event.id))),
       child: Card(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -36,11 +36,9 @@ class EventCardSmall extends StatelessWidget {
                   Flexible(
                     child: Row(
                       children: [
-                        event.organizer.runtimeType == UserProfile
-                            ? Icon(Icons.person)
-                            : Icon(Icons.home),
+                        Icon(Icons.person),
                         Text(
-                          '@' + event.organizer.identifier,
+                          '@' + event.organizer.handle,
                           style: Theme.of(context).textTheme.bodyText2,
                           maxLines: 1,
                           softWrap: false,

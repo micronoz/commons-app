@@ -63,11 +63,9 @@ class UserManager {
       absorbing.value = true;
       print('Fetching user profile');
       appUserResolver.value = _graphQLClientNotifier.value.query(QueryOptions(
-          document: gql(getProfileQuery),
-          fetchPolicy: FetchPolicy.noCache,
-          variables: {
-            'email': _firebaseAuth.currentUser.email,
-          }));
+        document: gql(getProfileQuery),
+        fetchPolicy: FetchPolicy.networkOnly,
+      ));
       var result = await appUserResolver.value;
       // TODO: Right now only checking if the data is null to see if the
       // user exists on the backend or not. This should be changed as this

@@ -1,15 +1,25 @@
 import 'package:geolocator/geolocator.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:tribal_instinct/model/activity_types.dart';
 import 'user_profile.dart';
 
+part 'activity.g.dart';
+
+@JsonSerializable()
 class Activity {
   final String id;
   final String title;
   final String description;
   final ActivityMedium mediumType;
   final String address;
+  @JsonKey(fromJson: _loctionFromJson, toJson: _locationToJson)
   final Position location;
+  @JsonKey(
+      name: 'eventDateTime',
+      fromJson: _dateTimeFromJson,
+      toJson: _dateTimeToJson)
   final DateTime dateTime;
+  @JsonKey(defaultValue: {})
   final Set<UserProfile> attendees;
   final UserProfile organizer;
 
@@ -25,7 +35,12 @@ class Activity {
     this.organizer,
   );
 
-  static Activity fromJSON(Map<String, dynamic> json) {
+  factory Activity.fromJson(Map<String, dynamic> json) =>
+      _$ActivityFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ActivityToJson(this);
+
+  static Activity fromJSONManual(Map<String, dynamic> json) {
     ActivityMedium mediumType;
     switch (json['mediumType']) {
       case 'in_person':
@@ -70,6 +85,25 @@ class Activity {
       },
       UserProfile.mock(),
     );
+  }
+
+  static Position _loctionFromJson(Map<String, dynamic> json) {
+    if (json == null) return null;
+    return Position(
+        longitude: (json['x']).toDouble(), latitude: (json['y']).toDouble());
+  }
+
+  static Map<String, double> _locationToJson(Position location) {
+    return {'x': location.latitude, 'y': location.longitude};
+  }
+
+  static DateTime _dateTimeFromJson(String json) {
+    if (json == null) return null;
+    return DateTime.fromMillisecondsSinceEpoch(int.parse(json), isUtc: true);
+  }
+
+  static String _dateTimeToJson(DateTime dateTime) {
+    return dateTime.toIso8601String();
   }
 
   static Activity getDefault() {

@@ -25,7 +25,7 @@ class _ChatsPageState extends State<ChatsPage> {
             MaterialPageRoute(
               builder: (context) => ChatPage(
                 true,
-                title: '@${otherUser.profile.identifier}',
+                title: '@${otherUser.profile.handle}',
               ),
             ),
           ),

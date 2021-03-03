@@ -1,26 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'user_profile.g.dart';
+
+@JsonSerializable()
 class UserProfile {
-  String id;
-  String name;
-  String identifier;
+  final String id;
+  final String name;
+  final String handle;
+  final String photoUrl;
+  @JsonKey(ignore: true)
   ImageProvider photo;
-  String description;
+  final String description;
 
   UserProfile(
-      this.id, this.name, this.identifier, String photoUrl, this.description) {
-    photo = NetworkImage(
-      photoUrl,
-    );
+      this.id, this.name, this.handle, this.description, this.photoUrl) {
+    if (photo != null) {
+      photo = NetworkImage(
+        photoUrl,
+      );
+    } else {
+      photo = NetworkImage('https://picsum.photos/250?image=11');
+    }
   }
 
-  UserProfile.mock() : id = '1' {
-    name = 'Nabi';
-    identifier = 'nozberkman';
-    description =
-        'Hello my name is Nabi. I\'m from Cyprus and this is the new app I created for bringing people together.';
-    photo = NetworkImage('https://picsum.photos/250?image=11');
-  }
+  factory UserProfile.fromJson(Map<String, dynamic> json) =>
+      _$UserProfileFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UserProfileToJson(this);
+
+  UserProfile.mock()
+      : id = '1',
+        name = 'Nabi',
+        handle = 'nozberkman',
+        description =
+            'Hello my name is Nabi. I\'m from Cyprus and this is the new app I created for bringing people together.',
+        photoUrl = 'https://picsum.photos/250?image=11';
 
   @override
   bool operator ==(Object other) {

@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tribal_instinct/components/question_switch.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:tribal_instinct/managers/activity_manager.dart';
 import 'package:tribal_instinct/model/activity.dart';
+import 'package:provider/provider.dart';
+import 'package:pedantic/pedantic.dart';
 
 import 'activity_detail.dart';
 
@@ -11,15 +14,6 @@ String createActivityMutation = '''
   mutation CreateActivity(\$title: String!, \$description: String!, \$mediumType: String!, \$xLocation: Float!, \$yLocation: Float!, \$address: String!, \$eventDateTime: DateTime) {
     createActivity(title: \$title, description: \$description, mediumType: \$mediumType, xLocation: \$xLocation, yLocation: \$yLocation, address: \$address, eventDateTime: \$eventDateTime) {
       id
-      title
-      description
-      mediumType
-     eventDateTime
-     location{
-       x
-       y
-     }
-     address
     }
   }
 ''';
@@ -34,15 +28,7 @@ class CreateActivityPage extends StatefulWidget {
 class _CreateActivityPageState extends State<CreateActivityPage> {
   void saveAndExit(BuildContext context, RunMutation createEventMutation) {
     final _mediumType = _isOnline ? 'online' : 'in_person';
-    final _dateTime = _date.toIso8601String();
-    // print(_dateTime);
-    // print(_maximumAttendance);
-    // print(_maximumAttendenceSize);
-    // print(_isMatching);
-    // print(_matchingSize);
-    // print(_visibilitySliderValue.index);
-    // print(_requireApproval);
-    // print(_pickedImage);
+    final _dateTime = _date.toUtc().toIso8601String();
     //TODO: Add location
     createEventMutation({
       'title': _activityName,
@@ -52,12 +38,7 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
       'yLocation': -4,
       'address': _location,
       'eventDateTime': _dateTime,
-      // 'visibility': _visibilitySliderValue.index,
     });
-    // print(result);
-    // Navigator.of(context).pop();
-    // Navigator.of(context).push(MaterialPageRoute(
-    // builder: (_) => ActivityDetailPage(Activity.getDefault())));
   }
 
   static const maxInputSize = 255;
@@ -115,16 +96,17 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
   Widget build(BuildContext context) {
     return Mutation(
       options: MutationOptions(
+        fetchPolicy: FetchPolicy.noCache,
         document: gql(createActivityMutation),
         onCompleted: (dynamic resultData) {
           print('Create Activity mutation return:');
           print(resultData);
+          context.read<ActivityManager>().addEvent();
           if (resultData != null) {
-            final activity = Activity.fromJSON(resultData['createActivity']);
-            // print(activity.location);
+            final activity = resultData['createActivity']['id'];
             Navigator.of(context).pop();
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (_) => ActivityDetailPage(activity)));
+            // Navigator.of(context).pushReplacement(MaterialPageRoute(
+            //     builder: (_) => ActivityDetailPage(activity)));
           } else {
             //TODO
           }
@@ -202,14 +184,6 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                   const SizedBox(
                     height: 20,
                   ),
-                  // QuestionSwitch(
-                  //   question: 'Format',
-                  //   disabledOption: 'Self-guided',
-                  //   enabledOption: 'Hosted',
-                  //   callback: (val) => setState(() => _format = val),
-                  //   additionalInfo:
-                  //       'In a \'Self-guided\' format you have to provide enough information to allow the grouped participants to be able to host the event themselves without you being present (e.g. providing recordings for a yoga class, providing map and guide for a hike etc.) Provide clear instructions and helpful materials for your guests. \n\nIn a \'Hosted\' format, you have to be present in each of the sessions and be able to host all of the groups in that session at the same time (limited by the maximum cohort size you set, which is required for hosted events).',
-                  // ),
                   QuestionSwitch(
                     question: 'Where will it be?',
                     disabledOption: 'In-person',
@@ -237,7 +211,7 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                     style: Theme.of(context).textTheme.subtitle1,
                   ),
                   DateTimeField(
-                    format: DateFormat('yyyy-MM-dd HH:mm'),
+                    format: DateFormat.yMMMMEEEEd().add_jm(),
                     onShowPicker: (context, currentValue) async {
                       final date = await showDatePicker(
                         context: context,
@@ -246,8 +220,9 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                             DateTime.now().add(Duration(days: 1)),
                         lastDate: DateTime.now().add(Duration(days: 365)),
                       );
+
                       if (date != null) {
-                        final time = await showTimePicker(
+                        var time = await showTimePicker(
                           context: context,
                           initialTime: TimeOfDay.fromDateTime(
                               currentValue ?? DateTime.now()),
@@ -269,75 +244,9 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                       }
                     },
                   ),
-                  // Text(
-                  //   '(You can always add more later)',
-                  //   style: Theme.of(context).textTheme.subtitle1,
-                  // ),
-                  // ..._sessions,
-                  // Row(
-                  //   children: [
-                  //     IconButton(
-                  //         icon: Icon(
-                  //           Icons.add_circle,
-                  //           color: Colors.green,
-                  //         ),
-                  //         onPressed: () {
-                  //           setState(() {
-                  //             _sessions.add(SessionCard(
-                  //               removeCallback: removeSession,
-                  //               key: UniqueKey(),
-                  //             ));
-                  //           });
-                  //         }),
-                  //     Text(
-                  //       'Add session',
-                  //       style: TextStyle(fontWeight: FontWeight.bold),
-                  //     )
-                  //   ],
-                  // ),
                   const SizedBox(
                     height: 20,
                   ),
-                  // QuestionSwitch(
-                  //   key: Key('multi group'),
-                  //   question: 'Multi group',
-                  //   disabledOption: 'Disabled',
-                  //   enabledOption: 'Enabled',
-                  //   callback: (val) => setState(() => _multiGroup = val),
-                  //   additionalInfo:
-                  //       'Usually keep this disabled for personal Activities\n\nEnabling this setting allows you to divide the attendees into multiple smaller groups in which they can connect with each other better. They can meet ahead of time and attend the event together. Grouping will be done randomly for now.\n\nIf enabled, you will need to define a target group size, which will be the average number of people per group.',
-                  // ),
-                  // if (_multiGroup)
-                  //   Text(
-                  //     'Target group size',
-                  //     style: Theme.of(context).textTheme.subtitle1,
-                  //   ),
-                  // if (_multiGroup)
-                  //   Row(
-                  //     children: [
-                  //       Flexible(
-                  //         child: TextFormField(
-                  //           style: Theme.of(context).textTheme.headline6,
-                  //           textAlign: TextAlign.center,
-                  //           decoration:
-                  //               const InputDecoration(border: OutlineInputBorder()),
-                  //           inputFormatters: [
-                  //             FilteringTextInputFormatter.digitsOnly
-                  //           ],
-                  //           keyboardType: TextInputType.number,
-                  //           onChanged: (value) => _targetGroupSize = value,
-                  //           validator: _genericValidator,
-                  //         ),
-                  //       ),
-                  //       Spacer(
-                  //         flex: 2,
-                  //       )
-                  //     ],
-                  //   ),
-                  // const SizedBox(
-                  // height: 20,
-                  // ),
-
                   const SizedBox(
                     height: 20,
                   ),
