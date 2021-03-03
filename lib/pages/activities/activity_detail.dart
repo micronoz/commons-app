@@ -27,6 +27,11 @@ final getActivityQuery = '''
         x
         y
       }
+      userConnections{
+        user {
+          id
+        }
+      }
       address
     }
   }
@@ -148,7 +153,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                   body: IndexedStack(
                     index: _tabIndex,
                     children: [
-                      ChatPage(false),
+                      ChatPage(false, widget.activityId),
                       ListView(
                         children: [
                           Text(
@@ -166,14 +171,6 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                             style: Theme.of(context).textTheme.bodyText1,
                             textScaleFactor: 1.3,
                           ),
-                          // Text(
-                          //   activity.hostType == ActivityHost.self_hosted
-                          //       ? 'without a host present'
-                          //       : 'with host present',
-                          //   textAlign: TextAlign.center,
-                          //   style: Theme.of(context).textTheme.bodyText1,
-                          //   textScaleFactor: 1.3,
-                          // ),
                           Text(
                             'on ' +
                                 _format.format(activity.dateTime?.toLocal()),
@@ -236,7 +233,6 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                               'Follow',
                               (UserProfile u) =>
                                   currentUser.following.contains(u))),
-
                           if (!_attending)
                             const SizedBox(
                               height: 60,

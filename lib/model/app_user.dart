@@ -37,7 +37,7 @@ class AppUser {
     // TODO: Also get the other fields and change the email field after
     // adding necessary fields to the database.
     final userProfile = UserProfile(
-        '2',
+        json['id'],
         json['fullName'],
         json['handle'],
         'https://picsum.photos/250?image=11',

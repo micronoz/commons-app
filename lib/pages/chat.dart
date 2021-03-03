@@ -1,14 +1,51 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_bubble/bubble_type.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_6.dart';
+import 'package:graphql/client.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:tribal_instinct/model/activity.dart';
+import 'package:tribal_instinct/model/app_user.dart';
 import 'package:tribal_instinct/model/message.dart';
+import 'package:provider/provider.dart';
+
+final String getMessagesQuery = r'''
+  query GetMessagesForActivity($id: String!) {
+    activity(id: $id) {
+      messageConnections {  
+        id
+        message
+        createdAt
+        sender {
+          id
+          handle
+        }
+      }
+    }
+  }
+''';
+
+final sendMessageMutation = r'''
+  mutation SendMessage($message: String!, $activityId: String!) {
+    createMessage(message: $message, activityId: $activityId) {
+      id
+      message
+      createdAt
+      sender {
+        id
+        handle
+      }
+    }
+  }
+''';
 
 class ChatPage extends StatefulWidget {
   final bool scaffold;
   final String title;
-  ChatPage(this.scaffold, {this.title}) : super() {
+  final String activityId;
+  ChatPage(this.scaffold, this.activityId, {this.title}) : super() {
     if (scaffold) {
       assert(title != null);
     }
@@ -19,22 +56,43 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final _messageInputHeight = 100.0;
-  final _messages = Message.createRandomChat(count: 5);
+  var _messages = <Message>[];
   final _formKey = GlobalKey<FormState>();
   var _messageIsEmpty = true;
   final _focusNode = FocusNode();
+  ObservableQuery _observableMessageQuery;
+  StreamSubscription<QueryResult> messageStream;
+
+  @override
+  void dispose() {
+    messageStream.cancel();
+    super.dispose();
+  }
 
 //TODO Implement backend connection
-  void sendMessage(BuildContext context, String content) {
+  void sendMessage(BuildContext context, String content) async {
     if (content.isEmpty) return;
-    print(content);
     _formKey.currentState.reset();
     _messageIsEmpty = true;
-    final myMessage =
-        Message.createMessage(context, content, Activity.getDefault());
-    //TODO send message to backend
+    final result = await GraphQLProvider.of(context).value.mutate(
+          MutationOptions(
+            document: gql(sendMessageMutation),
+            variables: {
+              'message': content,
+              'activityId': widget.activityId,
+            },
+          ),
+        );
+    if (result.hasException) {
+      print(result.exception);
+      return;
+    }
+    final myMessage = Message.fromJson(result.data['createMessage']);
     myMessage.isSender = true;
     _messages.insert(0, myMessage);
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void dismissKeyboard(BuildContext context) {
@@ -46,6 +104,35 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_observableMessageQuery == null) {
+      _observableMessageQuery = GraphQLProvider.of(context).value.watchQuery(
+            WatchQueryOptions(
+                document: gql(getMessagesQuery),
+                fetchPolicy: FetchPolicy.cacheAndNetwork,
+                variables: {'id': widget.activityId}),
+          );
+      _observableMessageQuery.startPolling(Duration(seconds: 5));
+      messageStream = _observableMessageQuery.stream.listen((result) {
+        if (!result.isLoading && result.data != null) {
+          print(result.data);
+          if (mounted) {
+            setState(() {
+              _messages = (result.data['activity']['messageConnections']
+                      as List<dynamic>)
+                  .map((json) {
+                final currentMessage = Message.fromJson(json);
+                currentMessage.isSender =
+                    context.read<AppUser>().profile == currentMessage.sender;
+                return currentMessage;
+              }).toList();
+              _messages.sort((first, second) =>
+                  second.timestamp.compareTo(first.timestamp));
+            });
+          }
+        }
+      }, onError: (error, stack) => print(error));
+      _observableMessageQuery.fetchResults();
+    }
     var body = Column(
       children: [
         Expanded(
@@ -56,9 +143,6 @@ class _ChatPageState extends State<ChatPage> {
               padding: EdgeInsets.only(top: 10),
               reverse: true,
               children: [
-                // SizedBox(
-                //   height: _messageInputHeight + 10,
-                // ),
                 ..._messages.map(
                   (m) => Container(
                     key: Key(m.hashCode.toString()),
@@ -69,7 +153,7 @@ class _ChatPageState extends State<ChatPage> {
                       backGroundColor:
                           m.isSender ? Colors.blue : Colors.blueGrey[100],
                       child: Container(
-                        child: Text(m.content),
+                        child: Text(m.message),
                         constraints: BoxConstraints(
                           maxWidth: MediaQuery.of(context).size.width * 0.7,
                         ),
@@ -101,8 +185,8 @@ class _ChatPageState extends State<ChatPage> {
                         key: _formKey,
                         child: TextFormField(
                           focusNode: _focusNode,
-                          onSaved: (message) {
-                            setState(() => sendMessage(context, message));
+                          onSaved: (message) async {
+                            await sendMessage(context, message);
                           },
                           onChanged: (message) {
                             if (message.isNotEmpty && _messageIsEmpty) {
