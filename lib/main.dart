@@ -4,10 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:tribal_instinct/constants.dart';
+import 'package:tribal_instinct/managers/activity_manager.dart';
 import 'package:tribal_instinct/pages/home.dart';
 import 'package:tribal_instinct/pages/login.dart';
 
 import 'managers/user_manager.dart';
+import 'model/app_user.dart';
 import 'model/is_logged_in.dart';
 
 //TODO need to add user state management
@@ -18,17 +20,12 @@ Future<void> main() async {
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   await initHiveForFlutter();
   runApp(AppConstants(
-    child: App(
-      userManager: await UserManager.create(),
-    ),
+    child: App(userManager: await UserManager.create()),
   ));
 }
 
 class App extends StatefulWidget {
-  const App({
-    Key key,
-    @required this.userManager,
-  }) : super(key: key);
+  App({Key key, @required this.userManager}) : super(key: key);
 
   final UserManager userManager;
 
@@ -46,6 +43,9 @@ class _AppState extends State<App> {
           Provider<UserManager>.value(value: widget.userManager),
           ValueListenableProvider.value(value: widget.userManager.appUser),
           ValueListenableProvider.value(value: widget.userManager.isLoggedIn),
+          ChangeNotifierProvider<ActivityManager>(
+            create: (context) => ActivityManager(),
+          )
         ],
         builder: (context, child) {
           var isLoggedIn = context.watch<IsLoggedIn>();

@@ -46,7 +46,7 @@ class MessageCard extends StatelessWidget {
                       ),
                       Flexible(
                         child: Text(
-                          '@' + profile.identifier,
+                          '@' + profile.handle,
                           style: TextStyle(),
                           textScaleFactor: 1.3,
                           softWrap: false,

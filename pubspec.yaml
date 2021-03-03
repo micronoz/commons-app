@@ -40,8 +40,12 @@ dependencies:
   graphql_flutter: ^4.0.1
   flutter_signin_button: ^1.1.0
   flutter_chat_bubble: ^1.0.2
+  json_annotation: ^3.1.1
+  
 
 dev_dependencies:
+  build_runner: ^1.0.0
+  json_serializable: ^3.5.1
   pedantic: ^1.9.2
   flutter_test:
     sdk: flutter

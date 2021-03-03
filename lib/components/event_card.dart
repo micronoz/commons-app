@@ -8,7 +8,7 @@ class EventCard extends StatelessWidget {
     assert(debugCheckHasMaterial(context));
     return InkWell(
       onTap: () => Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => ActivityDetailPage(Activity.getDefault()))),
+          builder: (_) => ActivityDetailPage('1'))),
       child: Card(
         margin: EdgeInsets.only(bottom: 10, top: 10),
         clipBehavior: Clip.hardEdge,

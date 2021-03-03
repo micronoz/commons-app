@@ -35,13 +35,6 @@ class _HomePageState extends State<HomePage> {
       )
       .toList(growable: false);
 
-  final _pages = [
-    FeedPage(),
-    ExperiencesPage(),
-    ChatsPage(),
-    ProfilePage(),
-  ];
-
   int _pageIndex = 0;
 
   @override
@@ -62,7 +55,12 @@ class _HomePageState extends State<HomePage> {
               })
           : IndexedStack(
               index: _pageIndex,
-              children: _pages,
+              children: [
+                FeedPage(),
+                ExperiencesPage(),
+                ChatsPage(),
+                ProfilePage(),
+              ],
             ),
       bottomNavigationBar: isAppUserNull
           ? null
