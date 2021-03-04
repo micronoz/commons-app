@@ -53,11 +53,12 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
   final DateFormat _format = DateFormat.yMMMMEEEEd().add_jm();
   final timeout = const Duration(seconds: 1);
 
-  var isAdmin = false;
-
   var _absorbing = false;
   var _success = false;
   var _attending = true;
+
+  ObservableQuery _observableQuery;
+  var _activityDetailStrem;
 
   var _tabIndex = 0;
 
@@ -110,6 +111,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
           );
         }
         final activity = Activity.fromJson(result.data['activity']);
+        print(activity.attendees);
         final currentUser = AppUser.of(context);
         var tabBar = TabBar(
           tabs: tabs,
@@ -124,7 +126,9 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
           }),
         );
         currentUser.hydrate();
-        isAdmin = currentUser.profile == activity.organizer;
+
+        final isAdmin = currentUser.profile == activity.organizer;
+
         return WillPopScope(
           onWillPop: () async => !_absorbing,
           child: AbsorbPointer(

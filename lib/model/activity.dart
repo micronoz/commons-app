@@ -23,7 +23,7 @@ class Activity {
       fromJson: _dateTimeFromJson,
       toJson: _dateTimeToJson)
   final DateTime dateTime;
-  @JsonKey(defaultValue: {})
+  @JsonKey(defaultValue: {}, name: 'userConnections')
   final Set<UserProfile> attendees;
   final UserProfile organizer;
 
