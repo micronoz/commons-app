@@ -47,15 +47,16 @@ class EventCardSmall extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Flexible(
-                    child: Text(
-                      event.description,
-                      style: Theme.of(context).textTheme.bodyText2,
-                      maxLines: 2,
-                      softWrap: false,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  )
+                  if (event.description != null)
+                    Flexible(
+                      child: Text(
+                        event.description,
+                        style: Theme.of(context).textTheme.bodyText2,
+                        maxLines: 2,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    )
                 ],
               ),
             ),
