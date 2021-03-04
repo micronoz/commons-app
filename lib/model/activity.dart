@@ -5,15 +5,19 @@ import 'user_profile.dart';
 
 part 'activity.g.dart';
 
+//TODO: Separate PhysicalActivity and Online Activity maybe
 @JsonSerializable()
 class Activity {
   final String id;
   final String title;
   final String description;
   final ActivityMedium mediumType;
-  final String address;
-  @JsonKey(fromJson: _loctionFromJson, toJson: _locationToJson)
-  final Position location;
+  final String physicalAddress;
+  final String eventUrl;
+  @JsonKey(fromJson: _locationFromJson, toJson: _locationToJson)
+  final Position discoveryCoordinates;
+  @JsonKey(fromJson: _locationFromJson, toJson: _locationToJson)
+  final Position eventCoordinates;
   @JsonKey(
       name: 'eventDateTime',
       fromJson: _dateTimeFromJson,
@@ -28,8 +32,10 @@ class Activity {
     this.title,
     this.description,
     this.mediumType,
-    this.address,
-    this.location,
+    this.physicalAddress,
+    this.eventUrl,
+    this.discoveryCoordinates,
+    this.eventCoordinates,
     this.dateTime,
     this.attendees,
     this.organizer,
@@ -40,54 +46,7 @@ class Activity {
 
   Map<String, dynamic> toJson() => _$ActivityToJson(this);
 
-  static Activity fromJSONManual(Map<String, dynamic> json) {
-    ActivityMedium mediumType;
-    switch (json['mediumType']) {
-      case 'in_person':
-        mediumType = ActivityMedium.in_person;
-        break;
-      case 'online':
-        mediumType = ActivityMedium.online;
-        break;
-      default:
-        throw Exception('Medium Type not an expected string.');
-    }
-    final fetchedEventTime = json['eventDateTime'];
-    var dateTime;
-    if (fetchedEventTime != null) {
-      dateTime = DateTime.fromMillisecondsSinceEpoch(
-          int.parse(json['eventDateTime']),
-          isUtc: true);
-    }
-    // print(json['location']);
-    var x = json['location']['x'];
-    var y = json['location']['y'];
-    if (x.runtimeType == int) {
-      x = x.toDouble();
-    }
-    if (y.runtimeType == int) {
-      y = y.toDouble();
-    }
-    final location = Position(longitude: x, latitude: y);
-    return Activity(
-      json['id'],
-      json['title'],
-      json['description'],
-      mediumType,
-      json['address'],
-      location,
-      dateTime,
-      //TODO: Get attendees and organizer
-      {
-        UserProfile.mock(),
-        UserProfile.mock(),
-        UserProfile.mock(),
-      },
-      UserProfile.mock(),
-    );
-  }
-
-  static Position _loctionFromJson(Map<String, dynamic> json) {
+  static Position _locationFromJson(Map<String, dynamic> json) {
     if (json == null) return null;
     return Position(
         longitude: (json['x']).toDouble(), latitude: (json['y']).toDouble());
@@ -113,7 +72,9 @@ class Activity {
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ut massa eu tellus pretium porttitor eu eu nunc. Aenean convallis, quam ut porttitor facilisis, nisl ipsum rhoncus dolor, id tempus lacus diam ac urna. Duis ut gravida magna. Aliquam erat volutpat. Pellentesque ut nibh mattis, aliquam dolor sed, condimentum quam. Phasellus elit turpis, interdum ac accumsan eget, rutrum ultricies est. Etiam in urna pharetra, lacinia leo eu, interdum sem. Aliquam nisi ipsum, pretium a blandit a, malesuada et lacus.',
       ActivityMedium.in_person,
       'Peet\'s coffee',
-      Position(latitude: 4.8, longitude: 5),
+      null,
+      Position(latitude: 42.37003, longitude: -71.11666),
+      null,
       DateTime.now(),
       {
         UserProfile.mock(),

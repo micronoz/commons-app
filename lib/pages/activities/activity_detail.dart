@@ -23,7 +23,11 @@ final getActivityQuery = '''
       description
       mediumType
       eventDateTime
-      location{
+      eventCoordinates{
+        x
+        y
+      }
+      discoveryCoordinates{
         x
         y
       }
@@ -32,7 +36,8 @@ final getActivityQuery = '''
           id
         }
       }
-      address
+      physicalAddress
+      eventUrl
     }
   }
 ''';
@@ -93,6 +98,10 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
           pollInterval: Duration(minutes: 1),
           variables: {'id': widget.activityId}),
       builder: (result, {refetch, fetchMore}) {
+        if (result.hasException) {
+          print('Activity Detail page query exception:');
+          print(result.exception);
+        }
         if (result.isLoading || result.data == null) {
           return Scaffold(
             body: Center(
@@ -164,9 +173,8 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                           ),
                           Text(
                             (activity.mediumType == ActivityMedium.in_person
-                                    ? 'in-person at '
-                                    : 'online at ') +
-                                activity.address,
+                                ? 'in-person at ' + activity.physicalAddress
+                                : 'online at ' + activity.eventUrl),
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.bodyText1,
                             textScaleFactor: 1.3,

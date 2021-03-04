@@ -12,8 +12,12 @@ Activity _$ActivityFromJson(Map<String, dynamic> json) {
     json['title'] as String,
     json['description'] as String,
     _$enumDecodeNullable(_$ActivityMediumEnumMap, json['mediumType']),
-    json['address'] as String,
-    Activity._loctionFromJson(json['location'] as Map<String, dynamic>),
+    json['physicalAddress'] as String,
+    json['eventUrl'] as String,
+    Activity._locationFromJson(
+        json['discoveryCoordinates'] as Map<String, dynamic>),
+    Activity._locationFromJson(
+        json['eventCoordinates'] as Map<String, dynamic>),
     Activity._dateTimeFromJson(json['eventDateTime'] as String),
     (json['attendees'] as List)
             ?.map((e) => e == null
@@ -32,8 +36,11 @@ Map<String, dynamic> _$ActivityToJson(Activity instance) => <String, dynamic>{
       'title': instance.title,
       'description': instance.description,
       'mediumType': _$ActivityMediumEnumMap[instance.mediumType],
-      'address': instance.address,
-      'location': Activity._locationToJson(instance.location),
+      'physicalAddress': instance.physicalAddress,
+      'eventUrl': instance.eventUrl,
+      'discoveryCoordinates':
+          Activity._locationToJson(instance.discoveryCoordinates),
+      'eventCoordinates': Activity._locationToJson(instance.eventCoordinates),
       'eventDateTime': Activity._dateTimeToJson(instance.dateTime),
       'attendees': instance.attendees?.toList(),
       'organizer': instance.organizer,

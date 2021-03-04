@@ -12,8 +12,12 @@ String discoverActivitiesQuery = '''
       id
       title
       description
-      address
-      location{
+      physicalAddress
+      organizer {
+        handle
+        id
+      }
+      discoveryCoordinates {
         x
         y
       }
@@ -114,15 +118,12 @@ class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
                   itemBuilder: (context, index) {
                     final _fetchedActivity = activities[index];
 
-                    final _activity = Activity.fromJSONManual(_fetchedActivity);
+                    final _activity = Activity.fromJson(_fetchedActivity);
 
                     return EventCardSmall(_activity);
                   });
             },
           ),
-          // EventCardSmall(Activity.getDefault()),
-          // EventCardSmall(Activity.getDefault()),
-          // EventCardSmall(Activity.getDefault()),
         ],
       ),
     );

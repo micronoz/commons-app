@@ -7,7 +7,6 @@ part of 'message.dart';
 // **************************************************************************
 
 Message _$MessageFromJson(Map<String, dynamic> json) {
-  
   return Message(
     message: json['message'] as String,
     timestamp: Message._dateTimeFromJson(json['createdAt'] as String),
