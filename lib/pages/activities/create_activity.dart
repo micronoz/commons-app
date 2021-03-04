@@ -4,15 +4,13 @@ import 'package:intl/intl.dart';
 import 'package:tribal_instinct/components/question_switch.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:tribal_instinct/managers/activity_manager.dart';
-import 'package:tribal_instinct/model/activity.dart';
 import 'package:provider/provider.dart';
-import 'package:pedantic/pedantic.dart';
 
 import 'activity_detail.dart';
 
 String createActivityMutation = '''
-  mutation CreateActivity(\$title: String!, \$description: String!, \$mediumType: String!, \$xLocation: Float!, \$yLocation: Float!, \$address: String!, \$eventDateTime: DateTime) {
-    createActivity(title: \$title, description: \$description, mediumType: \$mediumType, xLocation: \$xLocation, yLocation: \$yLocation, address: \$address, eventDateTime: \$eventDateTime) {
+  mutation CreateActivity(\$title: String!, \$description: String!, \$mediumType: String!, \$organizerCoordinates: LocationInput, \$eventCoordinates: LocationInput, \$physicalAddress: String, \$eventUrl: String, \$eventDateTime: DateTime) {
+    createActivity(title: \$title, description: \$description, mediumType: \$mediumType, organizerCoordinates: \$organizerCoordinates, eventCoordinates: \$eventCoordinates, physicalAddress: \$physicalAddress, eventUrl: \$eventUrl, eventDateTime: \$eventDateTime) {
       id
     }
   }
@@ -29,14 +27,23 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
   void saveAndExit(BuildContext context, RunMutation createEventMutation) {
     final _mediumType = _isOnline ? 'online' : 'in_person';
     final _dateTime = _date.toUtc().toIso8601String();
+    if (_isOnline) {
+      assert(_physicalAddress == null);
+    } else {
+      assert(_eventUrl == null);
+    }
     //TODO: Add location
     createEventMutation({
       'title': _activityName,
       'description': _desciption,
       'mediumType': _mediumType,
-      'xLocation': 0.2,
-      'yLocation': -4,
-      'address': _location,
+      'organizerCoordinates': {
+        //TODO: get actual location
+        'xLocation': 32.855234,
+        'yLocation': -117.217615,
+      },
+      'physicalAddress': _physicalAddress,
+      'eventUrl': _eventUrl,
       'eventDateTime': _dateTime,
     });
   }
@@ -51,7 +58,8 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
   String _activityName;
   String _desciption;
   bool _isOnline = false;
-  String _location;
+  String _physicalAddress;
+  String _eventUrl;
   DateTime _date;
 
   String _genericValidator(String value) {
@@ -105,11 +113,15 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
           if (resultData != null) {
             final activity = resultData['createActivity']['id'];
             Navigator.of(context).pop();
-            // Navigator.of(context).pushReplacement(MaterialPageRoute(
-            //     builder: (_) => ActivityDetailPage(activity)));
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => ActivityDetailPage(activity)));
           } else {
             //TODO
           }
+        },
+        onError: (error) {
+          print('Create Activity mutation ERROR:');
+          print(error);
         },
       ),
       builder: (
@@ -185,18 +197,34 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                     height: 20,
                   ),
                   QuestionSwitch(
-                    question: 'Where will it be?',
-                    disabledOption: 'In-person',
-                    enabledOption: 'Online',
-                    callback: (val) => setState(() => _isOnline = val),
-                  ),
+                      question: 'Where will it be?',
+                      disabledOption: 'In-person',
+                      enabledOption: 'Online',
+                      callback: (val) {
+                        setState(() => _isOnline = val);
+                        if (val) {
+                          _eventUrl = _physicalAddress;
+                          _physicalAddress = null;
+                        } else {
+                          _physicalAddress = _eventUrl;
+                          _eventUrl = null;
+                        }
+                      }),
                   TextFormField(
                     decoration: InputDecoration(
                         hintText: _isOnline
                             ? 'Provide a link (you can add it later as well)'
                             : 'Location'),
                     //TODO: Reconsider the maximum input size for links
-                    onChanged: (value) => _location = value,
+                    onChanged: (value) {
+                      if (_isOnline) {
+                        _physicalAddress = null;
+                        _eventUrl = value == '' ? null : value;
+                      } else {
+                        _physicalAddress = value == '' ? null : value;
+                        _eventUrl = null;
+                      }
+                    },
                     validator: _genericValidator,
                   ),
                   const SizedBox(

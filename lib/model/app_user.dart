@@ -8,7 +8,6 @@ import 'package:tribal_instinct/model/user_profile.dart';
 class AppUser {
   UserProfile profile;
   Position location;
-  String address;
   Set<UserProfile> followers;
   Set<UserProfile> following;
   Set<Activity> activities;
@@ -21,16 +20,6 @@ class AppUser {
 
   static AppUser of(BuildContext context) {
     return Provider.of<AppUser>(context, listen: false);
-  }
-
-  void updateUserPosition() async {
-    print('Updating position');
-    location = await Geolocator.getCurrentPosition();
-    print(location.toJson());
-    var placemarks =
-        await placemarkFromCoordinates(location.latitude, location.longitude);
-    address =
-        '${placemarks.first?.subAdministrativeArea}, ${placemarks.first?.administrativeArea}';
   }
 
   static AppUser fromJson(Map<String, dynamic> json) {

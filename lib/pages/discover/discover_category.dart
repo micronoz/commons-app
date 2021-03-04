@@ -9,10 +9,18 @@ import 'package:tribal_instinct/model/user_profile.dart';
 String discoverActivitiesQuery = '''
   query DiscoverActivities {
     discoverActivities {
+      id
       title
       description
-      address
-      location
+      physicalAddress
+      organizer {
+        handle
+        id
+      }
+      discoveryCoordinates {
+        x
+        y
+      }
       mediumType
       eventDateTime
     }
@@ -109,48 +117,13 @@ class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
                     final _fetchedActivity = activities[index];
-                    // return Text('a');
-                    final _id = _fetchedActivity['id'];
-                    final _title = _fetchedActivity['title'];
-                    final _description = _fetchedActivity['description'];
-                    ActivityMedium _mediumType;
-                    //TODO: Switch this value to an enum (or int)
-                    switch (_fetchedActivity['mediumType']) {
-                      case 'online':
-                        _mediumType = ActivityMedium.online;
-                        break;
-                      case 'in_person':
-                        _mediumType = ActivityMedium.in_person;
-                        break;
-                      default:
-                        _mediumType = null;
-                    }
-                    final _location = _fetchedActivity['location'];
-                    final _address = _fetchedActivity['address'];
 
-                    final _dateTime = _fetchedActivity['eventDateTime'] == null
-                        ? null
-                        : DateTime(
-                            int.parse(_fetchedActivity['eventDateTime']));
+                    final _activity = Activity.fromJson(_fetchedActivity);
 
-                    //TODO: Actually get attendees and organizer
-                    final _activity = Activity(
-                        _id,
-                        _title,
-                        _description,
-                        _mediumType,
-                        _address,
-                        _location,
-                        _dateTime,
-                        {UserProfile.mock(), UserProfile.mock()},
-                        UserProfile.mock());
                     return EventCardSmall(_activity);
                   });
             },
           ),
-          // EventCardSmall(Activity.getDefault()),
-          // EventCardSmall(Activity.getDefault()),
-          // EventCardSmall(Activity.getDefault()),
         ],
       ),
     );
