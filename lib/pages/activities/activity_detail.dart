@@ -173,24 +173,32 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                           ),
                           Text(
                             (activity.mediumType == ActivityMedium.in_person
-                                ? 'in-person at ' + activity.physicalAddress
-                                : 'online at ' + activity.eventUrl),
+                                ? 'in-person' +
+                                    (activity.physicalAddress != null
+                                        ? ' at ' + activity.physicalAddress
+                                        : '')
+                                : 'online' +
+                                    (activity.eventUrl != null
+                                        ? ' at ' + activity.eventUrl
+                                        : '')),
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.bodyText1,
                             textScaleFactor: 1.3,
                           ),
-                          Text(
-                            'on ' +
-                                _format.format(activity.dateTime?.toLocal()),
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyText1,
-                            textScaleFactor: 1.3,
-                          ),
-                          Text(
-                            activity.description,
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyText2,
-                          ),
+                          if (activity.dateTime != null)
+                            Text(
+                              'on ' +
+                                  _format.format(activity.dateTime?.toLocal()),
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.bodyText1,
+                              textScaleFactor: 1.3,
+                            ),
+                          if (activity.description != null)
+                            Text(
+                              activity.description,
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.bodyText2,
+                            ),
                           if (_attending)
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

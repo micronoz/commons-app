@@ -8,9 +8,16 @@ import 'package:provider/provider.dart';
 
 import 'activity_detail.dart';
 
-String createActivityMutation = '''
-  mutation CreateActivity(\$title: String!, \$description: String!, \$mediumType: String!, \$organizerCoordinates: LocationInput, \$eventCoordinates: LocationInput, \$physicalAddress: String, \$eventUrl: String, \$eventDateTime: DateTime) {
-    createActivity(title: \$title, description: \$description, mediumType: \$mediumType, organizerCoordinates: \$organizerCoordinates, eventCoordinates: \$eventCoordinates, physicalAddress: \$physicalAddress, eventUrl: \$eventUrl, eventDateTime: \$eventDateTime) {
+String createPhysicalActivityMutation = '''
+  mutation CreateActivity(\$title: String!, \$description: String, \$organizerCoordinates: LocationInput, \$physicalAddress: String, \$eventDateTime: DateTime) {
+    createPhysicalActivity(title: \$title, description: \$description, organizerCoordinates: \$organizerCoordinates, physicalAddress: \$physicalAddress, eventDateTime: \$eventDateTime) {
+      id
+    }
+  }
+''';
+String createOnlineActivityMutation = '''
+  mutation CreateActivity(\$title: String!, \$description: String, \$eventUrl: String, \$eventDateTime: DateTime) {
+    createOnlineActivity(title: \$title, description: \$description, eventUrl: \$eventUrl, eventDateTime: \$eventDateTime) {
       id
     }
   }
@@ -25,27 +32,30 @@ class CreateActivityPage extends StatefulWidget {
 
 class _CreateActivityPageState extends State<CreateActivityPage> {
   void saveAndExit(BuildContext context, RunMutation createEventMutation) {
-    final _mediumType = _isOnline ? 'online' : 'in_person';
-    final _dateTime = _date.toUtc().toIso8601String();
+    final _dateTime = _date?.toUtc()?.toIso8601String();
     if (_isOnline) {
       assert(_physicalAddress == null);
+      createEventMutation({
+        'title': _activityName,
+        'description': _desciption,
+        'eventUrl': _eventUrl,
+        'eventDateTime': _dateTime,
+      });
     } else {
       assert(_eventUrl == null);
+      createEventMutation({
+        'title': _activityName,
+        'description': _desciption,
+        'organizerCoordinates': {
+          //TODO: get actual location
+          'xLocation': 32.855234,
+          'yLocation': -117.217615,
+        },
+        'physicalAddress': _physicalAddress,
+        'eventUrl': _eventUrl,
+        'eventDateTime': _dateTime,
+      });
     }
-    //TODO: Add location
-    createEventMutation({
-      'title': _activityName,
-      'description': _desciption,
-      'mediumType': _mediumType,
-      'organizerCoordinates': {
-        //TODO: get actual location
-        'xLocation': 32.855234,
-        'yLocation': -117.217615,
-      },
-      'physicalAddress': _physicalAddress,
-      'eventUrl': _eventUrl,
-      'eventDateTime': _dateTime,
-    });
   }
 
   static const maxInputSize = 255;
@@ -62,10 +72,18 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
   String _eventUrl;
   DateTime _date;
 
-  String _genericValidator(String value) {
+  String _mandatoryValidator(String value) {
     if (value == null || value.isEmpty) {
       return emptyFieldError;
     } else if (value.length > maxInputSize) {
+      return largeInputError;
+    } else {
+      return null;
+    }
+  }
+
+  String _genericValidator(String value) {
+    if (value.length > maxInputSize) {
       return largeInputError;
     } else {
       return null;
@@ -105,13 +123,22 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
     return Mutation(
       options: MutationOptions(
         fetchPolicy: FetchPolicy.noCache,
-        document: gql(createActivityMutation),
+        document: gql(_isOnline
+            ? createOnlineActivityMutation
+            : createPhysicalActivityMutation),
         onCompleted: (dynamic resultData) {
           print('Create Activity mutation return:');
           print(resultData);
-          context.read<ActivityManager>().addEvent();
           if (resultData != null) {
-            final activity = resultData['createActivity']['id'];
+            var activity;
+            if (resultData['createOnlineActivity'] != null) {
+              activity = resultData['createOnlineActivity']['id'];
+            } else if (resultData['createPhysicalActivity'] != null) {
+              activity = resultData['createPhysicalActivity']['id'];
+            } else {
+              //TODO
+            }
+            context.read<ActivityManager>().addEvent();
             Navigator.of(context).pop();
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (_) => ActivityDetailPage(activity)));
@@ -122,6 +149,7 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
         onError: (error) {
           print('Create Activity mutation ERROR:');
           print(error);
+          //TODO: Handle error when passed in invalid address
         },
       ),
       builder: (
@@ -178,7 +206,7 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                   TextFormField(
                     decoration: InputDecoration(hintText: 'Title'),
                     onChanged: (value) => setState(() => _activityName = value),
-                    validator: _genericValidator,
+                    validator: _mandatoryValidator,
                   ),
                   const SizedBox(
                     height: 20,
@@ -235,7 +263,7 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                     style: Theme.of(context).textTheme.headline6,
                   ),
                   Text(
-                    '(Will calibrate to your local time)',
+                    '(In your local time)',
                     style: Theme.of(context).textTheme.subtitle1,
                   ),
                   DateTimeField(
@@ -262,10 +290,7 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                     },
                     onChanged: (value) => _date = value,
                     validator: (value) {
-                      if (value == null) {
-                        return emptyFieldError;
-                      }
-                      if (value.isBefore(DateTime.now())) {
+                      if (value != null && value.isBefore(DateTime.now())) {
                         return 'Time of the event must be in the future.';
                       } else {
                         return null;
