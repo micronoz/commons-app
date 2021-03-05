@@ -65,11 +65,11 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
+    _observableMessageQuery.close();
     messageStream.cancel();
     super.dispose();
   }
 
-//TODO Implement backend connection
   void sendMessage(BuildContext context, String content) async {
     if (content.isEmpty) return;
     _formKey.currentState.reset();

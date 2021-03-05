@@ -19,10 +19,10 @@ Activity _$ActivityFromJson(Map<String, dynamic> json) {
     Activity._locationFromJson(
         json['eventCoordinates'] as Map<String, dynamic>),
     Activity._dateTimeFromJson(json['eventDateTime'] as String),
-    (json['attendees'] as List)
+    (json['userConnections'] as List)
             ?.map((e) => e == null
                 ? null
-                : UserProfile.fromJson(e as Map<String, dynamic>))
+                : UserActivity.fromJson(e as Map<String, dynamic>))
             ?.toSet() ??
         {},
     json['organizer'] == null
@@ -42,7 +42,7 @@ Map<String, dynamic> _$ActivityToJson(Activity instance) => <String, dynamic>{
           Activity._locationToJson(instance.discoveryCoordinates),
       'eventCoordinates': Activity._locationToJson(instance.eventCoordinates),
       'eventDateTime': Activity._dateTimeToJson(instance.dateTime),
-      'attendees': instance.attendees?.toList(),
+      'userConnections': instance.attendees?.toList(),
       'organizer': instance.organizer,
     };
 

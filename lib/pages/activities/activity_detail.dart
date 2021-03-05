@@ -5,11 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:tribal_instinct/components/member_card.dart';
 import 'package:tribal_instinct/model/activity.dart';
+import 'package:tribal_instinct/model/activity_attendance_status.dart';
 import 'package:tribal_instinct/model/activity_types.dart';
 import 'package:tribal_instinct/model/app_user.dart';
-import 'package:tribal_instinct/model/user_profile.dart';
 import 'package:tribal_instinct/pages/chat.dart';
 
 final getActivityQuery = '''
@@ -26,6 +25,7 @@ final getActivityQuery = '''
       userConnections{
         user {
           id
+          fullName
         }
       }
       ... on InPersonActivity {
@@ -46,6 +46,15 @@ final getActivityQuery = '''
   }
 ''';
 
+final requestToJoinActivity = r'''
+  mutation RequestToJoinActivity($id: String!) {
+    requestToJoinActivity(id: $id) {
+      id
+      attendanceStatus
+    }
+  }
+''';
+
 class ActivityDetailPage extends StatefulWidget {
   final String activityId;
   ActivityDetailPage(this.activityId);
@@ -57,11 +66,8 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
   final DateFormat _format = DateFormat.yMMMMEEEEd().add_jm();
   final timeout = const Duration(seconds: 1);
 
-  var isAdmin = false;
-
   var _absorbing = false;
   var _success = false;
-  var _attending = true;
 
   var _tabIndex = 0;
 
@@ -78,7 +84,6 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
       setState(() {
         _absorbing = false;
         _success = false;
-        _attending = true;
       });
     });
 
@@ -98,9 +103,10 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
     print('Activity id: ${widget.activityId}');
     return Query(
       options: QueryOptions(
-          document: gql(getActivityQuery),
-          pollInterval: Duration(minutes: 1),
-          variables: {'id': widget.activityId}),
+        document: gql(getActivityQuery),
+        pollInterval: Duration(minutes: 1),
+        variables: {'id': widget.activityId},
+      ),
       builder: (result, {refetch, fetchMore}) {
         if (result.hasException) {
           print('Activity Detail page query exception:');
@@ -114,6 +120,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
           );
         }
         final activity = Activity.fromJson(result.data['activity']);
+
         final currentUser = AppUser.of(context);
         var tabBar = TabBar(
           tabs: tabs,
@@ -128,7 +135,19 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
           }),
         );
         currentUser.hydrate();
-        isAdmin = currentUser.profile == activity.organizer;
+
+        ActivityAttendanceStatus attendanceStatus;
+        if (activity.attendees.contains(currentUser.profile)) {
+          final userActivity = activity.attendees
+              .firstWhere((element) => element.user == currentUser.profile);
+          attendanceStatus = ActivityAttendanceStatus
+              .values[userActivity.attendanceStatus + 1];
+        } else {
+          attendanceStatus = ActivityAttendanceStatus.not_requested;
+        }
+        final isAttending = attendanceStatus == ActivityAttendanceStatus.joined;
+        final isAdmin = currentUser.profile == activity.organizer;
+
         return WillPopScope(
           onWillPop: () async => !_absorbing,
           child: AbsorbPointer(
@@ -138,7 +157,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                 Scaffold(
                   floatingActionButtonLocation:
                       FloatingActionButtonLocation.centerFloat,
-                  floatingActionButton: _attending
+                  floatingActionButton: isAttending
                       ? null
                       : FloatingActionButton.extended(
                           backgroundColor: Colors.green,
@@ -154,19 +173,21 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                         ),
                   appBar: AppBar(
                     title: Text('Activity details'),
-                    bottom: PreferredSize(
-                      preferredSize: tabBar.preferredSize,
-                      child: DefaultTabController(
-                        child: tabBar,
-                        length: 2,
-                        initialIndex: _tabIndex,
-                      ),
-                    ),
+                    bottom: isAttending
+                        ? PreferredSize(
+                            preferredSize: tabBar.preferredSize,
+                            child: DefaultTabController(
+                              child: tabBar,
+                              length: 2,
+                              initialIndex: _tabIndex,
+                            ),
+                          )
+                        : null,
                   ),
                   body: IndexedStack(
                     index: _tabIndex,
                     children: [
-                      ChatPage(false, widget.activityId),
+                      if (isAttending) ChatPage(false, widget.activityId),
                       ListView(
                         children: [
                           Text(
@@ -203,7 +224,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                               textAlign: TextAlign.center,
                               style: Theme.of(context).textTheme.bodyText2,
                             ),
-                          if (_attending)
+                          if (isAttending)
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -211,7 +232,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                                   padding:
                                       const EdgeInsets.only(left: 5, top: 10),
                                   child: Text(
-                                    isAdmin ? 'Slots' : 'My Group',
+                                    'Participants',
                                     style:
                                         Theme.of(context).textTheme.headline5,
                                   ),
@@ -224,36 +245,26 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                                     spacing: 35,
                                     children: [
                                       ...activity.attendees.map(
-                                        (user) => Column(
-                                          children: [
-                                            CircleAvatar(
-                                                backgroundColor:
-                                                    Colors.blueGrey,
-                                                maxRadius: 35,
-                                                backgroundImage: user.photo),
-                                            Text(user.name)
-                                          ],
-                                        ),
+                                        (userActivity) {
+                                          return Column(
+                                            children: [
+                                              CircleAvatar(
+                                                  backgroundColor:
+                                                      Colors.blueGrey,
+                                                  maxRadius: 35,
+                                                  backgroundImage:
+                                                      userActivity.user.photo),
+                                              Text(userActivity.user.name)
+                                            ],
+                                          );
+                                        },
                                       ),
                                     ],
                                   ),
                                 ),
                               ],
                             ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 5),
-                            child: Text(
-                              'Participants',
-                              style: Theme.of(context).textTheme.headline5,
-                            ),
-                          ),
-                          ...activity.attendees.map((m) => MemberCard(
-                              m,
-                              'Unfollow',
-                              'Follow',
-                              (UserProfile u) =>
-                                  currentUser.following.contains(u))),
-                          if (!_attending)
+                          if (!isAttending)
                             const SizedBox(
                               height: 60,
                             )

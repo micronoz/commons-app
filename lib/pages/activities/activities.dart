@@ -11,20 +11,29 @@ import 'package:provider/provider.dart';
 final getMyActivitiesQuery = '''
   query {
     user {
-      activityConnections {
-        activity {
-          id
-          title
-          eventDateTime
-          organizer {
-            id
-            handle
-          }
-          description
-        }
-        isOrganizing
-        attendanceStatus
+      ...activityConnectionFields
+    }
+  }
+
+  fragment activityConnectionFields on User {
+    activityConnections {
+      ...activityFields
+    }
+  }
+
+  fragment activityFields on UserActivity {
+    id
+    isOrganizing
+    attendanceStatus
+    activity {
+      id
+      title
+      eventDateTime
+      organizer {
+        id
+        handle
       }
+      description
     }
   }
 ''';
@@ -70,15 +79,16 @@ class _ExperiencesPageState extends State<ExperiencesPage> {
                 fetchResults: true,
                 eagerlyFetchResults: true,
                 document: gql(getMyActivitiesQuery),
-                cacheRereadPolicy: CacheRereadPolicy.mergeOptimistic,
+                cacheRereadPolicy: CacheRereadPolicy.ignoreAll,
                 fetchPolicy: FetchPolicy.cacheAndNetwork,
               ),
               builder: (QueryResult result, {fetchMore, refetch}) {
-                if (result.isLoading) {
+                if (result.isLoading && !result.isConcrete) {
                   return Center(
                     child: CircularProgressIndicator(),
                   );
                 }
+                print(result);
                 refetch = refetch;
 
                 final activities = (result.data['user']['activityConnections']

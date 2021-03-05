@@ -98,10 +98,10 @@ class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
           Query(
             options: QueryOptions(
               document: gql(discoverActivitiesQuery),
-              // pollInterval: Duration(seconds: 1),
             ),
             builder: (QueryResult result,
                 {VoidCallback refetch, FetchMore fetchMore}) {
+              print('Query discovery page');
               if (result.hasException) {
                 return Text(result.exception.toString());
               }

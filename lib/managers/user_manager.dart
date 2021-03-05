@@ -66,11 +66,24 @@ class UserManager {
         document: gql(getProfileQuery),
         fetchPolicy: FetchPolicy.networkOnly,
       ));
-      var result = await appUserResolver.value;
+      print('Sent query');
+      var result = await appUserResolver.value.timeout(Duration(seconds: 10),
+          onTimeout: () {
+        print('Timed out on user profile fetch');
+        throw NetworkException(
+          message: 'App user fetcher timed out.',
+          uri: Uri(
+            host: _graphQLClientNotifier.value.link.toString(),
+          ),
+        );
+      });
       // TODO: Right now only checking if the data is null to see if the
       // user exists on the backend or not. This should be changed as this
       // might also be due to network or other errors.
-      if (result.data == null) {
+      if (result.hasException) {
+        throw result.exception;
+      }
+      if (result.data['user'] == null) {
         print(result);
         print('User fetching returned null data.');
         appUser.value = null;

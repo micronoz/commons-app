@@ -6,6 +6,7 @@ part 'user_profile.g.dart';
 @JsonSerializable()
 class UserProfile {
   final String id;
+  @JsonKey(name: 'fullName')
   final String name;
   final String handle;
   final String photoUrl;
@@ -45,4 +46,7 @@ class UserProfile {
       return false;
     }
   }
+
+  @override
+  int get hashCode => id.hashCode;
 }

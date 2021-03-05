@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:provider/provider.dart';
 import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/model/user_profile.dart';
@@ -25,12 +24,7 @@ class AppUser {
   static AppUser fromJson(Map<String, dynamic> json) {
     // TODO: Also get the other fields and change the email field after
     // adding necessary fields to the database.
-    final userProfile = UserProfile(
-        json['id'],
-        json['fullName'],
-        json['handle'],
-        'https://picsum.photos/250?image=11',
-        'Hello my name is Nabi. I\'m from Cyprus and this is the new app I created for bringing people together.');
+    final userProfile = UserProfile.fromJson(json);
     return AppUser._(userProfile);
   }
 

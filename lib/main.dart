@@ -9,10 +9,7 @@ import 'package:tribal_instinct/pages/home.dart';
 import 'package:tribal_instinct/pages/login.dart';
 
 import 'managers/user_manager.dart';
-import 'model/app_user.dart';
 import 'model/is_logged_in.dart';
-
-//TODO need to add user state management
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,9 +46,7 @@ class _AppState extends State<App> {
         ],
         builder: (context, child) {
           var isLoggedIn = context.watch<IsLoggedIn>();
-          var httpLink = HttpLink(
-            AppConstants.of(context).backendUri,
-          );
+          var httpLink = HttpLink(AppConstants.of(context).backendUri);
 
           var authLink = AuthLink(
             getToken: () async {
@@ -62,12 +57,13 @@ class _AppState extends State<App> {
 
           var link = authLink.concat(httpLink);
           var client = GraphQLClient(
+            alwaysRebroadcast: true,
             link: link,
             cache: GraphQLCache(store: HiveStore()),
           );
           var clientNotifier = ValueNotifier(client);
           widget.userManager.registerGraphQL(clientNotifier);
-          widget.userManager.fetchUserProfile();
+
           return GraphQLProvider(
               client: clientNotifier,
               child: MaterialApp(
