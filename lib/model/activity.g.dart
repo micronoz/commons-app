@@ -22,7 +22,7 @@ Activity _$ActivityFromJson(Map<String, dynamic> json) {
     (json['userConnections'] as List)
             ?.map((e) => e == null
                 ? null
-                : UserProfile.fromJson(e as Map<String, dynamic>))
+                : UserActivity.fromJson(e as Map<String, dynamic>))
             ?.toSet() ??
         {},
     json['organizer'] == null

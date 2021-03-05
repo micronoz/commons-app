@@ -94,7 +94,7 @@ class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
           Query(
             options: QueryOptions(
               document: gql(discoverActivitiesQuery),
-              pollInterval: Duration(seconds: 1),
+              pollInterval: Duration(seconds: 30),
             ),
             builder: (QueryResult result,
                 {VoidCallback refetch, FetchMore fetchMore}) {

@@ -1,6 +1,7 @@
 import 'package:geolocator/geolocator.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:tribal_instinct/model/activity_types.dart';
+import 'package:tribal_instinct/model/user_activity.dart';
 import 'user_profile.dart';
 
 part 'activity.g.dart';
@@ -24,7 +25,7 @@ class Activity {
       toJson: _dateTimeToJson)
   final DateTime dateTime;
   @JsonKey(defaultValue: {}, name: 'userConnections')
-  final Set<UserProfile> attendees;
+  final Set<UserActivity> attendees;
   final UserProfile organizer;
 
   Activity(
@@ -77,9 +78,9 @@ class Activity {
       null,
       DateTime.now(),
       {
-        UserProfile.mock(),
-        UserProfile.mock(),
-        UserProfile.mock(),
+        // UserProfile.mock(),
+        // UserProfile.mock(),
+        // UserProfile.mock(),
       },
       UserProfile.mock(),
     );

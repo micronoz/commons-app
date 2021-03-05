@@ -41,9 +41,12 @@ class UserProfile {
   @override
   bool operator ==(Object other) {
     if (other is UserProfile) {
-      return (id == other.id);
+      return (id == id);
     } else {
       return false;
     }
   }
+
+  @override
+  int get hashCode => id.hashCode;
 }

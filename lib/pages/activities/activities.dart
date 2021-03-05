@@ -11,15 +11,20 @@ import 'package:provider/provider.dart';
 final getMyActivitiesQuery = '''
   query {
     user {
-      activityConnections {
-        ...activityFields
-        isOrganizing
-        attendanceStatus
-      }
+      ...activityConnectionFields
+    }
+  }
+
+  fragment activityConnectionFields on User {
+    activityConnections {
+      ...activityFields
     }
   }
 
   fragment activityFields on UserActivity {
+    id
+    isOrganizing
+    attendanceStatus
     activity {
       id
       title
