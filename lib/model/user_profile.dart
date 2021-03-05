@@ -41,7 +41,7 @@ class UserProfile {
   @override
   bool operator ==(Object other) {
     if (other is UserProfile) {
-      return (id == id);
+      return (id == other.id);
     } else {
       return false;
     }
