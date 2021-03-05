@@ -59,7 +59,7 @@ class _AppState extends State<App> {
           var client = GraphQLClient(
             alwaysRebroadcast: true,
             link: link,
-            cache: GraphQLCache(store: InMemoryStore()),
+            cache: GraphQLCache(store: HiveStore()),
           );
           var clientNotifier = ValueNotifier(client);
           widget.userManager.registerGraphQL(clientNotifier);
