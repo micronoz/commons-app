@@ -7,17 +7,23 @@ import 'package:tribal_instinct/model/discover_types.dart';
 String discoverActivitiesQuery = '''
   query DiscoverActivities {
     discoverActivities {
-      id
-      title
-      description
+    ... on InPersonActivity {
       physicalAddress
-      organizer {
-        handle
-        id
-      }
       discoveryCoordinates {
         x
         y
+      }
+
+    }
+    ... on OnlineActivity {
+      eventUrl
+    }
+      id
+      title
+      description
+      organizer {
+        handle
+        id
       }
       mediumType
       eventDateTime
