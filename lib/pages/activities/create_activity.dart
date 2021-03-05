@@ -8,9 +8,9 @@ import 'package:provider/provider.dart';
 
 import 'activity_detail.dart';
 
-String createPhysicalActivityMutation = '''
+String createInPersonActivityMutation = '''
   mutation CreateActivity(\$title: String!, \$description: String, \$organizerCoordinates: LocationInput, \$physicalAddress: String, \$eventDateTime: DateTime) {
-    createPhysicalActivity(title: \$title, description: \$description, organizerCoordinates: \$organizerCoordinates, physicalAddress: \$physicalAddress, eventDateTime: \$eventDateTime) {
+    createInPersonActivity(title: \$title, description: \$description, organizerCoordinates: \$organizerCoordinates, physicalAddress: \$physicalAddress, eventDateTime: \$eventDateTime) {
       id
     }
   }
@@ -125,7 +125,7 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
         fetchPolicy: FetchPolicy.noCache,
         document: gql(_isOnline
             ? createOnlineActivityMutation
-            : createPhysicalActivityMutation),
+            : createInPersonActivityMutation),
         onCompleted: (dynamic resultData) {
           print('Create Activity mutation return:');
           print(resultData);
@@ -133,8 +133,8 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
             var activity;
             if (resultData['createOnlineActivity'] != null) {
               activity = resultData['createOnlineActivity']['id'];
-            } else if (resultData['createPhysicalActivity'] != null) {
-              activity = resultData['createPhysicalActivity']['id'];
+            } else if (resultData['createInPersonActivity'] != null) {
+              activity = resultData['createInPersonActivity']['id'];
             } else {
               //TODO
             }
