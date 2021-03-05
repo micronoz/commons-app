@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:json_annotation/json_annotation.dart';
 import 'package:provider/provider.dart';
 import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/model/user_profile.dart';
 
-// @JsonSerializable()
 class AppUser {
-  // @JsonKey(nullable: false)
   UserProfile profile;
   Position location;
   Set<UserProfile> followers;
