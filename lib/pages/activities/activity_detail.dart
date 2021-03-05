@@ -23,21 +23,25 @@ final getActivityQuery = '''
       description
       mediumType
       eventDateTime
-      eventCoordinates{
-        x
-        y
-      }
-      discoveryCoordinates{
-        x
-        y
-      }
       userConnections{
         user {
           id
         }
       }
-      physicalAddress
-      eventUrl
+      ... on InPersonActivity {
+        physicalAddress
+        discoveryCoordinates {
+          x
+          y
+        }
+        eventCoordinates{
+          x
+          y
+        }
+      }
+      ... on OnlineActivity {
+        eventUrl
+      }
     }
   }
 ''';

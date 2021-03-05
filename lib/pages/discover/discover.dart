@@ -14,12 +14,23 @@ class DiscoverPage extends StatefulWidget {
 class _DiscoverPageState extends State<DiscoverPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(EnumToString.convertToString(widget.type).capitalize()),
-        centerTitle: true,
-      ),
-      body: DiscoverCategoryPage(widget.type),
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+          appBar: AppBar(
+            title: Text(EnumToString.convertToString(widget.type).capitalize()),
+            centerTitle: true,
+            bottom: TabBar(
+              indicatorColor: Colors.blue[800],
+              tabs: [Tab(text: 'Online'), Tab(text: 'In Person')],
+            ),
+          ),
+          body: TabBarView(
+            children: [
+              DiscoverCategoryPage(widget.type),
+              DiscoverCategoryPage(widget.type)
+            ],
+          )),
     );
   }
 }
