@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:tribal_instinct/components/event_card_small.dart';
 import 'package:tribal_instinct/model/activity.dart';
-import 'package:tribal_instinct/model/activity_types.dart';
 import 'package:tribal_instinct/model/discover_types.dart';
-import 'package:tribal_instinct/model/user_profile.dart';
 
 String discoverActivitiesQuery = '''
   query DiscoverActivities {
@@ -36,17 +34,17 @@ class DiscoverCategoryPage extends StatefulWidget {
 }
 
 class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
-  final List<String> _cast = <String>[
+  final List<String> _categotyNames = <String>[
     'All',
     'Hang Out',
     'Study',
     'Sports',
     'Other',
   ];
-  final List<String> _filters = <String>[];
+  final List<String> _categoryFilters = <String>[];
 
-  Iterable<Widget> get categoryWidgets sync* {
-    for (final category in _cast) {
+  Iterable<Widget> get _categoryFilterWidgets sync* {
+    for (final category in _categotyNames) {
       yield Padding(
         padding: const EdgeInsets.all(1.0),
         child: FilterChip(
@@ -55,19 +53,19 @@ class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
           visualDensity: VisualDensity.comfortable,
           label: Text(category),
           selected: category == 'All'
-              ? _filters.isEmpty
-              : _filters.contains(category),
+              ? _categoryFilters.isEmpty
+              : _categoryFilters.contains(category),
           onSelected: (bool value) {
             setState(() {
               if (value) {
                 if (category == 'All') {
-                  _filters.clear();
+                  _categoryFilters.clear();
                 } else {
-                  _filters.add(category);
+                  _categoryFilters.add(category);
                 }
               } else {
                 if (category != 'All') {
-                  _filters.removeWhere((String name) {
+                  _categoryFilters.removeWhere((String name) {
                     return name == category;
                   });
                 }
@@ -88,7 +86,7 @@ class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
           Wrap(
             direction: Axis.horizontal,
             alignment: WrapAlignment.spaceEvenly,
-            children: categoryWidgets.toList(),
+            children: _categoryFilterWidgets.toList(),
           ),
           // ...
           Query(
