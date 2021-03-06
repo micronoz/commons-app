@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:tribal_instinct/managers/location_manager.dart';
 import 'package:tribal_instinct/managers/user_manager.dart';
 import 'package:tribal_instinct/pages/discover/discover_category.dart';
 import 'package:provider/provider.dart';
@@ -69,7 +70,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
   Widget build(BuildContext context) {
     final currentPosition = context.watch<Position>();
     if (currentPosition == null) {
-      UserManager.of(context).updateCurrentLocation();
+      LocationManager.of(context).updateLocation();
     }
     return DefaultTabController(
       length: 2,

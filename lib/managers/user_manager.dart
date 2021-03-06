@@ -33,7 +33,6 @@ class UserManager {
   var _authSub;
 
   final ValueNotifier<Future<QueryResult>> appUserResolver;
-  final ValueNotifier<Position> currentLocation = ValueNotifier(null);
 
   ValueNotifier<GraphQLClient> _graphQLClientNotifier;
   static Future<UserManager> create() async {
@@ -55,18 +54,6 @@ class UserManager {
     print('Registering graphql notifier to userManager.');
 
     _graphQLClientNotifier = notifier;
-  }
-
-  void updateCurrentLocation() async {
-    print('Update Current Location called.');
-    try {
-      var _location = await getCurrentLocation();
-      currentLocation.value = _location;
-      print('Updated the current location to' + _location.toString());
-    } catch (e) {
-      print('Failed to update current location.');
-      print(e);
-    }
   }
 
   Future<String> getIdToken() {
