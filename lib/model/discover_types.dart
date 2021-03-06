@@ -1,1 +1,0 @@
-enum DiscoverType { clubs, experiences }
