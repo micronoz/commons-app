@@ -114,7 +114,6 @@ class _ChatPageState extends State<ChatPage> {
       _observableMessageQuery.startPolling(Duration(seconds: 5));
       messageStream = _observableMessageQuery.stream.listen((result) {
         if (!result.isLoading && result.data != null) {
-          print(result.data);
           if (mounted) {
             setState(() {
               _messages = (result.data['activity']['messageConnections']

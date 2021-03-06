@@ -87,7 +87,6 @@ class _ExperiencesPageState extends State<ExperiencesPage> {
                     child: CircularProgressIndicator(),
                   );
                 }
-                print(result);
                 refetch = refetch;
 
                 final activities = (result.data['user']['activityConnections']
