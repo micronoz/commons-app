@@ -3,7 +3,6 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:tribal_instinct/components/event_card_small.dart';
 import 'package:tribal_instinct/managers/activity_manager.dart';
 import 'package:tribal_instinct/model/activity.dart';
-import 'package:tribal_instinct/model/discover_types.dart';
 import 'package:tribal_instinct/pages/activities/create_activity.dart';
 import 'package:tribal_instinct/pages/discover/discover.dart';
 import 'package:provider/provider.dart';
@@ -106,8 +105,7 @@ class _ExperiencesPageState extends State<ExperiencesPage> {
                           color: Colors.blue[400],
                           onPressed: () {
                             Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) =>
-                                    DiscoverPage(DiscoverType.experiences)));
+                                builder: (context) => DiscoverPage()));
                           },
                           child: Text(
                             'Discover Events',
