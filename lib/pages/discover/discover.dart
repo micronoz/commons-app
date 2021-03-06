@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:tribal_instinct/managers/user_manager.dart';
 import 'package:tribal_instinct/pages/discover/discover_category.dart';
+import 'package:provider/provider.dart';
 
 class DiscoverPage extends StatefulWidget {
   const DiscoverPage({Key key}) : super(key: key);
@@ -61,8 +64,13 @@ class _DiscoverPageState extends State<DiscoverPage> {
     'Sports',
     'Other',
   ];
+
   @override
   Widget build(BuildContext context) {
+    final currentPosition = context.watch<Position>();
+    if (currentPosition == null) {
+      UserManager.of(context).updateCurrentLocation();
+    }
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -78,14 +86,20 @@ class _DiscoverPageState extends State<DiscoverPage> {
             children: [
               DiscoverCategoryPage(widget.discoverOnlineActivitiesQuery, {},
                   'discoverOnlineActivities', _onlineCategoryNames),
-              DiscoverCategoryPage(
-                  widget.discoverInPersonActivitiesQuery,
-                  {
-                    'discoveryCoordinates': {'xLocation': 34, 'yLocation': 13},
-                    'radiusInKilometers': 10,
-                  },
-                  'discoverInPersonActivities',
-                  _inPersonCategoryNames),
+              (currentPosition != null)
+                  ? DiscoverCategoryPage(
+                      widget.discoverInPersonActivitiesQuery,
+                      {
+                        'discoveryCoordinates': {
+                          'xLocation': currentPosition.longitude,
+                          'yLocation': currentPosition.latitude,
+                        },
+                        'radiusInKilometers': 10,
+                      },
+                      'discoverInPersonActivities',
+                      _inPersonCategoryNames)
+                  : Text(
+                      'Please enable location services to discover in person activities.'),
             ],
           )),
     );

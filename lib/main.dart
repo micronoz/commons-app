@@ -40,6 +40,8 @@ class _AppState extends State<App> {
           Provider<UserManager>.value(value: widget.userManager),
           ValueListenableProvider.value(value: widget.userManager.appUser),
           ValueListenableProvider.value(value: widget.userManager.isLoggedIn),
+          ValueListenableProvider.value(
+              value: widget.userManager.currentLocation),
           ChangeNotifierProvider<ActivityManager>(
             create: (context) => ActivityManager(),
           )
