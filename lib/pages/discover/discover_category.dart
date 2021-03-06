@@ -5,10 +5,14 @@ import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/pages/discover/discover_filter.dart';
 
 class DiscoverCategoryPage extends StatefulWidget {
-  DiscoverCategoryPage(this._discoverQuery, this._categoryNames, {Key key})
+  DiscoverCategoryPage(this._discoverQuery, this._queryVariables,
+      this._queryName, this._categoryNames,
+      {Key key})
       : super(key: key);
   final List<String> _categoryNames;
   final String _discoverQuery;
+  final String _queryName;
+  final Map<String, dynamic> _queryVariables;
 
   @override
   _DiscoverCategoryPageState createState() => _DiscoverCategoryPageState();
@@ -25,6 +29,7 @@ class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
           Query(
             options: QueryOptions(
               document: gql(widget._discoverQuery),
+              variables: widget._queryVariables,
             ),
             builder: (QueryResult result,
                 {VoidCallback refetch, FetchMore fetchMore}) {
@@ -35,7 +40,7 @@ class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
               if (result.isLoading) {
                 return Text('Loading');
               }
-              List activities = result.data['discoverActivities'];
+              List activities = result.data[widget._queryName];
 
               if (activities.isEmpty) {
                 return Text(

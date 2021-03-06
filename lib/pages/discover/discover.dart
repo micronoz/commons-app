@@ -5,22 +5,12 @@ class DiscoverPage extends StatefulWidget {
   const DiscoverPage({Key key}) : super(key: key);
   @override
   _DiscoverPageState createState() => _DiscoverPageState();
-  final String discoverActivitiesQuery = '''
-  query DiscoverActivities {
-    discoverActivities {
-    ... on InPersonActivity {
-      physicalAddress
-      discoveryCoordinates {
-        x
-        y
-      }
-
-    }
-    ... on OnlineActivity {
-      eventUrl
-    }
+  final String discoverOnlineActivitiesQuery = '''
+  query DiscoverOnlineActivities {
+    discoverOnlineActivities {
       id
       title
+      eventUrl
       description
       organizer {
         handle
@@ -33,7 +23,7 @@ class DiscoverPage extends StatefulWidget {
 ''';
 
   final String discoverInPersonActivitiesQuery = '''
-  query DiscoverInPersonActivities (\$discoveryCoordinates: LocationInput!, \$radiusInKilometers: number!){
+  query DiscoverInPersonActivities (\$discoveryCoordinates: LocationInput!, \$radiusInKilometers: Float!){
     discoverInPersonActivities(discoveryCoordinates: \$discoveryCoordinates, radiusInKilometers: \$radiusInKilometers) {
     ... on InPersonActivity {
       physicalAddress
@@ -67,6 +57,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
   final List<String> _onlineCategoryNames = <String>[
     'All',
     'Gaming',
+    'Discussion',
     'Sports',
     'Other',
   ];
@@ -85,10 +76,16 @@ class _DiscoverPageState extends State<DiscoverPage> {
           ),
           body: TabBarView(
             children: [
+              DiscoverCategoryPage(widget.discoverOnlineActivitiesQuery, {},
+                  'discoverOnlineActivities', _onlineCategoryNames),
               DiscoverCategoryPage(
-                  widget.discoverActivitiesQuery, _onlineCategoryNames),
-              DiscoverCategoryPage(
-                  widget.discoverActivitiesQuery, _inPersonCategoryNames),
+                  widget.discoverInPersonActivitiesQuery,
+                  {
+                    'discoveryCoordinates': {'xLocation': 34, 'yLocation': 13},
+                    'radiusInKilometers': 10,
+                  },
+                  'discoverInPersonActivities',
+                  _inPersonCategoryNames),
             ],
           )),
     );
