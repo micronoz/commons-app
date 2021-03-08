@@ -1,15 +1,17 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:tribal_instinct/components/question_switch.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:tribal_instinct/managers/activity_manager.dart';
 import 'package:provider/provider.dart';
+import 'package:tribal_instinct/managers/location_manager.dart';
 
 import 'activity_detail.dart';
 
 String createInPersonActivityMutation = '''
-  mutation CreateActivity(\$title: String!, \$description: String, \$organizerCoordinates: LocationInput, \$physicalAddress: String, \$eventDateTime: DateTime) {
+  mutation CreateActivity(\$title: String!, \$description: String, \$organizerCoordinates: LocationInput!, \$physicalAddress: String, \$eventDateTime: DateTime) {
     createInPersonActivity(title: \$title, description: \$description, organizerCoordinates: \$organizerCoordinates, physicalAddress: \$physicalAddress, eventDateTime: \$eventDateTime) {
       id
     }
@@ -31,7 +33,8 @@ class CreateActivityPage extends StatefulWidget {
 }
 
 class _CreateActivityPageState extends State<CreateActivityPage> {
-  void saveAndExit(BuildContext context, RunMutation createEventMutation) {
+  void saveAndExit(
+      BuildContext context, RunMutation createEventMutation) async {
     final _dateTime = _date?.toUtc()?.toIso8601String();
     if (_isOnline) {
       assert(_physicalAddress == null);
@@ -42,14 +45,17 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
         'eventDateTime': _dateTime,
       });
     } else {
+      var currentPosition = Provider.of<Position>(context, listen: false);
+      // TODO: Put loading screen while waiting for this so that it is not
+      // double clicked
+      currentPosition ??= await LocationManager.of(context).updateLocation();
       assert(_eventUrl == null);
       createEventMutation({
         'title': _activityName,
         'description': _desciption,
         'organizerCoordinates': {
-          //TODO: get actual location
-          'xLocation': 32.855234,
-          'yLocation': -117.217615,
+          'xLocation': currentPosition.longitude,
+          'yLocation': currentPosition.latitude,
         },
         'physicalAddress': _physicalAddress,
         'eventUrl': _eventUrl,

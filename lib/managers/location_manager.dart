@@ -9,15 +9,17 @@ class LocationManager {
     return Provider.of<LocationManager>(context, listen: false);
   }
 
-  void updateLocation() async {
+  Future<Position> updateLocation() async {
     print('Update Current Location called.');
     try {
       var _location = await _getCurrentLocation();
       currentLocation.value = _location;
       print('Updated the current location to' + _location.toString());
+      return _location;
     } catch (e) {
       print('Failed to update current location.');
       print(e);
+      return Future.error(e);
     }
   }
 

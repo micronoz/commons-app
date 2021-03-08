@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:tribal_instinct/model/activity.dart';
-import 'package:tribal_instinct/model/user_profile.dart';
 import 'package:tribal_instinct/pages/activities/activity_detail.dart';
 
 class EventCardSmall extends StatelessWidget {
-  EventCardSmall(this.event, {Key key}) : super(key: key);
+  EventCardSmall(this.event, {Key key, this.distance}) : super(key: key);
   final Activity event;
-
+  final double distance;
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -60,6 +59,8 @@ class EventCardSmall extends StatelessWidget {
                 ],
               ),
             ),
+            if (distance != null)
+              Text('Distance: ' + distance.toStringAsFixed(1) + ' km')
           ],
         ),
       ),

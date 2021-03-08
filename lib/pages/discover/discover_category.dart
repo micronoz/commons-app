@@ -52,8 +52,10 @@ class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
                     final _fetchedActivity = activities[index];
-                    final _activity = Activity.fromJson(_fetchedActivity);
-                    return EventCardSmall(_activity);
+                    final _activity =
+                        Activity.fromJson(_fetchedActivity['activity']);
+                    final distance = _fetchedActivity['distance'];
+                    return EventCardSmall(_activity, distance: distance);
                   });
             },
           ),

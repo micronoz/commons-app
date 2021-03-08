@@ -29,22 +29,23 @@ class DiscoverPage extends StatefulWidget {
   final String discoverInPersonActivitiesQuery = '''
   query DiscoverInPersonActivities (\$discoveryCoordinates: LocationInput!, \$radiusInKilometers: Float!){
     discoverInPersonActivities(discoveryCoordinates: \$discoveryCoordinates, radiusInKilometers: \$radiusInKilometers) {
-    ... on InPersonActivity {
-      physicalAddress
-      discoveryCoordinates {
-        x
-        y
-      }
-    }
-      id
-      title
-      description
-      organizer {
-        handle
+      activity{
+        physicalAddress
+        discoveryCoordinates {
+          x
+          y
+        }
         id
+        title
+        description
+        organizer {
+          handle
+          id
+        }
+        mediumType
+        eventDateTime
       }
-      mediumType
-      eventDateTime
+      distance
     }
   }
 ''';
@@ -95,7 +96,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                           'xLocation': currentPosition.longitude,
                           'yLocation': currentPosition.latitude,
                         },
-                        'radiusInKilometers': 10,
+                        'radiusInKilometers': 1,
                       },
                       'discoverInPersonActivities',
                       _inPersonCategoryNames)
