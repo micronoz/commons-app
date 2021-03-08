@@ -32,6 +32,7 @@ class CreateActivityPage extends StatefulWidget {
 
 class _CreateActivityPageState extends State<CreateActivityPage> {
   void saveAndExit(BuildContext context, RunMutation createEventMutation) {
+    context.read<ActivityManager>().addEvent();
     final _dateTime = _date?.toUtc()?.toIso8601String();
     if (_isOnline) {
       assert(_physicalAddress == null);
