@@ -7,7 +7,6 @@ import 'package:tribal_instinct/constants.dart';
 import 'package:tribal_instinct/managers/activity_manager.dart';
 import 'package:tribal_instinct/pages/home.dart';
 import 'package:tribal_instinct/pages/login.dart';
-
 import 'managers/user_manager.dart';
 import 'model/is_logged_in.dart';
 
