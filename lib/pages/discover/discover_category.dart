@@ -57,7 +57,10 @@ class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
                     if (widget._mediumType == ActivityMedium.in_person) {
                       final _activity =
                           Activity.fromJson(_fetchedActivity['activity']);
-                      final distance = _fetchedActivity['distance'];
+                      var distance = _fetchedActivity['distance'];
+                      if (distance.runtimeType == int) {
+                        distance = distance.toDouble();
+                      }
                       return EventCardSmall(_activity, distance: distance);
                     } else {
                       final _activity = Activity.fromJson(_fetchedActivity);
