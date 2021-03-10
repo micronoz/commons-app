@@ -152,12 +152,45 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
           attendanceStatus = ActivityAttendanceStatus.not_requested;
         }
         final isAdmin = currentUser.profile == activity.organizer;
-        var isAttending = true;
-        var isAwaitingApproval = false;
-        if (!isAdmin) {
-          isAttending = attendanceStatus == ActivityAttendanceStatus.joined;
-          isAwaitingApproval =
-              attendanceStatus == ActivityAttendanceStatus.requested;
+        var isAttending = attendanceStatus == ActivityAttendanceStatus.joined;
+
+        FloatingActionButton floatingActionButton;
+        if (attendanceStatus == ActivityAttendanceStatus.requested) {
+          floatingActionButton = FloatingActionButton.extended(
+            backgroundColor: Colors.grey,
+            onPressed: null,
+            label: Text(
+              'Already requested to join',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+            ),
+          );
+        } else if (attendanceStatus == ActivityAttendanceStatus.rejected) {
+          floatingActionButton = FloatingActionButton.extended(
+            icon: Icon(
+              Icons.warning,
+              color: Colors.white,
+            ),
+            backgroundColor: Colors.red,
+            label: Text(
+              'Rejected from this activity',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+            ),
+          );
+        } else if (attendanceStatus == ActivityAttendanceStatus.joined) {
+        } else {
+          floatingActionButton = FloatingActionButton.extended(
+            backgroundColor: Colors.green,
+            onPressed: () async {
+              await joinEvent(context);
+            },
+            label: Text(
+              'Sign up for this Activity',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+            ),
+          );
         }
 
         // print(
@@ -171,31 +204,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                 Scaffold(
                   floatingActionButtonLocation:
                       FloatingActionButtonLocation.centerFloat,
-                  floatingActionButton: isAttending
-                      ? null
-                      : isAwaitingApproval
-                          ? FloatingActionButton.extended(
-                              backgroundColor: Colors.grey,
-                              onPressed: null,
-                              label: Text(
-                                'Already requested to join',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w900),
-                              ),
-                            )
-                          : FloatingActionButton.extended(
-                              backgroundColor: Colors.green,
-                              onPressed: () async {
-                                await joinEvent(context);
-                              },
-                              label: Text(
-                                'Sign up for this Activity',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w900),
-                              ),
-                            ),
+                  floatingActionButton: floatingActionButton,
                   appBar: AppBar(
                     actions: [
                       if (isAdmin)

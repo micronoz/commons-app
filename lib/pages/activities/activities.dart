@@ -43,26 +43,19 @@ class ExperiencesPage extends StatefulWidget {
 }
 
 class _ExperiencesPageState extends State<ExperiencesPage> {
-  var registered = false;
-  var refetch;
   ActivityManager activityManager;
-
-  @override
-  void dispose() {
-    super.dispose();
-    activityManager.removeListener(refetch);
-  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<ActivityManager>(builder: (context, manager, child) {
+      final key = UniqueKey();
       var queryBody = Query(
-          key: Key('activitiesQuery'),
+          key: key,
           options: WatchQueryOptions(
             fetchResults: true,
             eagerlyFetchResults: true,
             document: gql(getMyActivitiesQuery),
-            fetchPolicy: FetchPolicy.cacheAndNetwork,
+            fetchPolicy: FetchPolicy.cacheFirst,
           ),
           builder: (QueryResult result, {fetchMore, refetch}) {
             if (result.isLoading && !result.isConcrete) {
@@ -70,11 +63,7 @@ class _ExperiencesPageState extends State<ExperiencesPage> {
                 child: CircularProgressIndicator(),
               );
             }
-            this.refetch = refetch;
-            if (!registered) {
-              manager.addListener(refetch);
-              registered = true;
-            }
+
             final activities =
                 (result.data['user']['activityConnections'] as List<dynamic>)
                     .map((a) => Activity.fromJson(a['activity']));

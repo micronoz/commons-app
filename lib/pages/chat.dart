@@ -6,7 +6,6 @@ import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_6.dart';
 import 'package:graphql/client.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/model/app_user.dart';
 import 'package:tribal_instinct/model/message.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +13,7 @@ import 'package:provider/provider.dart';
 final String getMessagesQuery = r'''
   query GetMessagesForActivity($id: String!) {
     activity(id: $id) {
+      id
       messageConnections {  
         id
         message
@@ -56,25 +56,16 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final _messageInputHeight = 100.0;
-  var _messages = <Message>[];
   final _formKey = GlobalKey<FormState>();
   var _messageIsEmpty = true;
-  final _focusNode = FocusNode();
-  ObservableQuery _observableMessageQuery;
-  StreamSubscription<QueryResult> messageStream;
-
-  @override
-  void dispose() {
-    _observableMessageQuery.close();
-    messageStream.cancel();
-    super.dispose();
-  }
+  var _outgoingMessages = <Map<String, dynamic>>[];
+  Function _refetch;
 
   void sendMessage(BuildContext context, String content) async {
     if (content.isEmpty) return;
     _formKey.currentState.reset();
     _messageIsEmpty = true;
-    final result = await GraphQLProvider.of(context).value.mutate(
+    final resultFuture = GraphQLProvider.of(context).value.mutate(
           MutationOptions(
             document: gql(sendMessageMutation),
             variables: {
@@ -83,16 +74,19 @@ class _ChatPageState extends State<ChatPage> {
             },
           ),
         );
-    if (result.hasException) {
-      print(result.exception);
-      return;
-    }
-    final myMessage = Message.fromJson(result.data['createMessage']);
-    myMessage.isSender = true;
-    _messages.insert(0, myMessage);
-    if (mounted) {
-      setState(() {});
-    }
+    setState(
+      () => _outgoingMessages.add(
+        {
+          'future': resultFuture.then((value) {
+            if (_refetch != null) {
+              _refetch();
+            }
+            return value;
+          }),
+          'message': content
+        },
+      ),
+    );
   }
 
   void dismissKeyboard(BuildContext context) {
@@ -104,45 +98,85 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_observableMessageQuery == null) {
-      _observableMessageQuery = GraphQLProvider.of(context).value.watchQuery(
-            WatchQueryOptions(
-                document: gql(getMessagesQuery),
-                fetchPolicy: FetchPolicy.cacheAndNetwork,
-                variables: {'id': widget.activityId}),
-          );
-      _observableMessageQuery.startPolling(Duration(seconds: 5));
-      messageStream = _observableMessageQuery.stream.listen((result) {
-        if (!result.isLoading && result.data != null) {
-          if (mounted) {
-            setState(() {
-              _messages = (result.data['activity']['messageConnections']
-                      as List<dynamic>)
-                  .map((json) {
-                final currentMessage = Message.fromJson(json);
-                currentMessage.isSender =
-                    context.read<AppUser>().profile == currentMessage.sender;
-                return currentMessage;
-              }).toList();
-              _messages.sort((first, second) =>
-                  second.timestamp.compareTo(first.timestamp));
-            });
-          }
-        }
-      }, onError: (error, stack) => print(error));
-      _observableMessageQuery.fetchResults();
-    }
-    var body = Column(
-      children: [
-        Expanded(
-          child: GestureDetector(
-            // onVerticalDragDown: (details) => dismissKeyboard(context),
-            onTap: () => dismissKeyboard(context),
-            child: ListView(
+    final messages = Expanded(
+      child: GestureDetector(
+        onTap: () => dismissKeyboard(context),
+        onVerticalDragStart: (details) => dismissKeyboard(context),
+        child: Query(
+          options: WatchQueryOptions(
+              pollInterval: Duration(seconds: 5),
+              document: gql(getMessagesQuery),
+              fetchPolicy: FetchPolicy.cacheAndNetwork,
+              variables: {'id': widget.activityId}),
+          builder: (result, {fetchMore, refetch}) {
+            _refetch = refetch;
+            if (result.hasException) {
+              return Text('Error');
+            }
+            final incomingMessages =
+                (result.data['activity']['messageConnections'] as List<dynamic>)
+                    .map((json) {
+              final currentMessage = Message.fromJson(json);
+              currentMessage.isSender =
+                  context.read<AppUser>().profile == currentMessage.sender;
+              return currentMessage;
+            }).toList();
+
+            incomingMessages.sort(
+                (first, second) => second.timestamp.compareTo(first.timestamp));
+            return ListView(
               padding: EdgeInsets.only(top: 10),
               reverse: true,
               children: [
-                ..._messages.map(
+                ..._outgoingMessages.map((pair) {
+                  return FutureBuilder(
+                      future: pair['future'],
+                      builder: (context, snap) {
+                        print('Building');
+                        if (snap.connectionState == ConnectionState.done) {
+                          final result = (snap.data as QueryResult);
+                          if (result.hasException) {
+                            print(result.exception.toString());
+                            return const SizedBox();
+                          }
+                          final message =
+                              Message.fromJson(result.data['createMessage']);
+                          if (incomingMessages.contains(message)) {
+                            _outgoingMessages.remove(pair);
+                            return const SizedBox();
+                          }
+                        }
+                        return Stack(
+                          children: [
+                            ChatBubble(
+                              alignment: Alignment.bottomRight,
+                              backGroundColor: Colors.blue,
+                              clipper: ChatBubbleClipper6(
+                                  type: BubbleType.sendBubble),
+                              child: Container(
+                                constraints: BoxConstraints(
+                                  maxWidth:
+                                      MediaQuery.of(context).size.width * 0.7,
+                                ),
+                                child: Text(
+                                  pair['message'] as String,
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: const SizedBox(
+                                width: 30,
+                                height: 30,
+                                child: CircularProgressIndicator(),
+                              ),
+                            )
+                          ],
+                        );
+                      });
+                }),
+                ...incomingMessages.map(
                   (m) => Container(
                     key: Key(m.hashCode.toString()),
                     child: ChatBubble(
@@ -151,23 +185,32 @@ class _ChatPageState extends State<ChatPage> {
                           : Alignment.bottomLeft,
                       backGroundColor:
                           m.isSender ? Colors.blue : Colors.blueGrey[100],
-                      child: Container(
-                        child: Text(m.message),
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.7,
-                        ),
-                      ),
                       clipper: ChatBubbleClipper6(
                           type: m.isSender
                               ? BubbleType.sendBubble
                               : BubbleType.receiverBubble),
+                      child: Container(
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.7,
+                        ),
+                        child: Text(
+                          m.message,
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ],
-            ),
-          ),
+            );
+          },
         ),
+      ),
+    );
+
+    var body = Column(
+      children: [
+        messages,
         Container(
           height: _messageInputHeight,
           color: Colors.blueGrey[100],
@@ -178,12 +221,14 @@ class _ChatPageState extends State<ChatPage> {
                 Expanded(
                   flex: 20,
                   child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.white),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: Form(
                         key: _formKey,
                         child: TextFormField(
-                          focusNode: _focusNode,
                           onSaved: (message) async {
                             await sendMessage(context, message);
                           },
@@ -206,9 +251,6 @@ class _ChatPageState extends State<ChatPage> {
                         ),
                       ),
                     ),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.white),
                   ),
                 ),
                 if (!_messageIsEmpty)

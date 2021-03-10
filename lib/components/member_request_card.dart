@@ -68,7 +68,7 @@ class _MemberRequestCardState extends State<MemberRequestCard> {
                 ShapeDecoration(shape: CircleBorder(), color: Colors.green),
             child: IconButton(
               icon: Icon(Icons.check),
-              onPressed: () {},
+              onPressed: () => widget.callback(true),
             ),
           ),
           const SizedBox(
@@ -79,7 +79,7 @@ class _MemberRequestCardState extends State<MemberRequestCard> {
                 ShapeDecoration(shape: CircleBorder(), color: Colors.red),
             child: IconButton(
               icon: Icon(Icons.close),
-              onPressed: () {},
+              onPressed: () => widget.callback(false),
             ),
           )
         ],

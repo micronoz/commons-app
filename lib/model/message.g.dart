@@ -14,6 +14,7 @@ Message _$MessageFromJson(Map<String, dynamic> json) {
     activity: json['activity'] == null
         ? null
         : Activity.fromJson(json['activity'] as Map<String, dynamic>),
+    id: json['id'] as String,
   )..isSender = json['isSender'] as bool;
 }
 
@@ -22,5 +23,6 @@ Map<String, dynamic> _$MessageToJson(Message instance) => <String, dynamic>{
       'createdAt': Message._dateTimeToJson(instance.timestamp),
       'sender': instance.sender,
       'activity': instance.activity,
+      'id': instance.id,
       'isSender': instance.isSender,
     };
