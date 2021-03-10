@@ -55,7 +55,7 @@ class _ExperiencesPageState extends State<ExperiencesPage> {
             fetchResults: true,
             eagerlyFetchResults: true,
             document: gql(getMyActivitiesQuery),
-            fetchPolicy: FetchPolicy.cacheFirst,
+            fetchPolicy: FetchPolicy.cacheAndNetwork,
           ),
           builder: (QueryResult result, {fetchMore, refetch}) {
             if (result.isLoading && !result.isConcrete) {
