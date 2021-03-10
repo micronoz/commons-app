@@ -20,9 +20,10 @@ class Message {
   final UserProfile sender;
   @JsonKey(nullable: true)
   final Activity activity;
+  final String id;
   bool isSender;
 
-  Message({this.message, this.timestamp, this.sender, this.activity});
+  Message({this.message, this.timestamp, this.sender, this.activity, this.id});
 
   factory Message.fromJson(Map<String, dynamic> json) =>
       _$MessageFromJson(json);
@@ -41,12 +42,22 @@ class Message {
 
   static DateTime _dateTimeFromJson(String json) {
     if (json == null) return null;
-
-    print(json);
     return DateTime.fromMillisecondsSinceEpoch(int.parse(json), isUtc: true);
   }
 
   static String _dateTimeToJson(DateTime dateTime) {
     return dateTime.toIso8601String();
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (other is Message) {
+      return (id == other.id);
+    } else {
+      return false;
+    }
+  }
+
+  @override
+  int get hashCode => id.hashCode;
 }

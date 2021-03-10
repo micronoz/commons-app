@@ -25,7 +25,13 @@ class Activity {
       toJson: _dateTimeToJson)
   final DateTime dateTime;
   @JsonKey(defaultValue: {}, name: 'userConnections')
-  final Set<UserActivity> attendees;
+  final Set<UserActivity> attendeeConnections;
+  Set<UserProfile> _attendeeSet;
+  Set<UserProfile> get attendees {
+    _attendeeSet ??= attendeeConnections?.map((e) => e.user)?.toSet();
+    return _attendeeSet;
+  }
+
   final UserProfile organizer;
 
   Activity(
@@ -38,7 +44,7 @@ class Activity {
     this.discoveryCoordinates,
     this.eventCoordinates,
     this.dateTime,
-    this.attendees,
+    this.attendeeConnections,
     this.organizer,
   );
 
@@ -50,11 +56,11 @@ class Activity {
   static Position _locationFromJson(Map<String, dynamic> json) {
     if (json == null) return null;
     return Position(
-        longitude: (json['x']).toDouble(), latitude: (json['y']).toDouble());
+        longitude: json['x']?.toDouble(), latitude: json['y']?.toDouble());
   }
 
   static Map<String, double> _locationToJson(Position location) {
-    return {'x': location.latitude, 'y': location.longitude};
+    return {'x': location?.latitude, 'y': location?.longitude};
   }
 
   static DateTime _dateTimeFromJson(String json) {
@@ -63,7 +69,7 @@ class Activity {
   }
 
   static String _dateTimeToJson(DateTime dateTime) {
-    return dateTime.toIso8601String();
+    return dateTime?.toIso8601String();
   }
 
   static Activity getDefault() {

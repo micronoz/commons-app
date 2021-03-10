@@ -43,25 +43,71 @@ class ExperiencesPage extends StatefulWidget {
 }
 
 class _ExperiencesPageState extends State<ExperiencesPage> {
-  var registered = false;
-  var refetch;
   ActivityManager activityManager;
 
   @override
-  void dispose() {
-    super.dispose();
-    activityManager.removeListener(refetch);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    activityManager = context.read<ActivityManager>();
-    if (!registered && refetch != null) {
-      context.read<ActivityManager>().addListener(refetch);
-      registered = true;
-    }
     return Consumer<ActivityManager>(builder: (context, manager, child) {
-      print('Rebuilding activities page');
+      final key = UniqueKey();
+      var queryBody = Query(
+          key: key,
+          options: WatchQueryOptions(
+            fetchResults: true,
+            eagerlyFetchResults: true,
+            document: gql(getMyActivitiesQuery),
+            fetchPolicy: FetchPolicy.cacheAndNetwork,
+          ),
+          builder: (QueryResult result, {fetchMore, refetch}) {
+            if (result.isLoading && !result.isConcrete) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+
+            final activities =
+                (result.data['user']['activityConnections'] as List<dynamic>)
+                    .map((a) => Activity.fromJson(a['activity']));
+            return ListView(
+              children: [
+                Container(
+                  child: Align(
+                    heightFactor: 1.5,
+                    child: RaisedButton(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18.0),
+                      ),
+                      color: Colors.blue[400],
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => DiscoverPage()));
+                      },
+                      child: Text(
+                        'Discover Events',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+                Text(
+                  'I\'m hosting',
+                  style: Theme.of(context).textTheme.headline1,
+                  textScaleFactor: 0.4,
+                ),
+                ...activities.map((a) => EventCardSmall(a)),
+                Text(
+                  'I\'m attending',
+                  style: Theme.of(context).textTheme.headline1,
+                  textScaleFactor: 0.4,
+                ),
+                Text(
+                  'Past',
+                  style: Theme.of(context).textTheme.headline1,
+                  textScaleFactor: 0.4,
+                ),
+              ],
+            );
+          });
+
       return Scaffold(
           appBar: AppBar(
             actions: [
@@ -72,66 +118,7 @@ class _ExperiencesPageState extends State<ExperiencesPage> {
             ],
             title: Text('Experiences'),
           ),
-          body: Query(
-              key: Key('activitiesQuery'),
-              options: WatchQueryOptions(
-                fetchResults: true,
-                eagerlyFetchResults: true,
-                document: gql(getMyActivitiesQuery),
-                cacheRereadPolicy: CacheRereadPolicy.ignoreAll,
-                fetchPolicy: FetchPolicy.cacheAndNetwork,
-              ),
-              builder: (QueryResult result, {fetchMore, refetch}) {
-                if (result.isLoading && !result.isConcrete) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                refetch = refetch;
-
-                final activities = (result.data['user']['activityConnections']
-                        as List<dynamic>)
-                    .map((a) => Activity.fromJson(a['activity']));
-                return ListView(
-                  children: [
-                    Container(
-                      child: Align(
-                        heightFactor: 1.5,
-                        child: RaisedButton(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18.0),
-                          ),
-                          color: Colors.blue[400],
-                          onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => DiscoverPage()));
-                          },
-                          child: Text(
-                            'Discover Events',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Text(
-                      'I\'m hosting',
-                      style: Theme.of(context).textTheme.headline1,
-                      textScaleFactor: 0.4,
-                    ),
-                    ...activities.map((a) => EventCardSmall(a)),
-                    Text(
-                      'I\'m attending',
-                      style: Theme.of(context).textTheme.headline1,
-                      textScaleFactor: 0.4,
-                    ),
-                    Text(
-                      'Past',
-                      style: Theme.of(context).textTheme.headline1,
-                      textScaleFactor: 0.4,
-                    ),
-                  ],
-                );
-              }));
+          body: queryBody);
     });
   }
 }

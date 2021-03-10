@@ -9,6 +9,7 @@ import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/model/activity_attendance_status.dart';
 import 'package:tribal_instinct/model/activity_types.dart';
 import 'package:tribal_instinct/model/app_user.dart';
+import 'package:tribal_instinct/pages/activities/manage_activity.dart';
 import 'package:tribal_instinct/pages/chat.dart';
 
 final getActivityQuery = '''
@@ -23,6 +24,7 @@ final getActivityQuery = '''
       mediumType
       eventDateTime
       userConnections{
+        attendanceStatus
         user {
           id
           fullName
@@ -57,7 +59,7 @@ final requestToJoinActivity = r'''
 
 class ActivityDetailPage extends StatefulWidget {
   final String activityId;
-  ActivityDetailPage(this.activityId);
+  ActivityDetailPage(this.activityId) : super();
   @override
   _ActivityDetailPageState createState() => _ActivityDetailPageState();
 }
@@ -68,6 +70,8 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
 
   var _absorbing = false;
   var _success = false;
+  var _failure = false;
+  var _refetch;
 
   var _tabIndex = 0;
 
@@ -79,38 +83,42 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
     Tab(icon: Icon(Icons.details), text: 'Details'),
   ];
 
-  void joinEvent(id) {
+//TODO use locking to prevent race conditions
+  Future joinEvent(BuildContext context) async {
+    final result = await GraphQLProvider.of(context).value.mutate(
+        MutationOptions(
+            document: gql(requestToJoinActivity),
+            variables: {'id': widget.activityId}));
+    await _refetch();
+    setState(() {
+      _absorbing = true;
+      if (!result.hasException) {
+        _success = true;
+      } else {
+        _failure = true;
+      }
+    });
     Timer(timeout, () {
       setState(() {
         _absorbing = false;
         _success = false;
+        _failure = false;
       });
-    });
-
-    setState(() {
-      _absorbing = true;
-      _success = true;
     });
   }
 
-  // void invite(BuildContext context) {
-  //   Navigator.of(context).push(
-  //       MaterialPageRoute(builder: (context) => InvitePage(widget.activity)));
-  // }
-
   @override
   Widget build(BuildContext context) {
-    print('Activity id: ${widget.activityId}');
     return Query(
-      options: QueryOptions(
-        document: gql(getActivityQuery),
-        pollInterval: Duration(minutes: 1),
-        variables: {'id': widget.activityId},
-      ),
+      options: WatchQueryOptions(
+          document: gql(getActivityQuery),
+          pollInterval: Duration(minutes: 1),
+          variables: {'id': widget.activityId},
+          fetchPolicy: FetchPolicy.cacheAndNetwork),
       builder: (result, {refetch, fetchMore}) {
+        _refetch = refetch;
         if (result.hasException) {
-          print('Activity Detail page query exception:');
-          print(result.exception);
+          print('ActivityDetailPage query exception: ${result.exception}');
         }
         if (result.isLoading || result.data == null) {
           return Scaffold(
@@ -120,7 +128,6 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
           );
         }
         final activity = Activity.fromJson(result.data['activity']);
-
         final currentUser = AppUser.of(context);
         var tabBar = TabBar(
           tabs: tabs,
@@ -135,19 +142,59 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
           }),
         );
         currentUser.hydrate();
-
         ActivityAttendanceStatus attendanceStatus;
         if (activity.attendees.contains(currentUser.profile)) {
-          final userActivity = activity.attendees
+          final userActivity = activity.attendeeConnections
               .firstWhere((element) => element.user == currentUser.profile);
           attendanceStatus = ActivityAttendanceStatus
               .values[userActivity.attendanceStatus + 1];
         } else {
           attendanceStatus = ActivityAttendanceStatus.not_requested;
         }
-        final isAttending = attendanceStatus == ActivityAttendanceStatus.joined;
         final isAdmin = currentUser.profile == activity.organizer;
+        var isAttending = attendanceStatus == ActivityAttendanceStatus.joined;
 
+        FloatingActionButton floatingActionButton;
+        if (attendanceStatus == ActivityAttendanceStatus.requested) {
+          floatingActionButton = FloatingActionButton.extended(
+            backgroundColor: Colors.grey,
+            onPressed: null,
+            label: Text(
+              'Already requested to join',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+            ),
+          );
+        } else if (attendanceStatus == ActivityAttendanceStatus.rejected) {
+          floatingActionButton = FloatingActionButton.extended(
+            icon: Icon(
+              Icons.warning,
+              color: Colors.white,
+            ),
+            backgroundColor: Colors.red,
+            label: Text(
+              'Rejected from this activity',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+            ),
+          );
+        } else if (attendanceStatus == ActivityAttendanceStatus.joined) {
+        } else {
+          floatingActionButton = FloatingActionButton.extended(
+            backgroundColor: Colors.green,
+            onPressed: () async {
+              await joinEvent(context);
+            },
+            label: Text(
+              'Sign up for this Activity',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+            ),
+          );
+        }
+
+        // print(
+        //     'isAttending: $isAttending, isAdmin: $isAdmin, requested: $isAwaitingApproval');
         return WillPopScope(
           onWillPop: () async => !_absorbing,
           child: AbsorbPointer(
@@ -157,29 +204,56 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                 Scaffold(
                   floatingActionButtonLocation:
                       FloatingActionButtonLocation.centerFloat,
-                  floatingActionButton: isAttending
-                      ? null
-                      : FloatingActionButton.extended(
-                          backgroundColor: Colors.green,
-                          onPressed: () {
-                            joinEvent(activity.id);
-                          },
-                          label: Text(
-                            'Sign up for this Activity',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w900),
-                          ),
-                        ),
+                  floatingActionButton: floatingActionButton,
                   appBar: AppBar(
+                    actions: [
+                      if (isAdmin)
+                        TextButtonTheme(
+                          data: TextButtonThemeData(
+                              style: TextButton.styleFrom(
+                            primary: Colors.black,
+                          )),
+                          child: TextButton(
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) =>
+                                        ManageActivityPage(widget.activityId)));
+                              },
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                      width: 25,
+                                      height: 25,
+                                      decoration: ShapeDecoration(
+                                          shape: CircleBorder(),
+                                          color: Colors.red),
+                                      child: Center(
+                                          child: Text(
+                                        '1',
+                                        style: TextStyle(color: Colors.white),
+                                      )),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Icon(Icons.edit),
+                                  ),
+                                ],
+                              )),
+                        )
+                    ],
                     title: Text('Activity details'),
                     bottom: isAttending
                         ? PreferredSize(
                             preferredSize: tabBar.preferredSize,
                             child: DefaultTabController(
-                              child: tabBar,
                               length: 2,
                               initialIndex: _tabIndex,
+                              child: tabBar,
                             ),
                           )
                         : null,
@@ -245,16 +319,15 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                                     spacing: 35,
                                     children: [
                                       ...activity.attendees.map(
-                                        (userActivity) {
+                                        (user) {
                                           return Column(
                                             children: [
                                               CircleAvatar(
                                                   backgroundColor:
                                                       Colors.blueGrey,
                                                   maxRadius: 35,
-                                                  backgroundImage:
-                                                      userActivity.user.photo),
-                                              Text(userActivity.user.name)
+                                                  backgroundImage: user.photo),
+                                              Text(user.name)
                                             ],
                                           );
                                         },
