@@ -12,10 +12,6 @@ class MemberRequestCard extends StatefulWidget {
 }
 
 class _MemberRequestCardState extends State<MemberRequestCard> {
-  void accept() {}
-
-  void reject() {}
-
   @override
   Widget build(BuildContext context) {
     return Container(
