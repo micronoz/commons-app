@@ -16,13 +16,7 @@ class UserProfile {
 
   UserProfile(
       this.id, this.name, this.handle, this.description, this.photoUrl) {
-    if (photo != null) {
-      photo = NetworkImage(
-        photoUrl,
-      );
-    } else {
-      photo = NetworkImage('https://picsum.photos/250?image=11');
-    }
+    photo = NetworkImage(photoUrl ?? 'https://picsum.photos/250?image=11');
   }
 
   factory UserProfile.fromJson(Map<String, dynamic> json) =>

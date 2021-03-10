@@ -60,7 +60,7 @@ class _AppState extends State<App> {
           var authLink = AuthLink(
             getToken: () async {
               final token = await widget.userManager.getIdToken();
-              return 'Bearer ${token}';
+              return 'Bearer $token';
             },
           );
 
