@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:tribal_instinct/managers/user_manager.dart';
+import 'package:tribal_instinct/managers/location_manager.dart';
+import 'package:tribal_instinct/model/activity_types.dart';
 import 'package:tribal_instinct/pages/discover/discover_category.dart';
 import 'package:provider/provider.dart';
 
@@ -28,22 +29,23 @@ class DiscoverPage extends StatefulWidget {
   final String discoverInPersonActivitiesQuery = '''
   query DiscoverInPersonActivities (\$discoveryCoordinates: LocationInput!, \$radiusInKilometers: Float!){
     discoverInPersonActivities(discoveryCoordinates: \$discoveryCoordinates, radiusInKilometers: \$radiusInKilometers) {
-    ... on InPersonActivity {
-      physicalAddress
-      discoveryCoordinates {
-        x
-        y
-      }
-    }
-      id
-      title
-      description
-      organizer {
-        handle
+      activity{
+        physicalAddress
+        discoveryCoordinates {
+          x
+          y
+        }
         id
+        title
+        description
+        organizer {
+          handle
+          id
+        }
+        mediumType
+        eventDateTime
       }
-      mediumType
-      eventDateTime
+      distance
     }
   }
 ''';
@@ -69,7 +71,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
   Widget build(BuildContext context) {
     final currentPosition = context.watch<Position>();
     if (currentPosition == null) {
-      UserManager.of(context).updateCurrentLocation();
+      LocationManager.of(context).updateLocation();
     }
     return DefaultTabController(
       length: 2,
@@ -84,8 +86,12 @@ class _DiscoverPageState extends State<DiscoverPage> {
           ),
           body: TabBarView(
             children: [
-              DiscoverCategoryPage(widget.discoverOnlineActivitiesQuery, {},
-                  'discoverOnlineActivities', _onlineCategoryNames),
+              DiscoverCategoryPage(
+                  widget.discoverOnlineActivitiesQuery,
+                  {},
+                  'discoverOnlineActivities',
+                  _onlineCategoryNames,
+                  ActivityMedium.online),
               (currentPosition != null)
                   ? DiscoverCategoryPage(
                       widget.discoverInPersonActivitiesQuery,
@@ -94,10 +100,11 @@ class _DiscoverPageState extends State<DiscoverPage> {
                           'xLocation': currentPosition.longitude,
                           'yLocation': currentPosition.latitude,
                         },
-                        'radiusInKilometers': 10,
+                        'radiusInKilometers': 1,
                       },
                       'discoverInPersonActivities',
-                      _inPersonCategoryNames)
+                      _inPersonCategoryNames,
+                      ActivityMedium.in_person)
                   : Text(
                       'Please enable location services to discover in person activities.'),
             ],
