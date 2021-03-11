@@ -111,8 +111,6 @@ class _ChatPageState extends State<ChatPage> {
               variables: {'id': widget.activityId}),
           builder: (result, {fetchMore, refetch}) {
             _refetch = refetch;
-            // print(
-            //     '${result.isConcrete}, ${result.isLoading}, ${result.isNotLoading}, ${result.isOptimistic}');
             if (result.hasException) {
               return Text('Error');
             }

@@ -98,10 +98,9 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
     setState(() {
       _loading = true;
     });
-    final result = await GraphQLProvider.of(context).value.mutate(
-        MutationOptions(
-            document: gql(requestToJoinActivity),
-            variables: {'id': widget.activityId}));
+    await GraphQLProvider.of(context).value.mutate(MutationOptions(
+        document: gql(requestToJoinActivity),
+        variables: {'id': widget.activityId}));
     await _refetch();
     setState(() {
       _loading = false;
@@ -110,17 +109,11 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
 
   Future removeUser(BuildContext context, String userId) async {
     final client = GraphQLProvider.of(context).value;
-    await client.mutate(
-      MutationOptions(
-          document: gql(removeUserFromActivityMutation),
-          variables: {'userId': userId, 'activityId': widget.activityId},
-          onError: (error) => print(error.toString()),
-          onCompleted: (something) {
-            print('complete');
-            print(something);
-            _refetch();
-          }),
-    );
+    await client.mutate(MutationOptions(
+      document: gql(removeUserFromActivityMutation),
+      variables: {'userId': userId, 'activityId': widget.activityId},
+      onError: (error) => print(error.toString()),
+    ));
   }
 
   @override
