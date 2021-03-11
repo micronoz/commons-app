@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:tribal_instinct/model/user_profile.dart';
 
 class MemberRequestCard extends StatefulWidget {
-  MemberRequestCard(this.member, this.callback, {Key key}) : super(key: key);
+  MemberRequestCard(this.member, this.callback,
+      {Key key, this.isRejected = false})
+      : super(key: key);
 
+  final bool isRejected;
   final Function callback;
   final UserProfile member;
 
@@ -59,25 +62,36 @@ class _MemberRequestCardState extends State<MemberRequestCard> {
           const Spacer(
             flex: 2,
           ),
-          Container(
-            decoration:
-                ShapeDecoration(shape: CircleBorder(), color: Colors.green),
-            child: IconButton(
-              icon: Icon(Icons.check),
-              onPressed: () => widget.callback(true),
+          if (!widget.isRejected) ...[
+            Container(
+              decoration:
+                  ShapeDecoration(shape: CircleBorder(), color: Colors.green),
+              child: IconButton(
+                icon: Icon(Icons.check),
+                onPressed: () => widget.callback(true),
+              ),
             ),
-          ),
-          const SizedBox(
-            width: 10,
-          ),
-          Container(
-            decoration:
-                ShapeDecoration(shape: CircleBorder(), color: Colors.red),
-            child: IconButton(
-              icon: Icon(Icons.close),
-              onPressed: () => widget.callback(false),
+            const SizedBox(
+              width: 10,
             ),
-          )
+            Container(
+              decoration:
+                  ShapeDecoration(shape: CircleBorder(), color: Colors.red),
+              child: IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () => widget.callback(false),
+              ),
+            )
+          ] else
+            ElevatedButtonTheme(
+              data: ElevatedButtonThemeData(
+                  style: ElevatedButton.styleFrom(primary: Colors.green)),
+              child: ElevatedButton.icon(
+                label: Text('Invite back'),
+                icon: Icon(Icons.check),
+                onPressed: () => widget.callback(),
+              ),
+            ),
         ],
       ),
     );
