@@ -13,9 +13,9 @@ import 'package:tribal_instinct/model/app_user.dart';
 import 'package:tribal_instinct/pages/activities/manage_activity.dart';
 import 'package:tribal_instinct/pages/chat.dart';
 
-final getActivityQuery = '''
-  query GetActivity(\$id: String!) {
-    activity(id: \$id) {
+final getActivityQuery = r'''
+  query GetActivity($id: String!) {
+    activity(id: $id) {
       organizer {
         id
       }

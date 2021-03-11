@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:tribal_instinct/components/member_request_card.dart';
 import 'package:tribal_instinct/model/activity.dart';
+import 'package:tribal_instinct/model/activity_attendance_status.dart';
 
 final getActivityRequestsQuery = r'''
   query GetActivityRequests($id: String!, $status: Int) {
@@ -25,11 +26,6 @@ final acceptActivityRequestMutation = r'''
     acceptJoinRequest(userId: $userId, activityId: $activityId) {
       id
       attendanceStatus
-      user {
-        id
-        fullName
-        handle
-      }
     }
   }
 ''';
@@ -39,11 +35,6 @@ final rejectActivityRequestMutation = r'''
     rejectJoinRequest(userId: $userId, activityId: $activityId) {
       id
       attendanceStatus
-      user {
-        id
-        fullName
-        handle
-      }
     }
   }
 ''';
@@ -57,8 +48,6 @@ class ActivityJoinRequestsPage extends StatefulWidget {
 }
 
 class _ActivityJoinRequestsPageState extends State<ActivityJoinRequestsPage> {
-  Function _refetchA;
-  Function _refetchB;
   Future setStatus(BuildContext context, String userId, String mutation) async {
     final client = GraphQLProvider.of(context).value;
     await client.mutate(
@@ -67,10 +56,7 @@ class _ActivityJoinRequestsPageState extends State<ActivityJoinRequestsPage> {
           document: gql(mutation),
           variables: {'userId': userId, 'activityId': widget.activityId},
           onError: (error) => print(error.toString()),
-          onCompleted: (something) {
-            _refetchA();
-            _refetchB();
-          }),
+          fetchPolicy: FetchPolicy.cacheAndNetwork),
     );
   }
 
@@ -83,32 +69,36 @@ class _ActivityJoinRequestsPageState extends State<ActivityJoinRequestsPage> {
           style: Theme.of(context).textTheme.headline5,
         ),
         Query(
+            key: Key('Requests'),
             options: WatchQueryOptions(
+                cacheRereadPolicy: CacheRereadPolicy.mergeOptimistic,
                 document: gql(getActivityRequestsQuery),
                 variables: {'id': widget.activityId, 'status': 0},
                 fetchPolicy: FetchPolicy.cacheAndNetwork),
             builder: (result, {fetchMore, refetch}) {
-              _refetchA = refetch;
               if (result.hasException) {
                 print(
                     'Exception has occurred in ManageActivityPage: ${result.exception}');
               }
               if (result.isConcrete) {
                 final activity = Activity.fromJson(result.data['activity']);
-
-                if (activity.attendees.isNotEmpty) {
+                final children = activity.attendeeConnections
+                    .where((ua) =>
+                        ua.attendanceStatus + 1 ==
+                        ActivityAttendanceStatus.requested.index)
+                    .map((ua) => MemberRequestCard(ua.user, (bool accept) {
+                          if (accept) {
+                            setStatus(context, ua.user.id,
+                                acceptActivityRequestMutation);
+                          } else {
+                            setStatus(context, ua.user.id,
+                                rejectActivityRequestMutation);
+                          }
+                        }))
+                    .toList();
+                if (children.isNotEmpty) {
                   return Column(
-                    children: activity.attendees
-                        .map((user) => MemberRequestCard(user, (bool accept) {
-                              if (accept) {
-                                setStatus(context, user.id,
-                                    acceptActivityRequestMutation);
-                              } else {
-                                setStatus(context, user.id,
-                                    rejectActivityRequestMutation);
-                              }
-                            }))
-                        .toList(),
+                    children: children,
                   );
                 } else {
                   return Center(
@@ -128,31 +118,36 @@ class _ActivityJoinRequestsPageState extends State<ActivityJoinRequestsPage> {
           style: Theme.of(context).textTheme.headline5,
         ),
         Query(
+            key: Key('Rejected'),
             options: WatchQueryOptions(
+                cacheRereadPolicy: CacheRereadPolicy.mergeOptimistic,
                 document: gql(getActivityRequestsQuery),
                 variables: {'id': widget.activityId, 'status': 2},
                 fetchPolicy: FetchPolicy.cacheAndNetwork),
             builder: (result, {fetchMore, refetch}) {
-              _refetchB = refetch;
               if (result.hasException) {
                 print(
                     'Exception has occurred in ManageActivityPage: ${result.exception}');
               }
               if (result.isConcrete) {
                 final activity = Activity.fromJson(result.data['activity']);
-                if (activity.attendees.isNotEmpty) {
-                  return Column(
-                    children: activity.attendees
-                        .map((user) => MemberRequestCard(
-                              user,
-                              () {
-                                setStatus(context, user.id,
-                                    acceptActivityRequestMutation);
-                              },
-                              isRejected: true,
-                            ))
-                        .toList(),
-                  );
+                final children = activity.attendeeConnections
+                    .where((ua) =>
+                        ua.attendanceStatus + 1 ==
+                        ActivityAttendanceStatus.rejected.index)
+                    .map(
+                      (ua) => MemberRequestCard(
+                        ua.user,
+                        () {
+                          setStatus(context, ua.user.id,
+                              acceptActivityRequestMutation);
+                        },
+                        isRejected: true,
+                      ),
+                    )
+                    .toList();
+                if (children.isNotEmpty) {
+                  return Column(children: children);
                 } else {
                   return Center(
                     child: Text(
