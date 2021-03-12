@@ -58,7 +58,8 @@ class _ChatPageState extends State<ChatPage> {
   final _messageInputHeight = 100.0;
   final _formKey = GlobalKey<FormState>();
   var _messageIsEmpty = true;
-  var _outgoingMessages = <Map<String, dynamic>>[];
+  final _outgoingMessages = <Map<String, dynamic>>[];
+  var _incomingMessages = [];
   Function _refetch;
 
   void sendMessage(BuildContext context, String content) async {
@@ -113,17 +114,24 @@ class _ChatPageState extends State<ChatPage> {
             if (result.hasException) {
               return Text('Error');
             }
-            final incomingMessages =
-                (result.data['activity']['messageConnections'] as List<dynamic>)
-                    .map((json) {
-              final currentMessage = Message.fromJson(json);
-              currentMessage.isSender =
-                  context.read<AppUser>().profile == currentMessage.sender;
-              return currentMessage;
-            }).toList();
+            if (!result.isConcrete && _incomingMessages.isEmpty) {
+              return Center(
+                child: CircularProgressIndicator.adaptive(),
+              );
+            } else if (result.isConcrete) {
+              final incomingMessages = (result.data['activity']
+                      ['messageConnections'] as List<dynamic>)
+                  .map((json) {
+                final currentMessage = Message.fromJson(json);
+                currentMessage.isSender =
+                    context.read<AppUser>().profile == currentMessage.sender;
+                return currentMessage;
+              }).toList();
+              incomingMessages.sort((first, second) =>
+                  second.timestamp.compareTo(first.timestamp));
+              _incomingMessages = incomingMessages;
+            }
 
-            incomingMessages.sort(
-                (first, second) => second.timestamp.compareTo(first.timestamp));
             return ListView(
               padding: EdgeInsets.only(top: 10),
               reverse: true,
@@ -132,7 +140,6 @@ class _ChatPageState extends State<ChatPage> {
                   return FutureBuilder(
                       future: pair['future'],
                       builder: (context, snap) {
-                        print('Building');
                         if (snap.connectionState == ConnectionState.done) {
                           final result = (snap.data as QueryResult);
                           if (result.hasException) {
@@ -141,7 +148,7 @@ class _ChatPageState extends State<ChatPage> {
                           }
                           final message =
                               Message.fromJson(result.data['createMessage']);
-                          if (incomingMessages.contains(message)) {
+                          if (_incomingMessages.contains(message)) {
                             _outgoingMessages.remove(pair);
                             return const SizedBox();
                           }
@@ -176,7 +183,7 @@ class _ChatPageState extends State<ChatPage> {
                         );
                       });
                 }),
-                ...incomingMessages.map(
+                ..._incomingMessages.map(
                   (m) => Container(
                     key: Key(m.hashCode.toString()),
                     child: ChatBubble(

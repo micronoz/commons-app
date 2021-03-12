@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -12,9 +13,9 @@ import 'package:tribal_instinct/model/app_user.dart';
 import 'package:tribal_instinct/pages/activities/manage_activity.dart';
 import 'package:tribal_instinct/pages/chat.dart';
 
-final getActivityQuery = '''
-  query GetActivity(\$id: String!) {
-    activity(id: \$id) {
+final getActivityQuery = r'''
+  query GetActivity($id: String!) {
+    activity(id: $id) {
       organizer {
         id
       }
@@ -24,6 +25,7 @@ final getActivityQuery = '''
       mediumType
       eventDateTime
       userConnections{
+        id
         attendanceStatus
         user {
           id
@@ -57,6 +59,15 @@ final requestToJoinActivity = r'''
   }
 ''';
 
+final removeUserFromActivityMutation = r'''
+  mutation RejectActivityRequest($userId: String!, $activityId: String!) {
+    rejectJoinRequest(userId: $userId, activityId: $activityId) {
+      id
+      attendanceStatus
+    }
+  }
+''';
+
 class ActivityDetailPage extends StatefulWidget {
   final String activityId;
   ActivityDetailPage(this.activityId) : super();
@@ -69,8 +80,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
   final timeout = const Duration(seconds: 1);
 
   var _absorbing = false;
-  var _success = false;
-  var _failure = false;
+  var _loading = false;
   var _refetch;
 
   var _tabIndex = 0;
@@ -85,32 +95,33 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
 
 //TODO use locking to prevent race conditions
   Future joinEvent(BuildContext context) async {
-    final result = await GraphQLProvider.of(context).value.mutate(
-        MutationOptions(
-            document: gql(requestToJoinActivity),
-            variables: {'id': widget.activityId}));
+    setState(() {
+      _loading = true;
+    });
+    await GraphQLProvider.of(context).value.mutate(MutationOptions(
+        document: gql(requestToJoinActivity),
+        variables: {'id': widget.activityId}));
     await _refetch();
     setState(() {
-      _absorbing = true;
-      if (!result.hasException) {
-        _success = true;
-      } else {
-        _failure = true;
-      }
+      _loading = false;
     });
-    Timer(timeout, () {
-      setState(() {
-        _absorbing = false;
-        _success = false;
-        _failure = false;
-      });
-    });
+  }
+
+  Future removeUser(BuildContext context, String userId) async {
+    final client = GraphQLProvider.of(context).value;
+    await client.mutate(MutationOptions(
+      document: gql(removeUserFromActivityMutation),
+      variables: {'userId': userId, 'activityId': widget.activityId},
+      onError: (error) => print(error.toString()),
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
     return Query(
+      key: Key('ActivityDetail'),
       options: WatchQueryOptions(
+          cacheRereadPolicy: CacheRereadPolicy.mergeOptimistic,
           document: gql(getActivityQuery),
           pollInterval: Duration(minutes: 1),
           variables: {'id': widget.activityId},
@@ -120,7 +131,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
         if (result.hasException) {
           print('ActivityDetailPage query exception: ${result.exception}');
         }
-        if (result.isLoading || result.data == null) {
+        if (!result.isConcrete || result.data == null) {
           return Scaffold(
             body: Center(
               child: CircularProgressIndicator(),
@@ -141,7 +152,6 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
             }
           }),
         );
-        currentUser.hydrate();
         ActivityAttendanceStatus attendanceStatus;
         if (activity.attendees.contains(currentUser.profile)) {
           final userActivity = activity.attendeeConnections
@@ -192,9 +202,14 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
             ),
           );
         }
-
-        // print(
-        //     'isAttending: $isAttending, isAdmin: $isAdmin, requested: $isAwaitingApproval');
+        var joinRequestCount = 0;
+        if (isAdmin) {
+          joinRequestCount = activity.attendeeConnections
+              .where((con) =>
+                  con.attendanceStatus + 1 ==
+                  ActivityAttendanceStatus.requested.index)
+              .length;
+        }
         return WillPopScope(
           onWillPop: () async => !_absorbing,
           child: AbsorbPointer(
@@ -223,21 +238,22 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Container(
-                                      width: 25,
-                                      height: 25,
-                                      decoration: ShapeDecoration(
-                                          shape: CircleBorder(),
-                                          color: Colors.red),
-                                      child: Center(
-                                          child: Text(
-                                        '1',
-                                        style: TextStyle(color: Colors.white),
-                                      )),
+                                  if (joinRequestCount > 0)
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        width: 25,
+                                        height: 25,
+                                        decoration: ShapeDecoration(
+                                            shape: CircleBorder(),
+                                            color: Colors.red),
+                                        child: Center(
+                                            child: Text(
+                                          joinRequestCount.toString(),
+                                          style: TextStyle(color: Colors.white),
+                                        )),
+                                      ),
                                     ),
-                                  ),
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Icon(Icons.edit),
@@ -318,15 +334,93 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                                     runSpacing: 10,
                                     spacing: 35,
                                     children: [
-                                      ...activity.attendees.map(
-                                        (user) {
+                                      ...activity.attendeeConnections
+                                          .where((ua) =>
+                                              ua.attendanceStatus + 1 ==
+                                              ActivityAttendanceStatus
+                                                  .joined.index)
+                                          .map(
+                                        (ua) {
+                                          final user = ua.user;
                                           return Column(
                                             children: [
-                                              CircleAvatar(
+                                              if (isAdmin)
+                                                Container(
+                                                  height: 100,
+                                                  width: 100,
+                                                  child: Stack(
+                                                    children: [
+                                                      Center(
+                                                        child: CircleAvatar(
+                                                          backgroundColor:
+                                                              Colors.blueGrey,
+                                                          maxRadius: 35,
+                                                          backgroundImage:
+                                                              user.photo,
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        alignment:
+                                                            Alignment.topRight,
+                                                        child: IconButton(
+                                                          iconSize: 25,
+                                                          icon: Container(
+                                                            height: 25,
+                                                            width: 25,
+                                                            decoration:
+                                                                ShapeDecoration(
+                                                              shape:
+                                                                  CircleBorder(),
+                                                              color: Colors
+                                                                  .blueGrey,
+                                                            ),
+                                                            child: Icon(
+                                                                Icons.close,
+                                                                color: Colors
+                                                                    .white),
+                                                          ),
+                                                          onPressed: () {
+                                                            showCupertinoDialog(
+                                                                barrierDismissible:
+                                                                    true,
+                                                                context:
+                                                                    context,
+                                                                builder:
+                                                                    (context) =>
+                                                                        AlertDialog(
+                                                                          title:
+                                                                              Text('Do you want to remove "${user.name}"?'),
+                                                                          actions: [
+                                                                            TextButton(
+                                                                              onPressed: () {
+                                                                                Navigator.of(context).pop();
+                                                                                removeUser(context, user.id);
+                                                                              },
+                                                                              child: Text('Yes', textScaleFactor: 1.4),
+                                                                            ),
+                                                                            TextButton(
+                                                                                onPressed: () {
+                                                                                  Navigator.of(context).pop();
+                                                                                },
+                                                                                child: Text(
+                                                                                  'No',
+                                                                                  textScaleFactor: 1.4,
+                                                                                ))
+                                                                          ],
+                                                                        ));
+                                                          },
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                )
+                                              else
+                                                CircleAvatar(
                                                   backgroundColor:
                                                       Colors.blueGrey,
                                                   maxRadius: 35,
-                                                  backgroundImage: user.photo),
+                                                  backgroundImage: user.photo,
+                                                ),
                                               Text(user.name)
                                             ],
                                           );
@@ -346,16 +440,12 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                     ],
                   ),
                 ),
-                if (_success)
+                if (_loading)
                   SafeArea(
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                       child: Center(
-                        child: Icon(
-                          Icons.check_circle,
-                          size: 100,
-                          color: Colors.green,
-                        ),
+                        child: CircularProgressIndicator.adaptive(),
                       ),
                     ),
                   ),

@@ -145,8 +145,7 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
               //TODO
             }
             context.read<ActivityManager>().addEvent();
-            Navigator.of(context).pop();
-            Navigator.of(context).push(MaterialPageRoute(
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
                 builder: (_) => ActivityDetailPage(activity)));
           } else {
             //TODO
