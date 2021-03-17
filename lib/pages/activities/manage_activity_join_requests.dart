@@ -39,15 +39,16 @@ final rejectActivityRequestMutation = r'''
   }
 ''';
 
-class ActivityJoinRequestsPage extends StatefulWidget {
+class ManageActivityJoinRequestsPage extends StatefulWidget {
   final String activityId;
-  ActivityJoinRequestsPage(this.activityId) : super();
+  ManageActivityJoinRequestsPage(this.activityId) : super();
   @override
-  _ActivityJoinRequestsPageState createState() =>
-      _ActivityJoinRequestsPageState();
+  _ManageActivityJoinRequestsPageState createState() =>
+      _ManageActivityJoinRequestsPageState();
 }
 
-class _ActivityJoinRequestsPageState extends State<ActivityJoinRequestsPage> {
+class _ManageActivityJoinRequestsPageState
+    extends State<ManageActivityJoinRequestsPage> {
   Future setStatus(BuildContext context, String userId, String mutation) async {
     final client = GraphQLProvider.of(context).value;
     await client.mutate(

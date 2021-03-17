@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:tribal_instinct/components/member_request_card.dart';
 import 'package:tribal_instinct/model/activity.dart';
-import 'package:tribal_instinct/pages/activities/activity_join_requests.dart';
+import 'package:tribal_instinct/pages/activities/manage_activity_join_requests.dart';
+import 'package:tribal_instinct/pages/activities/edit_activity.dart';
 
 class ManageActivityPage extends StatefulWidget {
   final String activityId;
@@ -53,7 +54,10 @@ class _ManageActivityPageState extends State<ManageActivityPage> {
       ),
       body: IndexedStack(
         index: _tabIndex,
-        children: [ActivityJoinRequestsPage(widget.activityId)],
+        children: [
+          ManageActivityJoinRequestsPage(widget.activityId),
+          EditActivityPage(widget.activityId)
+        ],
       ),
     );
   }

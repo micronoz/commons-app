@@ -130,6 +130,24 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
         _refetch = refetch;
         if (result.hasException) {
           print('ActivityDetailPage query exception: ${result.exception}');
+
+          Timer(Duration(seconds: 2), () async {
+            await showDialog(
+              barrierDismissible: false,
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text('An error has occured...'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('OK'),
+                  )
+                ],
+              ),
+            ).then((value) => Navigator.of(context).pop());
+          });
         }
         if (!result.isConcrete || result.data == null) {
           return Scaffold(
@@ -161,8 +179,10 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
         } else {
           attendanceStatus = ActivityAttendanceStatus.not_requested;
         }
-        final isAdmin = currentUser.profile == activity.organizer;
+
         var isAttending = attendanceStatus == ActivityAttendanceStatus.joined;
+        final isAdmin =
+            currentUser.profile == activity.organizer && isAttending;
 
         FloatingActionButton floatingActionButton;
         if (attendanceStatus == ActivityAttendanceStatus.requested) {
@@ -344,21 +364,23 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                                           final user = ua.user;
                                           return Column(
                                             children: [
-                                              if (isAdmin)
-                                                Container(
-                                                  height: 100,
-                                                  width: 100,
-                                                  child: Stack(
-                                                    children: [
-                                                      Center(
-                                                        child: CircleAvatar(
-                                                          backgroundColor:
-                                                              Colors.blueGrey,
-                                                          maxRadius: 35,
-                                                          backgroundImage:
-                                                              user.photo,
-                                                        ),
+                                              Container(
+                                                height: 100,
+                                                width: 100,
+                                                child: Stack(
+                                                  children: [
+                                                    Center(
+                                                      child: CircleAvatar(
+                                                        backgroundColor:
+                                                            Colors.blueGrey,
+                                                        maxRadius: 40,
+                                                        backgroundImage:
+                                                            user.photo,
                                                       ),
+                                                    ),
+                                                    if (isAdmin &&
+                                                        user !=
+                                                            currentUser.profile)
                                                       Container(
                                                         alignment:
                                                             Alignment.topRight,
@@ -381,46 +403,51 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                                                           ),
                                                           onPressed: () {
                                                             showCupertinoDialog(
-                                                                barrierDismissible:
-                                                                    true,
-                                                                context:
-                                                                    context,
-                                                                builder:
-                                                                    (context) =>
-                                                                        AlertDialog(
-                                                                          title:
-                                                                              Text('Do you want to remove "${user.name}"?'),
-                                                                          actions: [
-                                                                            TextButton(
-                                                                              onPressed: () {
-                                                                                Navigator.of(context).pop();
-                                                                                removeUser(context, user.id);
-                                                                              },
-                                                                              child: Text('Yes', textScaleFactor: 1.4),
-                                                                            ),
-                                                                            TextButton(
-                                                                                onPressed: () {
-                                                                                  Navigator.of(context).pop();
-                                                                                },
-                                                                                child: Text(
-                                                                                  'No',
-                                                                                  textScaleFactor: 1.4,
-                                                                                ))
-                                                                          ],
-                                                                        ));
+                                                              barrierDismissible:
+                                                                  true,
+                                                              context: context,
+                                                              builder:
+                                                                  (context) =>
+                                                                      AlertDialog(
+                                                                title: Text(
+                                                                    'Do you want to remove "${user.name}"?'),
+                                                                actions: [
+                                                                  TextButton(
+                                                                    onPressed:
+                                                                        () {
+                                                                      Navigator.of(
+                                                                              context)
+                                                                          .pop();
+                                                                      removeUser(
+                                                                          context,
+                                                                          user.id);
+                                                                    },
+                                                                    child: Text(
+                                                                        'Yes',
+                                                                        textScaleFactor:
+                                                                            1.4),
+                                                                  ),
+                                                                  TextButton(
+                                                                      onPressed:
+                                                                          () {
+                                                                        Navigator.of(context)
+                                                                            .pop();
+                                                                      },
+                                                                      child:
+                                                                          Text(
+                                                                        'No',
+                                                                        textScaleFactor:
+                                                                            1.4,
+                                                                      ))
+                                                                ],
+                                                              ),
+                                                            );
                                                           },
                                                         ),
                                                       )
-                                                    ],
-                                                  ),
-                                                )
-                                              else
-                                                CircleAvatar(
-                                                  backgroundColor:
-                                                      Colors.blueGrey,
-                                                  maxRadius: 35,
-                                                  backgroundImage: user.photo,
+                                                  ],
                                                 ),
+                                              ),
                                               Text(user.name)
                                             ],
                                           );

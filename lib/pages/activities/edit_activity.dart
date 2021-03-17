@@ -1,71 +1,92 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:intl/intl.dart';
-import 'package:tribal_instinct/components/question_switch.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:tribal_instinct/managers/activity_manager.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tribal_instinct/managers/location_manager.dart';
 
-import 'activity_detail.dart';
+class EditActivityPage extends StatefulWidget {
+  final String activityId;
+  EditActivityPage(this.activityId) : super();
 
-final createInPersonActivityMutation = '''
-  mutation CreateActivity(\$title: String!, \$description: String, \$organizerCoordinates: LocationInput!, \$physicalAddress: String, \$eventDateTime: DateTime) {
-    createInPersonActivity(title: \$title, description: \$description, organizerCoordinates: \$organizerCoordinates, physicalAddress: \$physicalAddress, eventDateTime: \$eventDateTime) {
-      id
-    }
-  }
-''';
-final createOnlineActivityMutation = '''
-  mutation CreateActivity(\$title: String!, \$description: String, \$eventUrl: String, \$eventDateTime: DateTime) {
-    createOnlineActivity(title: \$title, description: \$description, eventUrl: \$eventUrl, eventDateTime: \$eventDateTime) {
-      id
-    }
-  }
-''';
-
-class CreateActivityPage extends StatefulWidget {
   @override
-  _CreateActivityPageState createState() => _CreateActivityPageState();
+  _EditActivityPageState createState() => _EditActivityPageState();
 }
 
-class _CreateActivityPageState extends State<CreateActivityPage> {
-  void saveAndExit(
-      BuildContext context, RunMutation createEventMutation) async {
-    final _dateTime = _date?.toUtc()?.toIso8601String();
-    if (_isOnline) {
-      assert(_physicalAddress == null);
-      createEventMutation({
-        'title': _activityName,
-        'description': _desciption,
-        'eventUrl': _eventUrl,
-        'eventDateTime': _dateTime,
-      });
-    } else {
-      var currentPosition = Provider.of<Position>(context, listen: false);
-      // TODO: Put loading screen while waiting for this so that it is not
-      // double clicked
-      currentPosition ??= await LocationManager.of(context).updateLocation();
-      assert(_eventUrl == null);
-      createEventMutation({
-        'title': _activityName,
-        'description': _desciption,
-        'organizerCoordinates': {
-          'xLocation': currentPosition.longitude,
-          'yLocation': currentPosition.latitude,
-        },
-        'physicalAddress': _physicalAddress,
-        'eventUrl': _eventUrl,
-        'eventDateTime': _dateTime,
-      });
+final getActivityQuery = r'''
+  query GetActivity($id: String!) {
+    activity(id: $id) {
+      organizer {
+        id
+      }
+      id
+      title
+      description
+      mediumType
+      eventDateTime
+      userConnections{
+        id
+        attendanceStatus
+        user {
+          id
+          fullName
+        }
+      }
+      ... on InPersonActivity {
+        physicalAddress
+        discoveryCoordinates {
+          x
+          y
+        }
+        eventCoordinates{
+          x
+          y
+        }
+      }
+      ... on OnlineActivity {
+        eventUrl
+      }
     }
   }
+''';
 
+final updateInPersonActivityMutation = r'''
+  mutation UpdateInPersonActivity($title: String!, $description: String, $organizerCoordinates: LocationInput!, $physicalAddress: String, $eventDateTime: DateTime) {
+    updateInPersonActivity(title: $title, description: $description, organizerCoordinates: $organizerCoordinates, physicalAddress: $physicalAddress, eventDateTime: $eventDateTime) {
+      id
+      title
+      description
+      mediumType
+      eventDateTime
+      ... on InPersonActivity {
+        physicalAddress
+        discoveryCoordinates {
+          x
+          y
+        }
+        eventCoordinates{
+          x
+          y
+        }
+      }
+    }
+  }
+''';
+
+final updateOnlineActivityMutation = r'''
+  mutation UpdateOnlineActivity($title: String!, $description: String, $eventUrl: String, $eventDateTime: DateTime) {
+    updateOnlineActivity(title: $title, description: $description, eventUrl: $eventUrl, eventDateTime: $eventDateTime) {
+      id
+    }
+  }
+''';
+
+class _EditActivityPageState extends State<EditActivityPage> {
   static const maxInputSize = 255;
   static const emptyFieldError = 'You can not leave this field empty.';
   static const largeInputError =
-      'This field can not have more than than ${maxInputSize} characters.';
+      'This field can not have more than than $maxInputSize characters.';
 
   final _formKey = GlobalKey<FormState>();
   bool _edited = false;
@@ -122,14 +143,50 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
     );
   }
 
+  void saveAndExit(
+      BuildContext context, RunMutation createEventMutation) async {
+    final _dateTime = _date?.toUtc()?.toIso8601String();
+    if (_isOnline) {
+      assert(_physicalAddress == null);
+      createEventMutation({
+        'title': _activityName,
+        'description': _desciption,
+        'eventUrl': _eventUrl,
+        'eventDateTime': _dateTime,
+      });
+    } else {
+      var currentPosition = Provider.of<Position>(context, listen: false);
+      // TODO: Put loading screen while waiting for this so that it is not
+      // double clicked
+      currentPosition ??= await LocationManager.of(context).updateLocation();
+      assert(_eventUrl == null);
+      createEventMutation({
+        'title': _activityName,
+        'description': _desciption,
+        'organizerCoordinates': {
+          'xLocation': currentPosition.longitude,
+          'yLocation': currentPosition.latitude,
+        },
+        'physicalAddress': _physicalAddress,
+        'eventUrl': _eventUrl,
+        'eventDateTime': _dateTime,
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    GraphQLProvider.of(context).value.query(
+          QueryOptions(
+            document: gql(getActivityQuery),
+          ),
+        );
     return Mutation(
       options: MutationOptions(
         fetchPolicy: FetchPolicy.noCache,
         document: gql(_isOnline
-            ? createOnlineActivityMutation
-            : createInPersonActivityMutation),
+            ? updateOnlineActivityMutation
+            : updateInPersonActivityMutation),
         onCompleted: (dynamic resultData) {
           print('Create Activity mutation return:');
           print(resultData);
@@ -142,9 +199,6 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
             } else {
               //TODO
             }
-            context.read<ActivityManager>().addEvent();
-            Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (_) => ActivityDetailPage(activity)));
           } else {
             //TODO
           }
@@ -227,20 +281,10 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                   const SizedBox(
                     height: 20,
                   ),
-                  QuestionSwitch(
-                      question: 'Where will it be?',
-                      disabledOption: 'In-person',
-                      enabledOption: 'Online',
-                      callback: (val) {
-                        setState(() => _isOnline = val);
-                        if (val) {
-                          _eventUrl = _physicalAddress;
-                          _physicalAddress = null;
-                        } else {
-                          _physicalAddress = _eventUrl;
-                          _eventUrl = null;
-                        }
-                      }),
+                  Text(
+                    'Where will it be?',
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
                   TextFormField(
                     decoration: InputDecoration(
                         hintText: _isOnline
@@ -363,6 +407,7 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                                   ],
                                 ));
                       },
+                      color: Colors.red,
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -371,7 +416,6 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                           Icon(Icons.close)
                         ],
                       ),
-                      color: Colors.red,
                     ),
                   ),
                   const SizedBox(
