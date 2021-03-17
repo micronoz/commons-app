@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:tribal_instinct/model/activity.dart';
@@ -12,6 +13,7 @@ import 'package:tribal_instinct/model/activity_types.dart';
 import 'package:tribal_instinct/model/app_user.dart';
 import 'package:tribal_instinct/pages/activities/manage_activity.dart';
 import 'package:tribal_instinct/pages/chat.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 final getActivityQuery = r'''
   query GetActivity($id: String!) {
@@ -78,6 +80,7 @@ class ActivityDetailPage extends StatefulWidget {
 class _ActivityDetailPageState extends State<ActivityDetailPage> {
   final DateFormat _format = DateFormat.yMMMMEEEEd().add_jm();
   final timeout = const Duration(seconds: 1);
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   var _absorbing = false;
   var _loading = false;
@@ -197,6 +200,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
           );
         } else if (attendanceStatus == ActivityAttendanceStatus.rejected) {
           floatingActionButton = FloatingActionButton.extended(
+            onPressed: () {},
             icon: Icon(
               Icons.warning,
               color: Colors.white,
@@ -230,6 +234,9 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                   ActivityAttendanceStatus.requested.index)
               .length;
         }
+
+        final isOnline = activity.mediumType == ActivityMedium.online;
+
         return WillPopScope(
           onWillPop: () async => !_absorbing,
           child: AbsorbPointer(
@@ -237,6 +244,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
             child: Stack(
               children: [
                 Scaffold(
+                  key: _scaffoldKey,
                   floatingActionButtonLocation:
                       FloatingActionButtonLocation.centerFloat,
                   floatingActionButton: floatingActionButton,
@@ -308,17 +316,72 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                           ),
                           Text(
                             (activity.mediumType == ActivityMedium.in_person
-                                ? 'in-person' +
-                                    (activity.physicalAddress != null
-                                        ? ' at ' + activity.physicalAddress
-                                        : '')
-                                : 'online' +
-                                    (activity.eventUrl != null
-                                        ? ' at ' + activity.eventUrl
-                                        : '')),
+                                ? 'in-person'
+                                : 'online'),
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.bodyText1,
-                            textScaleFactor: 1.3,
+                            textScaleFactor: 1.5,
+                          ),
+                          Center(
+                            child: TextButton(
+                              onLongPress: () async {
+                                await Clipboard.setData(ClipboardData(
+                                    text: isOnline
+                                        ? activity.eventUrl
+                                        : activity.physicalAddress));
+                                final sheet = _scaffoldKey.currentState
+                                    .showBottomSheet<void>(
+                                        (context) => BottomSheet(
+                                            onClosing: () {},
+                                            builder: (context) => Container(
+                                                  width: MediaQuery.of(context)
+                                                      .size
+                                                      .width,
+                                                  height: 40,
+                                                  color: Colors.blueGrey[100],
+                                                  child: Center(
+                                                    child: Text(
+                                                      'Copied to cliboard',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodyText1
+                                                          .copyWith(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                    ),
+                                                  ),
+                                                )));
+
+                                Timer(Duration(seconds: 1, milliseconds: 500),
+                                    () => sheet.close());
+                              },
+                              child: Linkify(
+                                options: LinkifyOptions(looseUrl: true),
+                                textWidthBasis: TextWidthBasis.longestLine,
+                                // textAlign: TextAlign.center,
+                                text: (activity.mediumType ==
+                                        ActivityMedium.in_person
+                                    ? (activity.physicalAddress ?? '')
+                                    : (activity.eventUrl ?? '')),
+                                onOpen: (link) async {
+                                  print(link.url);
+                                  if (await canLaunch(link.url)) {
+                                    await launch(link.url);
+                                  } else {
+                                    throw 'Could not launch $link';
+                                  }
+                                },
+                                linkStyle: Theme.of(context)
+                                    .textTheme
+                                    .bodyText1
+                                    .copyWith(
+                                      color: Colors.blue,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                textScaleFactor: 1.5,
+                              ),
+                            ),
                           ),
                           if (activity.dateTime != null)
                             Text(
@@ -326,14 +389,19 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                                   _format.format(activity.dateTime?.toLocal()),
                               textAlign: TextAlign.center,
                               style: Theme.of(context).textTheme.bodyText1,
-                              textScaleFactor: 1.3,
+                              textScaleFactor: 1.5,
                             ),
-                          if (activity.description != null)
-                            Text(
-                              activity.description,
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.bodyText2,
-                            ),
+                          if (activity.description != null) ...[
+                            const SizedBox(height: 10),
+                            Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Text(
+                                activity.description,
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodyText2,
+                              ),
+                            )
+                          ],
                           if (isAttending)
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

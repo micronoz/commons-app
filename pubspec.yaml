@@ -41,7 +41,8 @@ dependencies:
   flutter_signin_button: ^1.1.0
   flutter_chat_bubble: ^1.0.2
   json_annotation: ^3.1.1
-  
+  url_launcher: ^5.4.11
+  flutter_linkify: ^4.1.0
 
 dev_dependencies:
   build_runner: ^1.0.0

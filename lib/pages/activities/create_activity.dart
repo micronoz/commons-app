@@ -203,7 +203,7 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                     height: 20,
                   ),
                   Text(
-                    'Firstly, give it a name',
+                    'What do you want to do?',
                     style: Theme.of(context).textTheme.headline6,
                   ),
                   TextFormField(
@@ -214,21 +214,8 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                   const SizedBox(
                     height: 20,
                   ),
-                  Text(
-                    'Describe what this Activity is about',
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                  TextFormField(
-                    maxLines: null,
-                    decoration: InputDecoration(hintText: 'Description'),
-                    onChanged: (value) => setState(() => _desciption = value),
-                    validator: _genericValidator,
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
                   QuestionSwitch(
-                      question: 'Where will it be?',
+                      question: 'Format?',
                       disabledOption: 'In-person',
                       enabledOption: 'Online',
                       callback: (val) {
@@ -241,6 +228,33 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                           _eventUrl = null;
                         }
                       }),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Optional',
+                    style: Theme.of(context).textTheme.headline4,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Tell me more',
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                  TextFormField(
+                    maxLines: null,
+                    decoration: InputDecoration(hintText: 'Description'),
+                    onChanged: (value) => setState(() => _desciption = value),
+                    validator: _genericValidator,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Where will it be?',
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
                   TextFormField(
                     decoration: InputDecoration(
                         hintText: _isOnline
@@ -264,10 +278,6 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                   Text(
                     'When will it be?',
                     style: Theme.of(context).textTheme.headline6,
-                  ),
-                  Text(
-                    '(In your local time)',
-                    style: Theme.of(context).textTheme.subtitle1,
                   ),
                   DateTimeField(
                     format: DateFormat.yMMMMEEEEd().add_jm(),
