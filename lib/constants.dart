@@ -9,7 +9,7 @@ class AppConstants extends InheritedWidget {
 
   final String backendUri = Platform.operatingSystem == 'android'
       ? 'http://10.0.2.2:4000/graphql'
-      : 'http://localhost:4000/graphql';
+      : 'http://192.168.86.242:4000/graphql';
   @override
   bool updateShouldNotify(AppConstants oldWidget) => false;
 }
