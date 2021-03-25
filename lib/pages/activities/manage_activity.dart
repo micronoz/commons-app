@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:tribal_instinct/components/member_request_card.dart';
-import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/pages/activities/manage_activity_join_requests.dart';
 import 'package:tribal_instinct/pages/activities/edit_activity.dart';
 
@@ -32,11 +29,9 @@ class _ManageActivityPageState extends State<ManageActivityPage> {
       tabs: tabs,
       onTap: (index) => setState(() {
         _tabIndex = index;
-        if (index == 1) {
-          final currentFocus = FocusScope.of(context);
-          if (!currentFocus.hasPrimaryFocus) {
-            currentFocus.unfocus();
-          }
+        final currentFocus = FocusScope.of(context);
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
         }
       }),
     );

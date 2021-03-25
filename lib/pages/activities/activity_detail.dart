@@ -316,77 +316,79 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                           ),
                           Text(
                             (activity.mediumType == ActivityMedium.in_person
-                                ? 'in-person'
+                                ? 'in person'
                                 : 'online'),
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.bodyText1,
                             textScaleFactor: 1.5,
                           ),
-                          Center(
-                            child: TextButton(
-                              onLongPress: () async {
-                                await Clipboard.setData(ClipboardData(
-                                    text: isOnline
-                                        ? activity.eventUrl
-                                        : activity.physicalAddress));
-                                final sheet = _scaffoldKey.currentState
-                                    .showBottomSheet<void>(
-                                        (context) => BottomSheet(
-                                            onClosing: () {},
-                                            builder: (context) => Container(
-                                                  width: MediaQuery.of(context)
-                                                      .size
-                                                      .width,
-                                                  height: 40,
-                                                  color: Colors.blueGrey[100],
-                                                  child: Center(
-                                                    child: Text(
-                                                      'Copied to cliboard',
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .bodyText1
-                                                          .copyWith(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
+                          if (activity.physicalAddress?.isNotEmpty ?? false)
+                            Center(
+                              child: TextButton(
+                                onLongPress: () async {
+                                  await Clipboard.setData(ClipboardData(
+                                      text: isOnline
+                                          ? activity.eventUrl
+                                          : activity.physicalAddress));
+                                  final sheet = _scaffoldKey.currentState
+                                      .showBottomSheet<void>(
+                                          (context) => BottomSheet(
+                                              onClosing: () {},
+                                              builder: (context) => Container(
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                            .size
+                                                            .width,
+                                                    height: 40,
+                                                    color: Colors.blueGrey[100],
+                                                    child: Center(
+                                                      child: Text(
+                                                        'Copied to cliboard',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .bodyText1
+                                                            .copyWith(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                      ),
                                                     ),
-                                                  ),
-                                                )));
+                                                  )));
 
-                                Timer(Duration(seconds: 1, milliseconds: 500),
-                                    () => sheet.close());
-                              },
-                              child: Linkify(
-                                options: LinkifyOptions(looseUrl: true),
-                                textWidthBasis: TextWidthBasis.longestLine,
-                                // textAlign: TextAlign.center,
-                                text: (activity.mediumType ==
-                                        ActivityMedium.in_person
-                                    ? (activity.physicalAddress ?? '')
-                                    : (activity.eventUrl ?? '')),
-                                onOpen: (link) async {
-                                  print(link.url);
-                                  if (await canLaunch(link.url)) {
-                                    await launch(link.url);
-                                  } else {
-                                    throw 'Could not launch $link';
-                                  }
+                                  Timer(Duration(seconds: 1, milliseconds: 500),
+                                      () => sheet.close());
                                 },
-                                linkStyle: Theme.of(context)
-                                    .textTheme
-                                    .bodyText1
-                                    .copyWith(
-                                      color: Colors.blue,
-                                      decoration: TextDecoration.underline,
-                                    ),
-                                textScaleFactor: 1.5,
+                                child: Linkify(
+                                  options: LinkifyOptions(looseUrl: true),
+                                  textWidthBasis: TextWidthBasis.longestLine,
+                                  // textAlign: TextAlign.center,
+                                  text: (activity.mediumType ==
+                                          ActivityMedium.in_person
+                                      ? (activity.physicalAddress ?? '')
+                                      : (activity.eventUrl ?? '')),
+                                  onOpen: (link) async {
+                                    print(link.url);
+                                    if (await canLaunch(link.url)) {
+                                      await launch(link.url);
+                                    } else {
+                                      throw 'Could not launch $link';
+                                    }
+                                  },
+                                  linkStyle: Theme.of(context)
+                                      .textTheme
+                                      .bodyText1
+                                      .copyWith(
+                                        color: Colors.blue,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                  textScaleFactor: 1.5,
+                                ),
                               ),
                             ),
-                          ),
                           if (activity.dateTime != null)
                             Text(
                               'on ' +
-                                  _format.format(activity.dateTime?.toLocal()),
+                                  _format.format(activity.dateTime.toLocal()),
                               textAlign: TextAlign.center,
                               style: Theme.of(context).textTheme.bodyText1,
                               textScaleFactor: 1.5,
@@ -398,7 +400,10 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                               child: Text(
                                 activity.description,
                                 textAlign: TextAlign.center,
-                                style: Theme.of(context).textTheme.bodyText2,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyText1
+                                    .apply(fontSizeFactor: 1.2),
                               ),
                             )
                           ],

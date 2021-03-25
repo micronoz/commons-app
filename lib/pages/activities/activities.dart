@@ -37,14 +37,13 @@ final getMyActivitiesQuery = '''
   }
 ''';
 
-class ExperiencesPage extends StatefulWidget {
+class ActivitiesPage extends StatefulWidget {
   @override
-  _ExperiencesPageState createState() => _ExperiencesPageState();
+  _ActivitiesPageState createState() => _ActivitiesPageState();
 }
 
-class _ExperiencesPageState extends State<ExperiencesPage> {
+class _ActivitiesPageState extends State<ActivitiesPage> {
   ActivityManager activityManager;
-
   @override
   Widget build(BuildContext context) {
     return Consumer<ActivityManager>(builder: (context, manager, child) {
@@ -69,25 +68,6 @@ class _ExperiencesPageState extends State<ExperiencesPage> {
                     .map((a) => Activity.fromJson(a['activity']));
             return ListView(
               children: [
-                Container(
-                  child: Align(
-                    heightFactor: 1.5,
-                    child: RaisedButton(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18.0),
-                      ),
-                      color: Colors.blue[400],
-                      onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => DiscoverPage()));
-                      },
-                      child: Text(
-                        'Discover Events',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ),
                 Text(
                   'I\'m hosting',
                   style: Theme.of(context).textTheme.headline1,
@@ -116,7 +96,7 @@ class _ExperiencesPageState extends State<ExperiencesPage> {
                       builder: (context) => CreateActivityPage())),
                   icon: Icon(Icons.add_rounded))
             ],
-            title: Text('Experiences'),
+            title: Text('My Activities'),
           ),
           body: queryBody);
     });

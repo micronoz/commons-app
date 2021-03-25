@@ -22,9 +22,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final menuIcons = <Map<String, Object>>[
-    {'icon': Icons.rss_feed, 'label': 'Feed'},
-    {'icon': Icons.calendar_today, 'label': 'Experiences'},
-    {'icon': Icons.chat, 'label': 'Chats'},
+    {'icon': Icons.public, 'label': 'Discover'},
+    {'icon': Icons.calendar_today, 'label': 'Activities'},
+    // {'icon': Icons.chat, 'label': 'Chats'},
     {'icon': Icons.supervisor_account, 'label': 'Profile'}
   ]
       .map(
@@ -97,8 +97,8 @@ class _HomePageState extends State<HomePage> {
               index: _pageIndex,
               children: [
                 FeedPage(),
-                ExperiencesPage(),
-                ChatsPage(),
+                ActivitiesPage(),
+                // ChatsPage(),
                 ProfilePage(),
               ],
             ),

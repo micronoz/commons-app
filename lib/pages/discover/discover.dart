@@ -67,11 +67,16 @@ class _DiscoverPageState extends State<DiscoverPage> {
     'Other',
   ];
 
+  var updatedLocation = false;
+  var currentPosition;
+
   @override
   Widget build(BuildContext context) {
-    final currentPosition = context.watch<Position>();
-    if (currentPosition == null) {
-      LocationManager.of(context).updateLocation();
+    if (currentPosition == null || !updatedLocation) {
+      LocationManager.of(context).updateLocation().then((value) => setState(() {
+            currentPosition = context.read<Position>();
+          }));
+      updatedLocation = true;
     }
     return DefaultTabController(
       length: 2,

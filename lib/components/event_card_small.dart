@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/pages/activities/activity_detail.dart';
 
@@ -6,6 +7,7 @@ class EventCardSmall extends StatelessWidget {
   EventCardSmall(this.event, {Key key, this.distance}) : super(key: key);
   final Activity event;
   final double distance;
+  final DateFormat _format = DateFormat.yMMMMEEEEd().add_jm();
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -50,12 +52,25 @@ class EventCardSmall extends StatelessWidget {
                     Flexible(
                       child: Text(
                         event.description,
-                        style: Theme.of(context).textTheme.bodyText2,
+                        style: Theme.of(context).textTheme.bodyText1,
                         maxLines: 2,
                         softWrap: false,
                         overflow: TextOverflow.ellipsis,
                       ),
-                    )
+                    ),
+                  if (event.dateTime != null)
+                    Flexible(
+                      child: Row(
+                        children: [
+                          Icon(Icons.calendar_today),
+                          Text(
+                            _format.format(event.dateTime.toLocal()),
+                            style: Theme.of(context).textTheme.bodyText1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
                 ],
               ),
             ),
