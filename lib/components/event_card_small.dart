@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:fluttericon/font_awesome5_icons.dart';
+import 'package:fluttericon/font_awesome_icons.dart';
+import 'package:fluttericon/fontelico_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/pages/activities/activity_detail.dart';
@@ -13,77 +16,92 @@ class EventCardSmall extends StatelessWidget {
     return InkWell(
       onTap: () => Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => ActivityDetailPage(event.id))),
-      child: Card(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(
-              width: 10,
-            ),
-            Flexible(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Flexible(
-                    child: Row(
-                      children: [
-                        event.isOnline
-                            ? Icon(Icons.public)
-                            : Icon(Icons.person),
-                        Text(
-                          event.title,
-                          style: Theme.of(context).textTheme.bodyText1,
-                          textScaleFactor: 1.3,
-                          softWrap: false,
-                          overflow: TextOverflow.ellipsis,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  width: 10,
+                ),
+                Flexible(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Flexible(
+                        child: Row(
+                          children: [
+                            event.isOnline
+                                ? Icon(Icons.public)
+                                : Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: Icon(FontAwesome5.user_friends),
+                                  ),
+                            Text(
+                              event.title,
+                              style: Theme.of(context).textTheme.bodyText1,
+                              textScaleFactor: 1.3,
+                              softWrap: false,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                  Flexible(
-                    child: Row(
-                      children: [
-                        Icon(Icons.person),
-                        Text(
-                          '@' + event.organizer.handle,
-                          style: Theme.of(context).textTheme.bodyText2,
-                          maxLines: 1,
-                          softWrap: false,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (event.description != null)
-                    Flexible(
-                      child: Text(
-                        event.description,
-                        style: Theme.of(context).textTheme.bodyText1,
-                        maxLines: 2,
-                        softWrap: false,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  if (event.dateTime != null)
-                    Flexible(
-                      child: Row(
-                        children: [
-                          Icon(Icons.calendar_today),
-                          Text(
-                            _format.format(event.dateTime.toLocal()),
+                      Flexible(
+                        child: Row(
+                          children: [
+                            Icon(
+                              FontAwesome5.crown,
+                              size: 16,
+                            ),
+                            const SizedBox(
+                              width: 6,
+                            ),
+                            Text(
+                              '@' + event.organizer.handle,
+                              style: Theme.of(context).textTheme.bodyText1,
+                              maxLines: 1,
+                              softWrap: false,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (event.description != null)
+                        Flexible(
+                          child: Text(
+                            event.description,
                             style: Theme.of(context).textTheme.bodyText1,
+                            maxLines: 2,
+                            softWrap: false,
                             overflow: TextOverflow.ellipsis,
                           ),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
+                        ),
+                      if (event.dateTime != null)
+                        Flexible(
+                          child: Row(
+                            children: [
+                              Icon(Icons.calendar_today),
+                              Text(
+                                _format.format(event.dateTime.toLocal()),
+                                style: Theme.of(context).textTheme.bodyText1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                if (distance != null)
+                  Text('Distance: ' + distance.toStringAsFixed(0) + ' km')
+              ],
             ),
-            if (distance != null)
-              Text('Distance: ' + distance.toStringAsFixed(0) + ' km')
-          ],
+          ),
         ),
       ),
     );

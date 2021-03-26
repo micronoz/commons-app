@@ -78,11 +78,18 @@ class _AppState extends State<App> {
               child: MaterialApp(
                 title: 'Tribal Instinct',
                 theme: ThemeData(
-                  // platform: TargetPlatform.iOS,
-                  primarySwatch: Colors.cyan,
-                  accentColor: Colors.orangeAccent,
-                  visualDensity: VisualDensity.adaptivePlatformDensity,
-                ),
+                    cardTheme: CardTheme(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15))),
+                    scaffoldBackgroundColor: Colors.amber[50],
+                    appBarTheme: AppBarTheme(
+                        foregroundColor: Colors.black, color: Colors.amber[50]),
+                    primarySwatch: Colors.amber,
+                    accentColor: Colors.tealAccent,
+                    visualDensity: VisualDensity.adaptivePlatformDensity,
+                    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+                        backgroundColor: Colors.amber[50],
+                        selectedItemColor: Colors.teal)),
                 navigatorKey: _navigatorKey,
                 home: isLoggedIn.val ? HomePage() : LoginPage(),
               ));

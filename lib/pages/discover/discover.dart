@@ -93,7 +93,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
             ],
             centerTitle: false,
             bottom: TabBar(
-              indicatorColor: Colors.blue[800],
               tabs: [Tab(text: 'Online'), Tab(text: 'In Person')],
             ),
           ),

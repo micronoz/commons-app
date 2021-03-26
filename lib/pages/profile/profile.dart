@@ -20,7 +20,6 @@ class _ProfilePageState extends State<ProfilePage> {
     final profile = widget.profile ?? AppUser.of(context).profile;
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
         centerTitle: true,
         title: Text('@${profile.handle}'),
         actions: [

@@ -16,7 +16,7 @@ class _DiscoverFilterState extends State<DiscoverFilter> {
       yield Padding(
         padding: const EdgeInsets.all(1.0),
         child: FilterChip(
-          selectedColor: Colors.blue,
+          selectedColor: Colors.tealAccent,
           showCheckmark: false,
           visualDensity: VisualDensity.comfortable,
           label: Text(category),

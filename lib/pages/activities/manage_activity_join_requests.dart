@@ -8,6 +8,7 @@ final getActivityRequestsQuery = r'''
   query GetActivityRequests($id: String!, $status: Int) {
     activity(id: $id) {
       id
+      mediumType
       userConnections(status: $status) {
         id
         attendanceStatus

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:fluttericon/entypo_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:tribal_instinct/managers/user_manager.dart';
 import 'package:tribal_instinct/model/app_user.dart';
@@ -21,7 +22,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final menuIcons = <Map<String, Object>>[
-    {'icon': Icons.public, 'label': 'Discover'},
+    {'icon': Entypo.compass, 'label': 'Discover'},
     {'icon': Icons.calendar_today, 'label': 'My Activities'},
     // {'icon': Icons.chat, 'label': 'Chats'},
     {'icon': Icons.account_circle, 'label': 'Profile'}
