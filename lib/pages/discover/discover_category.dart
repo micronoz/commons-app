@@ -25,10 +25,11 @@ class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: ListView(
+      child: Column(
         children: <Widget>[
           DiscoverFilter(widget._categoryNames),
           Query(
+            key: UniqueKey(),
             options: QueryOptions(
               document: gql(widget._discoverQuery),
               variables: widget._queryVariables,
@@ -53,18 +54,18 @@ class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
                   scrollDirection: Axis.vertical,
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
-                    final _fetchedActivity = activities[index];
+                    final fetchedActivity = activities[index];
                     if (widget._mediumType == ActivityMedium.in_person) {
-                      final _activity =
-                          Activity.fromJson(_fetchedActivity['activity']);
-                      var distance = _fetchedActivity['distance'];
+                      final activity =
+                          Activity.fromJson(fetchedActivity['activity']);
+                      var distance = fetchedActivity['distance'];
                       if (distance.runtimeType == int) {
                         distance = distance.toDouble();
                       }
-                      return EventCardSmall(_activity, distance: distance);
+                      return EventCardSmall(activity, distance: distance);
                     } else {
-                      final _activity = Activity.fromJson(_fetchedActivity);
-                      return EventCardSmall(_activity);
+                      final activity = Activity.fromJson(fetchedActivity);
+                      return EventCardSmall(activity);
                     }
                   });
             },

@@ -11,13 +11,11 @@ Activity _$ActivityFromJson(Map<String, dynamic> json) {
     json['id'] as String,
     json['title'] as String,
     json['description'] as String,
-    _$enumDecodeNullable(_$ActivityMediumEnumMap, json['mediumType']),
+    _$enumDecode(_$ActivityMediumEnumMap, json['mediumType']),
     json['physicalAddress'] as String,
     json['eventUrl'] as String,
     Activity._locationFromJson(
         json['discoveryCoordinates'] as Map<String, dynamic>),
-    Activity._locationFromJson(
-        json['eventCoordinates'] as Map<String, dynamic>),
     Activity._dateTimeFromJson(json['eventDateTime'] as String),
     (json['userConnections'] as List)
             ?.map((e) => e == null
@@ -40,7 +38,6 @@ Map<String, dynamic> _$ActivityToJson(Activity instance) => <String, dynamic>{
       'eventUrl': instance.eventUrl,
       'discoveryCoordinates':
           Activity._locationToJson(instance.discoveryCoordinates),
-      'eventCoordinates': Activity._locationToJson(instance.eventCoordinates),
       'eventDateTime': Activity._dateTimeToJson(instance.dateTime),
       'userConnections': instance.attendeeConnections?.toList(),
       'organizer': instance.organizer,
@@ -65,17 +62,6 @@ T _$enumDecode<T>(
         '${enumValues.values.join(', ')}');
   }
   return value ?? unknownValue;
-}
-
-T _$enumDecodeNullable<T>(
-  Map<T, dynamic> enumValues,
-  dynamic source, {
-  T unknownValue,
-}) {
-  if (source == null) {
-    return null;
-  }
-  return _$enumDecode<T>(enumValues, source, unknownValue: unknownValue);
 }
 
 const _$ActivityMediumEnumMap = {

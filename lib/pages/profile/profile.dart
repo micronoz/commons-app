@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_signin_button/button_list.dart';
 import 'package:tribal_instinct/managers/user_manager.dart';
 import 'package:tribal_instinct/model/app_user.dart';
+import 'package:tribal_instinct/model/user_profile.dart';
+import 'package:tribal_instinct/pages/profile/edit_profile.dart';
 
 class ProfilePage extends StatefulWidget {
+  final UserProfile profile;
+
+  ProfilePage({this.profile}) : super();
+
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
@@ -10,13 +17,18 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
-    final appUser = AppUser.of(context);
+    final profile = widget.profile ?? AppUser.of(context).profile;
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
         centerTitle: true,
-        title: Text(appUser.profile.handle),
+        title: Text('@${profile.handle}'),
+        actions: [
+          IconButton(
+              icon: Icon(Icons.edit),
+              onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => EditProfilePage())))
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
@@ -35,7 +47,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       image: DecorationImage(
-                          image: appUser.profile.photo, fit: BoxFit.fill),
+                          image: profile.photo, fit: BoxFit.fill),
                     ),
                   ),
                 ),
@@ -81,10 +93,21 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(
               height: 10,
             ),
+            Text(profile.name, style: Theme.of(context).textTheme.headline6),
+            const SizedBox(
+              height: 10,
+            ),
+            if (profile.description != null) ...[
+              Text(profile.description,
+                  style: Theme.of(context).textTheme.headline6),
+              const SizedBox(
+                height: 10,
+              )
+            ],
             Text(
               'Past events',
               style: Theme.of(context).textTheme.headline3,
-              textScaleFactor: 0.8,
+              textScaleFactor: 0.5,
             ),
             const SizedBox(
               height: 10,

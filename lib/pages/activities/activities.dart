@@ -10,29 +10,23 @@ import 'package:provider/provider.dart';
 final getMyActivitiesQuery = '''
   query {
     user {
-      ...activityConnectionFields
-    }
-  }
-
-  fragment activityConnectionFields on User {
-    activityConnections {
-      ...activityFields
-    }
-  }
-
-  fragment activityFields on UserActivity {
-    id
-    isOrganizing
-    attendanceStatus
-    activity {
       id
-      title
-      eventDateTime
-      organizer {
+      activityConnections {
         id
-        handle
+        isOrganizing
+        attendanceStatus
+        activity {
+          id
+          title
+          mediumType
+          eventDateTime
+          organizer {
+            id
+            handle
+          }
+          description
+        }
       }
-      description
     }
   }
 ''';
@@ -51,18 +45,23 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
       var queryBody = Query(
           key: key,
           options: WatchQueryOptions(
-            fetchResults: true,
-            eagerlyFetchResults: true,
             document: gql(getMyActivitiesQuery),
             fetchPolicy: FetchPolicy.cacheAndNetwork,
           ),
           builder: (QueryResult result, {fetchMore, refetch}) {
-            if (result.isLoading && !result.isConcrete) {
+            if (!result.isConcrete) {
               return Center(
                 child: CircularProgressIndicator(),
               );
+            } else if (result.hasException) {
+              print(result.exception);
+              return Center(
+                child: Text(
+                  'An error has occurred!',
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+              );
             }
-
             final activities =
                 (result.data['user']['activityConnections'] as List<dynamic>)
                     .map((a) => Activity.fromJson(a['activity']));

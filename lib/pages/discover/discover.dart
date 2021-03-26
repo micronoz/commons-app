@@ -65,25 +65,33 @@ class _DiscoverPageState extends State<DiscoverPage> {
     'Discussion',
     'Sports',
     'Other',
+    'More',
+    'Less',
+    'You',
+    'Hi',
+    'Hey'
   ];
 
-  var updatedLocation = false;
   var currentPosition;
 
   @override
   Widget build(BuildContext context) {
-    if (currentPosition == null || !updatedLocation) {
-      LocationManager.of(context).updateLocation().then((value) => setState(() {
-            currentPosition = context.read<Position>();
-          }));
-      updatedLocation = true;
-    }
+    currentPosition ??= LocationManager.of(context).updateLocation();
+    currentPosition = context.watch<Position>();
+
     return DefaultTabController(
       length: 2,
       child: Scaffold(
           appBar: AppBar(
             title: Text('Discover Activities'),
-            centerTitle: true,
+            actions: [
+              IconButton(
+                  icon: Icon(Icons.refresh),
+                  onPressed: () {
+                    LocationManager.of(context).updateLocation();
+                  })
+            ],
+            centerTitle: false,
             bottom: TabBar(
               indicatorColor: Colors.blue[800],
               tabs: [Tab(text: 'Online'), Tab(text: 'In Person')],

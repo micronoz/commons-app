@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tribal_instinct/pages/profile.dart';
+import 'package:tribal_instinct/pages/profile/profile.dart';
 
 class FeedCard extends StatelessWidget {
   @override

@@ -4,10 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:tribal_instinct/managers/user_manager.dart';
 import 'package:tribal_instinct/model/app_user.dart';
 import 'package:tribal_instinct/onboarding/onboarding_flow.dart';
-import 'package:tribal_instinct/pages/feed.dart';
+import 'package:tribal_instinct/pages/discover/discover.dart';
 import 'package:tribal_instinct/pages/activities/activities.dart';
-import 'package:tribal_instinct/pages/chats.dart';
-import 'package:tribal_instinct/pages/profile.dart';
+import 'package:tribal_instinct/pages/profile/profile.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -23,9 +22,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final menuIcons = <Map<String, Object>>[
     {'icon': Icons.public, 'label': 'Discover'},
-    {'icon': Icons.calendar_today, 'label': 'Activities'},
+    {'icon': Icons.calendar_today, 'label': 'My Activities'},
     // {'icon': Icons.chat, 'label': 'Chats'},
-    {'icon': Icons.supervisor_account, 'label': 'Profile'}
+    {'icon': Icons.account_circle, 'label': 'Profile'}
   ]
       .map(
         (i) => BottomNavigationBarItem(
@@ -96,7 +95,7 @@ class _HomePageState extends State<HomePage> {
           : IndexedStack(
               index: _pageIndex,
               children: [
-                FeedPage(),
+                DiscoverPage(),
                 ActivitiesPage(),
                 // ChatsPage(),
                 ProfilePage(),

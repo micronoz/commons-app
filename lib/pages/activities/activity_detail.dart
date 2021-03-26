@@ -40,10 +40,6 @@ final getActivityQuery = r'''
           x
           y
         }
-        eventCoordinates{
-          x
-          y
-        }
       }
       ... on OnlineActivity {
         eventUrl
@@ -483,7 +479,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                                                                   (context) =>
                                                                       AlertDialog(
                                                                 title: Text(
-                                                                    'Do you want to remove "${user.name}"?'),
+                                                                    'Do you want to remove "${user.name}(@${user.handle})"?'),
                                                                 actions: [
                                                                   TextButton(
                                                                     onPressed:

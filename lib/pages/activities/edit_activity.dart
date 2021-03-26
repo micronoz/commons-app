@@ -48,10 +48,6 @@ final updateInPersonActivityMutation = r'''
           x
           y
         }
-        eventCoordinates{
-          x
-          y
-        }
       }
     }
   }

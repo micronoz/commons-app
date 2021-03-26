@@ -26,12 +26,19 @@ class EventCardSmall extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Flexible(
-                    child: Text(
-                      event.title,
-                      style: Theme.of(context).textTheme.bodyText1,
-                      textScaleFactor: 1.3,
-                      softWrap: false,
-                      overflow: TextOverflow.ellipsis,
+                    child: Row(
+                      children: [
+                        event.isOnline
+                            ? Icon(Icons.public)
+                            : Icon(Icons.person),
+                        Text(
+                          event.title,
+                          style: Theme.of(context).textTheme.bodyText1,
+                          textScaleFactor: 1.3,
+                          softWrap: false,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
                   ),
                   Flexible(
@@ -75,7 +82,7 @@ class EventCardSmall extends StatelessWidget {
               ),
             ),
             if (distance != null)
-              Text('Distance: ' + distance.toStringAsFixed(1) + ' km')
+              Text('Distance: ' + distance.toStringAsFixed(0) + ' km')
           ],
         ),
       ),
