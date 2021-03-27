@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fluttericon/font_awesome5_icons.dart';
-import 'package:fluttericon/font_awesome_icons.dart';
-import 'package:fluttericon/fontelico_icons.dart';
-import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/pages/activities/activity_detail.dart';
