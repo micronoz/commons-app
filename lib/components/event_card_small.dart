@@ -11,8 +11,6 @@ class EventCardSmall extends StatelessWidget {
   final DateFormat _format = DateFormat.MMMMd().add_jm();
   @override
   Widget build(BuildContext context) {
-    print(event.title);
-    print(event.description.isEmpty);
     return InkWell(
       onTap: () => Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => ActivityDetailPage(event.id))),
