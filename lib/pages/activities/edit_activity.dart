@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -10,7 +12,8 @@ import 'package:tribal_instinct/model/activity_types.dart';
 
 class EditActivityPage extends StatefulWidget {
   final String activityId;
-  EditActivityPage(this.activityId) : super();
+  final GlobalKey<ScaffoldState> _scaffoldKey;
+  EditActivityPage(this.activityId, this._scaffoldKey) : super();
 
   @override
   _EditActivityPageState createState() => _EditActivityPageState();
@@ -75,7 +78,6 @@ class _EditActivityPageState extends State<EditActivityPage> {
       'This field can not have more than than $maxInputSize characters.';
 
   final _formKey = GlobalKey<FormState>();
-  bool _edited = false;
   String _activityName;
   String _desciption;
   bool _isOnline = false;
@@ -83,6 +85,33 @@ class _EditActivityPageState extends State<EditActivityPage> {
   String _eventUrl;
   DateTime _date;
   bool _init = false;
+  bool _isBottomSheetOpen = false;
+
+  void showCustomBottomSheet(String message) {
+    if (_isBottomSheetOpen) return;
+    _isBottomSheetOpen = true;
+    final sheet = widget._scaffoldKey.currentState
+        .showBottomSheet<void>((context) => BottomSheet(
+            onClosing: () {
+              _isBottomSheetOpen = false;
+            },
+            builder: (context) => Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 40,
+                  color: Colors.blueGrey[100],
+                  child: Center(
+                    child: Text(
+                      message,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText1
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                )));
+
+    Timer(Duration(seconds: 1, milliseconds: 500), () => sheet.close());
+  }
 
   String _mandatoryValidator(String value) {
     if (value == null || value.isEmpty) {
@@ -130,8 +159,12 @@ class _EditActivityPageState extends State<EditActivityPage> {
     );
   }
 
-  void saveAndExit(
+  Future<bool> saveAndExit(
       BuildContext context, RunMutation updateEventMutation) async {
+    final currentFocus = FocusScope.of(context);
+    if (!currentFocus.hasPrimaryFocus) {
+      currentFocus.unfocus();
+    }
     final _dateTime = _date?.toUtc()?.toIso8601String();
     QueryResult result;
     if (_isOnline) {
@@ -164,108 +197,62 @@ class _EditActivityPageState extends State<EditActivityPage> {
     }
 
     if (result.hasException) {
-      showModalBottomSheet(
-          context: context,
-          builder: (context) => BottomSheet(
-              onClosing: () {},
-              builder: (context) => Text(
-                    'An Error has occurred',
-                    style: Theme.of(context).textTheme.headline6,
-                  )));
+      showCustomBottomSheet('An Error has occurred');
+      return false;
     } else {
-      showModalBottomSheet(
-          context: context,
-          builder: (context) => BottomSheet(
-              onClosing: () {},
-              builder: (context) => Text('Successfully saved!',
-                  style: Theme.of(context).textTheme.headline6)));
+      showCustomBottomSheet('Successfully saved!');
+      return true;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Query(
-      options: QueryOptions(
-          document: gql(getActivityQuery),
-          variables: {'id': widget.activityId},
-          fetchPolicy: FetchPolicy.cacheAndNetwork),
-      builder: (result, {fetchMore, refetch}) {
-        if (result.isConcrete && !_init) {
-          final initialActivity = Activity.fromJson(result.data['activity']);
-          _date = initialActivity.dateTime;
-          _desciption = initialActivity.description;
-          _activityName = initialActivity.title;
-
-          if (initialActivity.mediumType == ActivityMedium.in_person) {
-            _physicalAddress = initialActivity.physicalAddress;
-            _isOnline = false;
-          } else {
-            _eventUrl = initialActivity.eventUrl;
-            _isOnline = true;
-          }
-          _init = true;
+    return GestureDetector(
+      onTap: () {
+        final currentFocus = FocusScope.of(context);
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
         }
+      },
+      child: Query(
+        options: QueryOptions(
+            document: gql(getActivityQuery),
+            variables: {'id': widget.activityId},
+            fetchPolicy: FetchPolicy.cacheAndNetwork),
+        builder: (result, {fetchMore, refetch}) {
+          if (result.isConcrete && !_init) {
+            final initialActivity = Activity.fromJson(result.data['activity']);
+            _date = initialActivity.dateTime;
+            _desciption = initialActivity.description;
+            _activityName = initialActivity.title;
 
-        return Mutation(
-          options: MutationOptions(
-            fetchPolicy: FetchPolicy.cacheAndNetwork,
-            document: gql(_isOnline
-                ? updateOnlineActivityMutation
-                : updateInPersonActivityMutation),
-            onCompleted: (dynamic resultData) {
-              print('Create Activity mutation return:');
-              print(resultData);
-              if (resultData != null) {
-                var activity;
-                if (resultData['createOnlineActivity'] != null) {
-                  activity = resultData['createOnlineActivity']['id'];
-                } else if (resultData['createInPersonActivity'] != null) {
-                  activity = resultData['createInPersonActivity']['id'];
-                } else {
-                  //TODO
-                }
-              } else {
-                //TODO
-              }
-            },
-            onError: (error) {
-              print('Create Activity mutation ERROR:');
-              print(error);
-              //TODO: Handle error when passed in invalid address
-            },
-          ),
-          builder: (
-            RunMutation runMutation,
-            QueryResult result,
-          ) {
-            return WillPopScope(
-              onWillPop: () async {
-                if (_edited) {
-                  return await showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                            title:
-                                const Text('Are you sure you want to cancel?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop(false);
-                                },
-                                child: Text('No'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop(true);
-                                },
-                                child: Text('Yes'),
-                              ),
-                            ],
-                          ));
-                } else {
-                  return true;
-                }
+            if (initialActivity.mediumType == ActivityMedium.in_person) {
+              _physicalAddress = initialActivity.physicalAddress;
+              _isOnline = false;
+            } else {
+              _eventUrl = initialActivity.eventUrl;
+              _isOnline = true;
+            }
+            _init = true;
+          }
+
+          return Mutation(
+            options: MutationOptions(
+              fetchPolicy: FetchPolicy.cacheAndNetwork,
+              document: gql(_isOnline
+                  ? updateOnlineActivityMutation
+                  : updateInPersonActivityMutation),
+              onError: (error) {
+                print('Create Activity mutation ERROR:');
+                print(error);
+                //TODO: Handle error when passed in invalid address
               },
-              child: Form(
+            ),
+            builder: (
+              RunMutation runMutation,
+              QueryResult result,
+            ) {
+              return Form(
                 key: _formKey,
                 child: ListView(
                   padding: const EdgeInsets.all(8),
@@ -415,11 +402,11 @@ class _EditActivityPageState extends State<EditActivityPage> {
                     ),
                   ],
                 ),
-              ),
-            );
-          },
-        );
-      },
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

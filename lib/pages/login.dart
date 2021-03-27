@@ -3,27 +3,13 @@ import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:tribal_instinct/managers/user_manager.dart';
 
 class LoginPage extends StatefulWidget {
-  static Route<dynamic> route() {
-    return MaterialPageRoute(
-      builder: (context) => LoginPage(),
-    );
-  }
-
   @override
   _LoginPageState createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
   void _onLoginWithGooglePressed() {
-    setState(() {
-      UserManager.of(context).loginWithGoogle();
-    });
-  }
-
-  void _onLoginAnonymouslyPressed() {
-    setState(() {
-      UserManager.of(context).loginAnonymously();
-    });
+    UserManager.of(context).loginWithGoogle();
   }
 
   @override
@@ -33,7 +19,8 @@ class _LoginPageState extends State<LoginPage> {
         body: FutureBuilder(
           future: UserManager.of(context).appUserResolver.value,
           builder: (context, state) {
-            if (state.connectionState == ConnectionState.waiting) {
+            if (state.connectionState != ConnectionState.done &&
+                state.connectionState != ConnectionState.none) {
               return Center(child: CircularProgressIndicator());
             }
             return Center(
@@ -41,14 +28,11 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SignInButton(
-                    Buttons.Google,
+                    Buttons.GoogleDark,
+                    padding: EdgeInsets.only(left: 15, top: 3, bottom: 3),
                     onPressed: _onLoginWithGooglePressed,
-                  ),
-                  SignInButton(
-                    Buttons.Email,
-                    onPressed: _onLoginAnonymouslyPressed,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(50))),
+                        borderRadius: BorderRadius.all(Radius.circular(40))),
                   ),
                 ],
               ),

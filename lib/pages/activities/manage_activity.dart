@@ -22,6 +22,8 @@ class _ManageActivityPageState extends State<ManageActivityPage> {
     Tab(icon: Icon(Icons.edit_attributes), text: 'Edit details'),
   ];
 
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     print(widget.activityId);
@@ -36,6 +38,7 @@ class _ManageActivityPageState extends State<ManageActivityPage> {
       }),
     );
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text('Manage Activity'),
         bottom: PreferredSize(
@@ -51,7 +54,7 @@ class _ManageActivityPageState extends State<ManageActivityPage> {
         index: _tabIndex,
         children: [
           ManageActivityJoinRequestsPage(widget.activityId),
-          EditActivityPage(widget.activityId)
+          EditActivityPage(widget.activityId, _scaffoldKey)
         ],
       ),
     );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttericon/font_awesome5_icons.dart';
 import 'package:fluttericon/font_awesome_icons.dart';
 import 'package:fluttericon/fontelico_icons.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:tribal_instinct/model/activity.dart';
 import 'package:tribal_instinct/pages/activities/activity_detail.dart';
@@ -10,9 +11,11 @@ class EventCardSmall extends StatelessWidget {
   EventCardSmall(this.event, {Key key, this.distance}) : super(key: key);
   final Activity event;
   final double distance;
-  final DateFormat _format = DateFormat.yMMMMEEEEd().add_jm();
+  final DateFormat _format = DateFormat.MMMMd().add_jm();
   @override
   Widget build(BuildContext context) {
+    print(event.title);
+    print(event.description.isEmpty);
     return InkWell(
       onTap: () => Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => ActivityDetailPage(event.id))),
@@ -71,7 +74,7 @@ class EventCardSmall extends StatelessWidget {
                           ],
                         ),
                       ),
-                      if (event.description != null)
+                      if (event.description?.isNotEmpty ?? false)
                         Flexible(
                           child: Text(
                             event.description,

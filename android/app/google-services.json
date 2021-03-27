@@ -14,7 +14,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "600024232537-lsas356aidn86gsuq46rvu41d8qq977e.apps.googleusercontent.com",
+          "client_id": "600024232537-cl2fqqt17g81jeoom7peje4amd1oqn0e.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.nozberkman.tribal_instinct",
@@ -37,6 +37,13 @@
             {
               "client_id": "600024232537-ice3hj3saqivs750pc5vn38c1rukl5np.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "600024232537-9l1gmbi1m1kldll1h4s0ge9h06blumfg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.nozberkman.commons"
+              }
             }
           ]
         }

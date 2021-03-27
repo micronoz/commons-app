@@ -318,7 +318,8 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                             style: Theme.of(context).textTheme.bodyText1,
                             textScaleFactor: 1.5,
                           ),
-                          if (activity.physicalAddress?.isNotEmpty ?? false)
+                          if ((activity.physicalAddress?.isNotEmpty ?? false) ||
+                              (activity.eventUrl?.isNotEmpty ?? false))
                             Center(
                               child: TextButton(
                                 onLongPress: () async {

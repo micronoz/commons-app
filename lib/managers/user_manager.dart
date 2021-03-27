@@ -113,23 +113,6 @@ class UserManager {
     _authSub.cancel();
   }
 
-  Future<void> loginAnonymously() async {
-    try {
-      await _firebaseAuth.signInAnonymously();
-    } catch (e, st) {
-      throw _getAuthException(e, st);
-    }
-  }
-
-  Future<void> loginWithEmailAndPassword(String email, String password) async {
-    try {
-      await _firebaseAuth.signInWithEmailAndPassword(
-          email: email, password: password);
-    } catch (e, st) {
-      throw _getAuthException(e, st);
-    }
-  }
-
   Future<void> loginWithGoogle() async {
     try {
       final account = await _googleSignIn.signIn();
