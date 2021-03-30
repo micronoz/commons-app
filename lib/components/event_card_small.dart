@@ -8,7 +8,7 @@ class EventCardSmall extends StatelessWidget {
   EventCardSmall(this.event, {Key key, this.distance}) : super(key: key);
   final Activity event;
   final double distance;
-  final DateFormat _format = DateFormat.MMMMd().add_jm();
+  final DateFormat _format = DateFormat.MMMMd().addPattern(',', '').add_jm();
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -90,10 +90,11 @@ class EventCardSmall extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Icon(
                                   FontAwesome5.calendar_day,
-                                  size: 22,
+                                  size: 18,
                                 ),
                                 Text(
                                   _format.format(event.dateTime.toLocal()),
