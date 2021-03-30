@@ -26,7 +26,6 @@ class _ManageActivityPageState extends State<ManageActivityPage> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.activityId);
     var tabBar = TabBar(
       tabs: tabs,
       onTap: (index) => setState(() {

@@ -120,7 +120,6 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               document: gql(createUserMutation),
               onCompleted: (dynamic resultData) {
                 print('Created User.');
-                print(resultData);
                 UserManager.of(context).fetchUserProfile();
               },
             ),

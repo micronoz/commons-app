@@ -39,6 +39,9 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   final _navigatorKey = GlobalKey<NavigatorState>();
 
+  final _primaryColor = const Color(0xfffbf9f2);
+  final _secondaryColor = const Color(0xfff2f4fb);
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -81,20 +84,19 @@ class _AppState extends State<App> {
                     cardTheme: CardTheme(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15))),
-                    scaffoldBackgroundColor: Colors.amber[50],
-                    appBarTheme: AppBarTheme(
-                        foregroundColor: Colors.black, color: Colors.amber[50]),
-                    primarySwatch: Colors.amber,
-                    accentColor: Colors.blue[200],
+                    appBarTheme: AppBarTheme(foregroundColor: Colors.black),
+                    scaffoldBackgroundColor: _primaryColor,
+                    primaryColor: _primaryColor,
+                    accentColor: Colors.blue[100],
                     visualDensity: VisualDensity.adaptivePlatformDensity,
                     bottomNavigationBarTheme: BottomNavigationBarThemeData(
-                        backgroundColor: Colors.amber[50],
-                        selectedItemColor: Colors.blue[400]),
+                        backgroundColor: _primaryColor,
+                        selectedItemColor: Colors.blue[200]),
                     chipTheme: ChipThemeData.fromDefaults(
-                      secondaryColor: Colors.blue[200],
+                      secondaryColor: Colors.blue[100],
                       labelStyle: TextStyle(),
                       brightness: Brightness.light,
-                    ).copyWith(selectedColor: Colors.blue[200])),
+                    ).copyWith(selectedColor: Colors.blue[100])),
                 navigatorKey: _navigatorKey,
                 home: isLoggedIn.val ? HomePage() : LoginPage(),
               ));

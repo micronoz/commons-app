@@ -132,7 +132,6 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
             : createInPersonActivityMutation),
         onCompleted: (dynamic resultData) {
           print('Create Activity mutation return:');
-          print(resultData);
           if (resultData != null) {
             var activity;
             if (resultData['createOnlineActivity'] != null) {
@@ -159,236 +158,209 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
         RunMutation runMutation,
         QueryResult result,
       ) {
-        return WillPopScope(
-          onWillPop: () async {
-            if (_edited) {
-              return await showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                        title: const Text('Are you sure you want to cancel?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop(false);
-                            },
-                            child: Text('No'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop(true);
-                            },
-                            child: Text('Yes'),
-                          ),
-                        ],
-                      ));
-            } else {
-              return true;
-            }
-          },
-          child: Scaffold(
-            appBar: AppBar(
-              title: Text('Create an Activity'),
-            ),
-            body: Form(
-              key: _formKey,
-              child: ListView(
-                padding: const EdgeInsets.all(8),
-                children: [
-                  Text(
-                    'Let\'s plan your Activity',
-                    style: Theme.of(context).textTheme.headline4,
-                    textScaleFactor: 0.9,
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    'What do you want to do?',
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(hintText: 'Title'),
-                    onChanged: (value) => setState(() => _activityName = value),
-                    validator: _mandatoryValidator,
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  QuestionSwitch(
-                      question: 'Format?',
-                      disabledOption: 'In-person',
-                      enabledOption: 'Online',
-                      callback: (val) {
-                        setState(() => _isOnline = val);
-                        if (val) {
-                          _eventUrl = _physicalAddress;
-                          _physicalAddress = null;
-                        } else {
-                          _physicalAddress = _eventUrl;
-                          _eventUrl = null;
-                        }
-                      }),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    'Optional',
-                    style: Theme.of(context).textTheme.headline4,
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    'Tell me more',
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                  TextFormField(
-                    maxLines: null,
-                    decoration: InputDecoration(hintText: 'Description'),
-                    onChanged: (value) => setState(() => _desciption = value),
-                    validator: _genericValidator,
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    'Where will it be?',
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(
-                        hintText: _isOnline
-                            ? 'Provide a link (you can add it later as well)'
-                            : 'Location'),
-                    //TODO: Reconsider the maximum input size for links
-                    onChanged: (value) {
-                      if (_isOnline) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('Create an Activity'),
+          ),
+          body: Form(
+            key: _formKey,
+            child: ListView(
+              padding: const EdgeInsets.all(8),
+              children: [
+                Text(
+                  'Let\'s plan your Activity',
+                  style: Theme.of(context).textTheme.headline4,
+                  textScaleFactor: 0.9,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  'What do you want to do?',
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+                TextFormField(
+                  decoration: InputDecoration(hintText: 'Title'),
+                  onChanged: (value) => setState(() => _activityName = value),
+                  validator: _mandatoryValidator,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                QuestionSwitch(
+                    question: 'Format?',
+                    disabledOption: 'In-person',
+                    enabledOption: 'Online',
+                    callback: (val) {
+                      setState(() => _isOnline = val);
+                      if (val) {
+                        _eventUrl = _physicalAddress;
                         _physicalAddress = null;
-                        _eventUrl = value == '' ? null : value;
                       } else {
-                        _physicalAddress = value == '' ? null : value;
+                        _physicalAddress = _eventUrl;
                         _eventUrl = null;
                       }
-                    },
-                    validator: _genericValidator,
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    'When will it be?',
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                  DateTimeField(
-                    format: DateFormat.yMMMMEEEEd().add_jm(),
-                    onShowPicker: (context, currentValue) async {
-                      final date = await showDatePicker(
-                        context: context,
-                        firstDate: DateTime.now(),
-                        initialDate: currentValue ??
-                            DateTime.now().add(Duration(days: 1)),
-                        lastDate: DateTime.now().add(Duration(days: 365)),
-                      );
+                    }),
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  'Optional',
+                  style: Theme.of(context).textTheme.headline4,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  'Tell me more',
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+                TextFormField(
+                  maxLines: null,
+                  decoration: InputDecoration(hintText: 'Description'),
+                  onChanged: (value) => setState(() => _desciption = value),
+                  validator: _genericValidator,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  'Where will it be?',
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+                TextFormField(
+                  decoration: InputDecoration(
+                      hintText: _isOnline
+                          ? 'Provide a link (you can add it later as well)'
+                          : 'Location'),
+                  //TODO: Reconsider the maximum input size for links
+                  onChanged: (value) {
+                    if (_isOnline) {
+                      _physicalAddress = null;
+                      _eventUrl = value == '' ? null : value;
+                    } else {
+                      _physicalAddress = value == '' ? null : value;
+                      _eventUrl = null;
+                    }
+                  },
+                  validator: _genericValidator,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  'When will it be?',
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+                DateTimeField(
+                  format: DateFormat.yMMMMEEEEd().add_jm(),
+                  onShowPicker: (context, currentValue) async {
+                    final date = await showDatePicker(
+                      context: context,
+                      firstDate: DateTime.now(),
+                      initialDate:
+                          currentValue ?? DateTime.now().add(Duration(days: 1)),
+                      lastDate: DateTime.now().add(Duration(days: 365)),
+                    );
 
-                      if (date != null) {
-                        var time = await showTimePicker(
+                    if (date != null) {
+                      var time = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.fromDateTime(
+                            currentValue ?? DateTime.now()),
+                      );
+                      return DateTimeField.combine(date, time);
+                    } else {
+                      return currentValue;
+                    }
+                  },
+                  onChanged: (value) => _date = value,
+                  validator: (value) {
+                    if (value != null && value.isBefore(DateTime.now())) {
+                      return 'Time of the event must be in the future.';
+                    } else {
+                      return null;
+                    }
+                  },
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                SizedBox(
+                  height: 40,
+                  child: RaisedButton(
+                    shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(30))),
+                    onPressed: () {
+                      if (_formKey.currentState.validate()) {
+                        saveAndExit(context, runMutation);
+                      } else {
+                        _showFormError();
+                      }
+                    },
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Ready to go!'),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        Icon(Icons.check)
+                      ],
+                    ),
+                    color: Colors.green,
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                SizedBox(
+                  height: 40,
+                  child: RaisedButton(
+                    shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(30))),
+                    onPressed: () {
+                      showDialog(
                           context: context,
-                          initialTime: TimeOfDay.fromDateTime(
-                              currentValue ?? DateTime.now()),
-                        );
-                        return DateTimeField.combine(date, time);
-                      } else {
-                        return currentValue;
-                      }
+                          builder: (context) => AlertDialog(
+                                title: const Text(
+                                    'Are you sure you want to cancel?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('No'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('Yes'),
+                                  ),
+                                ],
+                              ));
                     },
-                    onChanged: (value) => _date = value,
-                    validator: (value) {
-                      if (value != null && value.isBefore(DateTime.now())) {
-                        return 'Time of the event must be in the future.';
-                      } else {
-                        return null;
-                      }
-                    },
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  SizedBox(
-                    height: 40,
-                    child: RaisedButton(
-                      shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(30))),
-                      onPressed: () {
-                        if (_formKey.currentState.validate()) {
-                          saveAndExit(context, runMutation);
-                        } else {
-                          _showFormError();
-                        }
-                      },
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text('Ready to go!'),
-                          const SizedBox(
-                            width: 5,
-                          ),
-                          Icon(Icons.check)
-                        ],
-                      ),
-                      color: Colors.green,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Nah maybe another time...'),
+                        Icon(Icons.close)
+                      ],
                     ),
+                    color: Colors.red,
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  SizedBox(
-                    height: 40,
-                    child: RaisedButton(
-                      shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(30))),
-                      onPressed: () {
-                        showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                                  title: const Text(
-                                      'Are you sure you want to cancel?'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text('No'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text('Yes'),
-                                    ),
-                                  ],
-                                ));
-                      },
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text('Nah maybe another time...'),
-                          Icon(Icons.close)
-                        ],
-                      ),
-                      color: Colors.red,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                ],
-              ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+              ],
             ),
           ),
         );

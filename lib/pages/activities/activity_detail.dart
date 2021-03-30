@@ -364,7 +364,6 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                                       ? (activity.physicalAddress ?? '')
                                       : (activity.eventUrl ?? '')),
                                   onOpen: (link) async {
-                                    print(link.url);
                                     if (await canLaunch(link.url)) {
                                       await launch(link.url);
                                     } else {

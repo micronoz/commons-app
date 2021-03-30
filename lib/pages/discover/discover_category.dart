@@ -44,7 +44,6 @@ class _DiscoverCategoryPageState extends State<DiscoverCategoryPage> {
                 return Text('Loading');
               }
               List activities = result.data[widget._queryName];
-              print(result.data);
               if (activities.isEmpty) {
                 return Text(
                     'There are currently no events matching your criteria.');

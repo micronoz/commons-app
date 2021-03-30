@@ -34,7 +34,7 @@ class EventCardSmall extends StatelessWidget {
                         child: Row(
                           children: [
                             event.isOnline
-                                ? Icon(Icons.public)
+                                ? Icon(FontAwesome5.globe_americas)
                                 : Padding(
                                     padding: const EdgeInsets.only(right: 8.0),
                                     child: Icon(FontAwesome5.user_friends),
@@ -54,13 +54,13 @@ class EventCardSmall extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(vertical: 4.0),
                           child: Row(
                             children: [
-                              Icon(
-                                FontAwesome5.crown,
-                                size: 16,
-                              ),
-                              const SizedBox(
-                                width: 6,
-                              ),
+                              // Icon(
+                              //   FontAwesome5.crown,
+                              //   size: 16,
+                              // ),
+                              // const SizedBox(
+                              //   width: 6,
+                              // ),
                               Text(
                                 '@' + event.organizer.handle,
                                 style: Theme.of(context).textTheme.bodyText1,
@@ -92,7 +92,7 @@ class EventCardSmall extends StatelessWidget {
                             child: Row(
                               children: [
                                 Icon(
-                                  Icons.calendar_today,
+                                  FontAwesome5.calendar_day,
                                   size: 22,
                                 ),
                                 Text(
