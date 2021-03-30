@@ -50,53 +50,69 @@ class EventCardSmall extends StatelessWidget {
                         ),
                       ),
                       Flexible(
-                        child: Row(
-                          children: [
-                            Icon(
-                              FontAwesome5.crown,
-                              size: 16,
-                            ),
-                            const SizedBox(
-                              width: 6,
-                            ),
-                            Text(
-                              '@' + event.organizer.handle,
-                              style: Theme.of(context).textTheme.bodyText1,
-                              maxLines: 1,
-                              softWrap: false,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0),
+                          child: Row(
+                            children: [
+                              Icon(
+                                FontAwesome5.crown,
+                                size: 16,
+                              ),
+                              const SizedBox(
+                                width: 6,
+                              ),
+                              Text(
+                                '@' + event.organizer.handle,
+                                style: Theme.of(context).textTheme.bodyText1,
+                                maxLines: 1,
+                                softWrap: false,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       if (event.description?.isNotEmpty ?? false)
                         Flexible(
-                          child: Text(
-                            event.description,
-                            style: Theme.of(context).textTheme.bodyText1,
-                            maxLines: 2,
-                            softWrap: false,
-                            overflow: TextOverflow.ellipsis,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              event.description,
+                              style: Theme.of(context).textTheme.bodyText1,
+                              maxLines: 2,
+                              softWrap: false,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                       if (event.dateTime != null)
                         Flexible(
-                          child: Row(
-                            children: [
-                              Icon(Icons.calendar_today),
-                              Text(
-                                _format.format(event.dateTime.toLocal()),
-                                style: Theme.of(context).textTheme.bodyText1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.calendar_today,
+                                  size: 22,
+                                ),
+                                Text(
+                                  _format.format(event.dateTime.toLocal()),
+                                  style: Theme.of(context).textTheme.bodyText1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                     ],
                   ),
                 ),
                 if (distance != null)
-                  Text('Distance: ' + distance.toStringAsFixed(0) + ' km')
+                  Text(
+                    'Distance: ' + distance.toStringAsFixed(0) + ' km',
+                    style: Theme.of(context).textTheme.bodyText1,
+                    textScaleFactor: 1.1,
+                  )
               ],
             ),
           ),

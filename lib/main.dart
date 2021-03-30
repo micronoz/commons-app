@@ -85,11 +85,16 @@ class _AppState extends State<App> {
                     appBarTheme: AppBarTheme(
                         foregroundColor: Colors.black, color: Colors.amber[50]),
                     primarySwatch: Colors.amber,
-                    accentColor: Colors.tealAccent,
+                    accentColor: Colors.blue[200],
                     visualDensity: VisualDensity.adaptivePlatformDensity,
                     bottomNavigationBarTheme: BottomNavigationBarThemeData(
                         backgroundColor: Colors.amber[50],
-                        selectedItemColor: Colors.teal)),
+                        selectedItemColor: Colors.blue[400]),
+                    chipTheme: ChipThemeData.fromDefaults(
+                      secondaryColor: Colors.blue[200],
+                      labelStyle: TextStyle(),
+                      brightness: Brightness.light,
+                    ).copyWith(selectedColor: Colors.blue[200])),
                 navigatorKey: _navigatorKey,
                 home: isLoggedIn.val ? HomePage() : LoginPage(),
               ));

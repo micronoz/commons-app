@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:tribal_instinct/managers/user_manager.dart';
 import 'package:tribal_instinct/model/app_user.dart';
 import 'package:tribal_instinct/onboarding/onboarding_flow.dart';
+import 'package:tribal_instinct/pages/activities/create_activity.dart';
 import 'package:tribal_instinct/pages/discover/discover.dart';
 import 'package:tribal_instinct/pages/activities/activities.dart';
 import 'package:tribal_instinct/pages/profile/profile.dart';
@@ -82,6 +83,15 @@ class _HomePageState extends State<HomePage> {
       );
     }
     return Scaffold(
+      floatingActionButton: _pageIndex == 0
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => CreateActivityPage()));
+              },
+              child: Icon(Icons.add),
+            )
+          : null,
       body: isAppUserNull
           ? FutureBuilder(
               future: UserManager.of(context).appUserResolver.value,
