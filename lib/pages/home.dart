@@ -83,15 +83,6 @@ class _HomePageState extends State<HomePage> {
       );
     }
     return Scaffold(
-      floatingActionButton: _pageIndex == 0
-          ? FloatingActionButton(
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => CreateActivityPage()));
-              },
-              child: Icon(Icons.add),
-            )
-          : null,
       body: isAppUserNull
           ? FutureBuilder(
               future: UserManager.of(context).appUserResolver.value,

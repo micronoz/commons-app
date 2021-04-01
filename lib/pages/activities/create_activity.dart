@@ -1,5 +1,6 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttericon/font_awesome5_icons.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:tribal_instinct/components/question_switch.dart';
@@ -62,7 +63,7 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
     }
   }
 
-  static const maxInputSize = 255;
+  static const maxInputSize = 10000;
   static const emptyFieldError = 'You can not leave this field empty.';
   static const largeInputError =
       'This field can not have more than than ${maxInputSize} characters.';
@@ -289,73 +290,20 @@ class _CreateActivityPageState extends State<CreateActivityPage> {
                 const SizedBox(
                   height: 20,
                 ),
-                SizedBox(
-                  height: 40,
-                  child: RaisedButton(
-                    shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(30))),
-                    onPressed: () {
-                      if (_formKey.currentState.validate()) {
-                        saveAndExit(context, runMutation);
-                      } else {
-                        _showFormError();
-                      }
-                    },
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Ready to go!'),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Icon(Icons.check)
-                      ],
-                    ),
-                    color: Colors.green,
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                SizedBox(
-                  height: 40,
-                  child: RaisedButton(
-                    shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(30))),
-                    onPressed: () {
-                      showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                                title: const Text(
-                                    'Are you sure you want to cancel?'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Text('No'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Text('Yes'),
-                                  ),
-                                ],
-                              ));
-                    },
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Nah maybe another time...'),
-                        Icon(Icons.close)
-                      ],
-                    ),
-                    color: Colors.red,
-                  ),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                      primary: Colors.green,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20))),
+                  onPressed: () {
+                    if (_formKey.currentState.validate()) {
+                      saveAndExit(context, runMutation);
+                    } else {
+                      _showFormError();
+                    }
+                  },
+                  icon: Icon(FontAwesome5.thumbs_up),
+                  label: Text('Let\'s go!'),
                 ),
                 const SizedBox(
                   height: 20,

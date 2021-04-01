@@ -8,14 +8,16 @@ class UserProfile {
   final String id;
   @JsonKey(name: 'fullName')
   final String name;
+  final String firstName;
+  final String lastName;
   final String handle;
   final String photoUrl;
   @JsonKey(ignore: true)
   ImageProvider photo;
-  final String description;
+  final String bio;
 
-  UserProfile(
-      this.id, this.name, this.handle, this.description, this.photoUrl) {
+  UserProfile(this.id, this.name, this.handle, this.bio, this.photoUrl,
+      this.firstName, this.lastName) {
     photo = NetworkImage(photoUrl ?? 'https://picsum.photos/250?image=11');
   }
 
@@ -27,8 +29,10 @@ class UserProfile {
   UserProfile.mock()
       : id = '1',
         name = 'Nabi',
+        firstName = 'Nabi',
+        lastName = 'Oz',
         handle = 'nozberkman',
-        description =
+        bio =
             'Hello my name is Nabi. I\'m from Cyprus and this is the new app I created for bringing people together.',
         photoUrl = 'https://picsum.photos/250?image=11';
 

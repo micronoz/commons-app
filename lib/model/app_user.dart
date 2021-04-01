@@ -40,12 +40,12 @@ class AppUser {
   @override
   bool operator ==(Object other) {
     if (other is AppUser) {
-      return (profile.id == other.profile.id);
+      return (profile == other.profile);
     } else {
       return false;
     }
   }
 
   @override
-  int get hashCode => profile.id.hashCode;
+  int get hashCode => profile.hashCode;
 }

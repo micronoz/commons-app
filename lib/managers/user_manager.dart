@@ -14,6 +14,9 @@ String getProfileQuery = '''
       id
       handle
       fullName
+      firstName
+      lastName
+      bio
     }
   }
 ''';
@@ -64,7 +67,7 @@ class UserManager {
       print('Fetching user profile');
       appUserResolver.value = _graphQLClientNotifier.value.query(QueryOptions(
         document: gql(getProfileQuery),
-        fetchPolicy: FetchPolicy.networkOnly,
+        fetchPolicy: FetchPolicy.cacheAndNetwork,
       ));
       print('Sent query');
       var result = await appUserResolver.value.timeout(Duration(seconds: 10),
@@ -89,7 +92,7 @@ class UserManager {
         appUser.value = null;
         return;
       }
-      print('Fetched user result successfully:');
+      print('Fetched user result successfully');
       final profileJSON = result.data['user'];
       appUser.value = AppUser.fromJson(profileJSON);
       absorbing.value = false;

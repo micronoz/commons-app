@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:tribal_instinct/managers/location_manager.dart';
 import 'package:tribal_instinct/model/activity_types.dart';
+import 'package:tribal_instinct/pages/activities/create_activity.dart';
 import 'package:tribal_instinct/pages/discover/discover_category.dart';
 import 'package:provider/provider.dart';
 
@@ -82,6 +83,14 @@ class _DiscoverPageState extends State<DiscoverPage> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
+          floatingActionButton: FloatingActionButton(
+            heroTag: 'discover',
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => CreateActivityPage()));
+            },
+            child: Icon(Icons.add),
+          ),
           appBar: AppBar(
             title: Text('Discover Activities'),
             actions: [

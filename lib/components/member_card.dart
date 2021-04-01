@@ -59,7 +59,7 @@ class _MemberCardState extends State<MemberCard> {
                 ),
                 Flexible(
                   child: Text(
-                    widget.member.description,
+                    widget.member.bio,
                     style: Theme.of(context).textTheme.bodyText2,
                     maxLines: 2,
                     softWrap: true,

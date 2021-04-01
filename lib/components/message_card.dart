@@ -57,7 +57,7 @@ class MessageCard extends StatelessWidget {
                   ),
                   Flexible(
                     child: Text(
-                      profile.description,
+                      profile.bio,
                       style: Theme.of(context).textTheme.bodyText2,
                       maxLines: 2,
                       softWrap: true,

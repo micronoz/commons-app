@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttericon/font_awesome5_icons.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:intl/intl.dart';
@@ -367,32 +368,20 @@ class _EditActivityPageState extends State<EditActivityPage> {
                     const SizedBox(
                       height: 20,
                     ),
-                    SizedBox(
-                      height: 40,
-                      child: RaisedButton(
-                        shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(30))),
-                        onPressed: () {
-                          if (_formKey.currentState.validate()) {
-                            saveAndExit(context, runMutation);
-                          } else {
-                            _showFormError();
-                          }
-                        },
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text('Save'),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            Icon(Icons.check)
-                          ],
-                        ),
-                        color: Colors.green,
-                      ),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                          primary: Colors.green,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20))),
+                      onPressed: () {
+                        if (_formKey.currentState.validate()) {
+                          saveAndExit(context, runMutation);
+                        } else {
+                          _showFormError();
+                        }
+                      },
+                      icon: Icon(FontAwesome5.check),
+                      label: Text('Save'),
                     ),
                     const SizedBox(
                       height: 10,

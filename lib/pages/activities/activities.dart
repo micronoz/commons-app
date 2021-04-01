@@ -88,7 +88,16 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
           });
 
       return Scaffold(
+          floatingActionButton: FloatingActionButton(
+            heroTag: 'activities',
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => CreateActivityPage()));
+            },
+            child: Icon(Icons.add),
+          ),
           appBar: AppBar(
+            centerTitle: false,
             actions: [
               IconButton(
                   onPressed: () => Navigator.of(context).push(MaterialPageRoute(
